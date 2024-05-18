@@ -1,1 +1,0 @@
-# tinkoff-qt-app
