@@ -2,3 +2,7 @@ build
 .vscode
 CMakeLists.txt.user*
 apps/CMakeLists.txt.user*
+.DS_Store
+build-apps-Desktop_arm_darwin_generic_mach_o_64bit-Debug/
+include/.DS_Store
+apps/mainwindow.ui.autosave

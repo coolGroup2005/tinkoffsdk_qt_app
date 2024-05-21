@@ -20,6 +20,12 @@ set(PROJECT_SOURCES
     dialog.h
     akcii.cpp
     akcii.h
+    # shareinfowindow.cpp
+    # shareinfowindow.h
+    # window1.cpp
+    # window1.h
+    # window2.cpp
+    # window2.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -29,7 +35,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
         dialog.h dialog.cpp dialog.ui
         akcii.h akcii.cpp akcii.ui
-
+        mainwindow.h mainwindow.cpp mainwindow.ui
+        # window1.h window1.cpp window1.ui
+        # window2.h window2.cpp window2.ui
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET tinkoff-app APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
