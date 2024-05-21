@@ -2,6 +2,8 @@
 #define AKCII_H
 
 #include <QDialog>
+#include <QDateTime>
+#include <QTimer>
 
 namespace Ui {
 class akcii;
@@ -15,8 +17,13 @@ public:
     explicit akcii(QWidget *parent = nullptr);
     ~akcii();
 
+private slots:
+    void updateDateTime();
+
 private:
     Ui::akcii *ui;
+    QTimer *timer;
 };
 
 #endif // AKCII_H
+
