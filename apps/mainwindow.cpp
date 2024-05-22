@@ -4,6 +4,7 @@
 
 #include <QStringList>
 #include <QStringListModel>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -30,6 +31,33 @@ MainWindow::MainWindow(QWidget *parent)
     model->setStringList(list);
     ui->listView->setModel(model);
 
+    // Connect listView click signal to slot
+    connect(ui->listView, &QListView::clicked, this, &MainWindow::on_listView_clicked);
+
+    // Initialize models for the statistics lists
+    QStringListModel *topGainersModel = new QStringListModel(this);
+    QStringListModel *topLosersModel = new QStringListModel(this);
+    QStringListModel *topActiveModel = new QStringListModel(this);
+
+    // Example data for the statistics lists
+    QStringList topGainers = {"Gainer 1", "Gainer 2", "Gainer 3"};
+    QStringList topLosers = {"Loser 1", "Loser 2", "Loser 3"};
+    QStringList topActive = {"Active 1", "Active 2", "Active 3"};
+
+    topGainersModel->setStringList(topGainers);
+    topLosersModel->setStringList(topLosers);
+    topActiveModel->setStringList(topActive);
+
+    // Set models for the statistics list views
+    ui->top_gainers_list->setModel(topGainersModel);
+    ui->top_losers_list->setModel(topLosersModel);
+    ui->top_active_list->setModel(topActiveModel);
+
+    // Connect list view clicked signals to slots
+    connect(ui->top_gainers_list, &QListView::clicked, this, &MainWindow::on_topGainersList_clicked);
+    connect(ui->top_losers_list, &QListView::clicked, this, &MainWindow::on_topLosersList_clicked);
+    connect(ui->top_active_list, &QListView::clicked, this, &MainWindow::on_topActiveList_clicked);
+
 
 }
 
@@ -48,4 +76,23 @@ void MainWindow::on_listView_clicked(const QModelIndex &index)
 {
     QString selectedItem = index.data().toString();
     ui->lineEdit->setText(";;;  " + selectedItem);
+}
+
+
+void MainWindow::on_topGainersList_clicked(const QModelIndex &index)
+{
+    QString selectedItem = index.data().toString();
+    QMessageBox::information(this, "Top Gainer Selected", "You selected: " + selectedItem);
+}
+
+void MainWindow::on_topLosersList_clicked(const QModelIndex &index)
+{
+    QString selectedItem = index.data().toString();
+    QMessageBox::information(this, "Top Loser Selected", "You selected: " + selectedItem);
+}
+
+void MainWindow::on_topActiveList_clicked(const QModelIndex &index)
+{
+    QString selectedItem = index.data().toString();
+    QMessageBox::information(this, "Top Active Selected", "You selected: " + selectedItem);
 }

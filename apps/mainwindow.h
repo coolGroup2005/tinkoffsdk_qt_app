@@ -23,8 +23,11 @@ public:
 private slots:
     void openDialog();
     // void openAkcii();
-    void on_listView_clicked(const QModelIndex &index);
 
+    void on_listView_clicked(const QModelIndex &index);
+    void on_topGainersList_clicked(const QModelIndex &index);
+    void on_topLosersList_clicked(const QModelIndex &index);
+    void on_topActiveList_clicked(const QModelIndex &index);
 private:
     Ui::MainWindow *ui;
     QStringListModel *model;
