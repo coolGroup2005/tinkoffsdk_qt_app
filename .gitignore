@@ -6,3 +6,4 @@ apps/CMakeLists.txt.user*
 build-apps-Desktop_arm_darwin_generic_mach_o_64bit-Debug/
 include/.DS_Store
 apps/mainwindow.ui.autosave
+docs/CMakeLists.txt.autosave

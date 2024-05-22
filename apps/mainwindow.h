@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 
+#include <QString>
+#include <QStringListModel>
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -19,9 +22,13 @@ public:
 
 private slots:
     void openDialog();
+    // void openAkcii();
+    void on_listView_clicked(const QModelIndex &index);
 
 private:
     Ui::MainWindow *ui;
+    QStringListModel *model;
+    QList<QString> songs;
 };
 
 #endif // MAINWINDOW_H
