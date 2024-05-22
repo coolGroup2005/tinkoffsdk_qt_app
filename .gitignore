@@ -4,6 +4,7 @@ CMakeLists.txt.user*
 apps/CMakeLists.txt.user*
 .DS_Store
 build-apps-Desktop_arm_darwin_generic_mach_o_64bit-Debug/
+build-apps-Desktop_x86_darwin_generic_mach_o_32bit-Debug/
 include/.DS_Store
 apps/mainwindow.ui.autosave
 docs/CMakeLists.txt.autosave

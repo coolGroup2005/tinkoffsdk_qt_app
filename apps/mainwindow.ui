@@ -30,7 +30,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;k&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="tab">
         <property name="enabled">
@@ -185,19 +185,79 @@
         <widget class="QWidget" name="verticalLayoutWidget_2">
          <property name="geometry">
           <rect>
-           <x>69</x>
-           <y>19</y>
-           <width>601</width>
-           <height>431</height>
+           <x>20</x>
+           <y>40</y>
+           <width>701</width>
+           <height>441</height>
           </rect>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
+         <layout class="QVBoxLayout" name="statistics_page">
           <item>
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="statistics_header">
+            <property name="font">
+             <font>
+              <pointsize>20</pointsize>
+             </font>
+            </property>
+            <property name="lineWidth">
+             <number>5</number>
+            </property>
             <property name="text">
-             <string>Statistics window</string>
+             <string>Statistics</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="margin">
+             <number>22</number>
             </property>
            </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="statistics_content">
+            <item>
+             <layout class="QVBoxLayout" name="top_gainers_layout">
+              <item>
+               <widget class="QLabel" name="top_gainers_h">
+                <property name="text">
+                 <string>Top Gainers</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QListView" name="top_gainers_list"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="top_losers_layout">
+              <item>
+               <widget class="QLabel" name="top_losers_h">
+                <property name="text">
+                 <string>Top Losers</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QListView" name="top_losers_list"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="top_active_layout">
+              <item>
+               <widget class="QLabel" name="top_active_h">
+                <property name="text">
+                 <string>Top active</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QListView" name="top_active_list"/>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
