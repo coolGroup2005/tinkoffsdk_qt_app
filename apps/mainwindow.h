@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
+#include <QDialog>
 #include <QString>
 #include <QStringListModel>
 
@@ -22,7 +22,7 @@ public:
 
 private slots:
     void openDialog();
-    // void openAkcii();
+    void openAkcii();
 
     void on_listView_clicked(const QModelIndex &index);
     void on_topGainersList_clicked(const QModelIndex &index);

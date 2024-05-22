@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "dialog.h"
+#include "akcii.h"
 #include "ui_mainwindow.h"
 
 #include <QStringList>
@@ -16,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tabWidget->setTabText(2, "Statistics");
     ui->tabWidget->setTabText(3, "Home");
 
-    // connect(ui->buttonWindow1, &QPushButton::clicked, this, &MainWindow::openDialog);
+    // Iteraction with tab Home
     QStringList list;
     model = new QStringListModel;
 
@@ -34,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Connect listView click signal to slot
     connect(ui->listView, &QListView::clicked, this, &MainWindow::on_listView_clicked);
 
+    // Interaction with tab Statistics
     // Initialize models for the statistics lists
     QStringListModel *topGainersModel = new QStringListModel(this);
     QStringListModel *topLosersModel = new QStringListModel(this);
@@ -76,6 +78,13 @@ void MainWindow::on_listView_clicked(const QModelIndex &index)
 {
     QString selectedItem = index.data().toString();
     ui->lineEdit->setText(";;;  " + selectedItem);
+    MainWindow::openAkcii();
+}
+
+void MainWindow::openAkcii()
+{
+    akcii *window1 = new akcii(this);
+    window1->show();
 }
 
 
