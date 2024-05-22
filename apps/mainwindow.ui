@@ -24,18 +24,15 @@
      </rect>
     </property>
     <property name="styleSheet">
-        <string notr="true">
+     <string notr="true">
             QWidget {
                 background-color: #ebeae7;
                 color: #525252;
             }
 
-            <!-- QListView {
-                background-color: #d3d2d0;
-                border-radius: 10px;
-                color: #525252;
-                padding: 20px;
-            } -->
+            QTabWidget::pane {
+                border: 1px solid #ebeae7;
+            }
 
             QLabel {
                 color: #525252;
@@ -73,7 +70,7 @@
        <property name="currentIndex">
         <number>3</number>
        </property>
-       <widget class="QWidget" name="tab">
+       <widget class="QWidget" name="figi">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -201,7 +198,7 @@
          </layout>
         </widget>
        </widget>
-       <widget class="QWidget" name="tab_5">
+       <widget class="QWidget" name="portfolio">
         <attribute name="title">
          <string>Page</string>
         </attribute>
@@ -219,7 +216,7 @@
          </property>
         </widget>
        </widget>
-       <widget class="QWidget" name="tab_2">
+       <widget class="QWidget" name="statistics">
         <attribute name="title">
          <string>Tab 2</string>
         </attribute>
@@ -303,7 +300,7 @@
          </layout>
         </widget>
        </widget>
-       <widget class="QWidget" name="tab_6">
+       <widget class="QWidget" name="home">
         <attribute name="title">
          <string>Page</string>
         </attribute>
@@ -478,16 +475,6 @@
      </item>
     </layout>
    </widget>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>22</height>
-    </rect>
-   </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionTab_1">
