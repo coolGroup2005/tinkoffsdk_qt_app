@@ -56,8 +56,18 @@ else()
     endif()
 endif()
 
-# сюда дописывать названия библиотек из src или писать код весь в apps
-target_link_libraries(tinkoff-app PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::PrintSupport invest_lib tink_grpc_proto TinkoffInvestSDK sqlite3) # tink_grpc_proto TinkoffInvestSDK
+# сюда дописывать названия библиотек из src
+target_link_libraries(
+    tinkoff-app 
+    PRIVATE 
+    Qt${QT_VERSION_MAJOR}::Widgets 
+    Qt${QT_VERSION_MAJOR}::PrintSupport 
+    invest_lib 
+    homepage_lib
+    tink_grpc_proto 
+    TinkoffInvestSDK 
+    sqlite3
+    ) # tink_grpc_proto TinkoffInvestSDK
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
