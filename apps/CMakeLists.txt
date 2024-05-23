@@ -17,8 +17,6 @@ set(PROJECT_SOURCES
     main.cpp
     mainwindow.cpp
     mainwindow.h
-    dialog.cpp
-    dialog.h
     akcii.cpp
     akcii.h
     # shareinfowindow.cpp
@@ -34,7 +32,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
 
-        dialog.h dialog.cpp dialog.ui
+
         akcii.h akcii.cpp akcii.ui
         mainwindow.h mainwindow.cpp mainwindow.ui
         # window1.h window1.cpp window1.ui

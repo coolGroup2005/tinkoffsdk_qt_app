@@ -21,7 +21,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void openDialog();
     void openAkcii();
 
     void on_listView_clicked(const QModelIndex &index);

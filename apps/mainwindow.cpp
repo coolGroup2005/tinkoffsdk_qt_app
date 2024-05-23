@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "dialog.h"
 #include "akcii.h"
 #include "ui_mainwindow.h"
 
@@ -63,16 +62,12 @@ MainWindow::MainWindow(QWidget *parent)
 
 }
 
+
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
-void MainWindow::openDialog()
-{
-    Dialog *window1 = new Dialog(this);
-    window1->show();
-}
 
 void MainWindow::on_listView_clicked(const QModelIndex &index)
 {
@@ -80,6 +75,7 @@ void MainWindow::on_listView_clicked(const QModelIndex &index)
     ui->lineEdit->setText(";;;  " + selectedItem);
     MainWindow::openAkcii();
 }
+
 
 void MainWindow::openAkcii()
 {
@@ -94,11 +90,13 @@ void MainWindow::on_topGainersList_clicked(const QModelIndex &index)
     QMessageBox::information(this, "Top Gainer Selected", "You selected: " + selectedItem);
 }
 
+
 void MainWindow::on_topLosersList_clicked(const QModelIndex &index)
 {
     QString selectedItem = index.data().toString();
     QMessageBox::information(this, "Top Loser Selected", "You selected: " + selectedItem);
 }
+
 
 void MainWindow::on_topActiveList_clicked(const QModelIndex &index)
 {
