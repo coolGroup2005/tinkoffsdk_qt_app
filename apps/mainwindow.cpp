@@ -54,6 +54,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->top_losers_list->setModel(topLosersModel);
     ui->top_active_list->setModel(topActiveModel);
 
+    ui->top_gainers_list->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    ui->top_losers_list->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    ui->top_active_list->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+
     // Connect list view clicked signals to slots
     connect(ui->top_gainers_list, &QListView::clicked, this, &MainWindow::on_topGainersList_clicked);
     connect(ui->top_losers_list, &QListView::clicked, this, &MainWindow::on_topLosersList_clicked);
