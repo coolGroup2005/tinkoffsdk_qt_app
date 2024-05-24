@@ -153,7 +153,7 @@ akcii::akcii(QWidget *parent)
 
     createCandlesTable(db);
 
-    InvestApiClient client("invest-public-api.tinkoff.ru:443", "TOKEN");
+    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
     auto sandbox = std::dynamic_pointer_cast<Sandbox>(client.service("sandbox"));
     sandbox->OpenSandboxAccount();
     auto accounts = sandbox->GetSandboxAccounts();
