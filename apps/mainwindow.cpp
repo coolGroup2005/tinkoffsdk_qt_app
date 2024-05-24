@@ -1,10 +1,14 @@
 #include "mainwindow.h"
 #include "akcii.h"
 #include "ui_mainwindow.h"
+#include "homepage/homepage.h"
+
 
 #include <QStringList>
 #include <QStringListModel>
 #include <QMessageBox>
+
+#include <vector>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -20,14 +24,15 @@ MainWindow::MainWindow(QWidget *parent)
     QStringList list;
     model = new QStringListModel;
 
-    list << "ITEM 1";
-    list << "ITEM 2";
-    list << "ITEM 3";
-    list << "ITEM 4";
-    list << "ITEM 5";
-    list << "ITEM 6";
-    list << "ITEM 7";
-    list << "ITEM 8";
+    std::vector<ShareInfo> sharesList;
+    sharesList = parseFigi();
+    
+    for (ShareInfo availableShare: sharesList)
+    {
+        QString listItem = QString::fromStdString(availableShare.name + "\t" + availableShare.figi + "\t" + formatTradingStatus(availableShare.trading_status));
+        list << listItem;
+    }
+
     model->setStringList(list);
     ui->listView->setModel(model);
 
@@ -63,8 +68,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->top_gainers_list, &QListView::clicked, this, &MainWindow::on_topGainersList_clicked);
     connect(ui->top_losers_list, &QListView::clicked, this, &MainWindow::on_topLosersList_clicked);
     connect(ui->top_active_list, &QListView::clicked, this, &MainWindow::on_topActiveList_clicked);
-
-
 }
 
 

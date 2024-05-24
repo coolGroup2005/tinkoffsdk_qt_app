@@ -31,7 +31,7 @@ file(GLOB
 
 # define homepage_lib
 add_library(homepage_lib #name of your library
-        homepage/homepage.cpp  homepage/homepage2.cpp #if >1, try adding them to a list first?
+        homepage/homepage.cpp #if >1, try adding them to a list first?
         ${HEADER_LIST2} #name of variable from respective file()
         )
 
@@ -41,5 +41,10 @@ target_include_directories(homepage_lib
         ../include
         )
 
+target_link_libraries(homepage_lib 
+        PRIVATE # The PRIVATE keyword means that the library will be used by this project, but it will not be available to other projects via this project’s interface
+        tink_grpc_proto 
+        TinkoffInvestSDK
+        )
 
 # target_link_libraries(ort ortools::ortools)
