@@ -5,9 +5,11 @@ set(CMAKE_CXX_STANDARD 17)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Specific parameters for Linux CMAKE
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(SYSTEMD REQUIRED libsystemd>=233)
+if (LINUX)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(SYSTEMD REQUIRED libsystemd>=233)
+endif()
 
 include(cmake/common.cmake)
 
@@ -17,12 +19,12 @@ include(cmake/common.cmake)
 add_subdirectory(src)
 add_subdirectory(apps)
 
-# find_package(Doxygen)
-# if(Doxygen_FOUND)
-#     add_subdirectory(docs)
-# else()
-#     message(STATUS "Doxygen not found")
-# endif()
+find_package(Doxygen)
+if(Doxygen_FOUND)
+    add_subdirectory(docs)
+else()
+    message(STATUS "Doxygen not found")
+endif()
 
 
 
