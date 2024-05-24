@@ -8,3 +8,4 @@ build-apps-Desktop_x86_darwin_generic_mach_o_32bit-Debug/
 include/.DS_Store
 apps/mainwindow.ui.autosave
 docs/CMakeLists.txt.autosave
+candles.db

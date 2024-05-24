@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     
     for (ShareInfo availableShare: sharesList)
     {
-        QString listItem = QString::fromStdString(availableShare.name + "\t" + availableShare.figi + "\t" + std::to_string(availableShare.trading_status));
+        QString listItem = QString::fromStdString(availableShare.name + "\t" + availableShare.figi + "\t" + formatTradingStatus(availableShare.trading_status));
         list << listItem;
     }
 

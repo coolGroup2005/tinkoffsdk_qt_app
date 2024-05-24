@@ -50,3 +50,47 @@ std::vector<ShareInfo> parseFigi()
 
     return sharesList;
 }
+
+
+std::string formatTradingStatus(unsigned int statusId)
+{
+    switch (statusId)
+    {
+        case 0:
+            return "STATUS UNSPECIFIED";
+        case 1:
+            return "NOT AVAILABLE FOR TRADING";
+        case 2:
+            return "OPENING PERIOD";
+        case 3:
+            return "CLOSING PERIOD";
+        case 4:
+            return "BREAK IN TRADING";
+        case 5:
+            return "NORMAL TRADING";
+        case 6:
+            return "CLOSING AUCTION";
+        case 7:
+            return "DARK POOL AUCTION";
+        case 8:
+            return "DISCRETE AUCTION";
+        case 9:
+            return "OPENING AUCTION PERIOD";   
+        case 10:
+            return "TRADING AT CLOSING AUCTION PRICE";
+        case 11:
+            return "SESSION ASSIGNED";
+        case 12:
+            return "SESSION CLOSE";
+        case 13:
+            return "SESSION OPEN";
+        case 14:
+            return "DEALER NORMAL TRADING";
+        case 15:
+            return "DEALER BREAK IN TRADING";    
+        case 16:
+            return "DEALER NOT AVAILABLE FOR TRADING";
+        default:
+            return "ERROR";
+    }
+}

@@ -9,7 +9,6 @@
 
 #include "instrumentsservice.h"
 #include "operationsservice.h"
-#include <string>
 
 
 struct ShareInfo
@@ -23,5 +22,6 @@ struct ShareInfo
 
 ShareInfo getShareInfo(InvestApiClient&, std::string&);
 std::vector<ShareInfo> parseFigi();
+std::string formatTradingStatus(unsigned int);
 
 #endif // __EXAMPLE_H__
