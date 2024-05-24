@@ -52,14 +52,14 @@
   <widget class="QLabel" name="dateLabel">
    <property name="geometry">
     <rect>
-     <x>660</x>
+     <x>657</x>
      <y>10</y>
      <width>141</width>
      <height>20</height>
     </rect>
    </property>
    <property name="layoutDirection">
-    <enum>Qt::LeftToRight</enum>
+    <enum>Qt::LayoutDirection::LeftToRight</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">background-color: rgb(244, 244, 248);
@@ -69,20 +69,20 @@ color: rgb(10, 10, 10);</string>
     <string>Monday, June 8</string>
    </property>
    <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
    </property>
   </widget>
   <widget class="QLabel" name="timeLabel">
    <property name="geometry">
     <rect>
-     <x>660</x>
+     <x>657</x>
      <y>30</y>
      <width>141</width>
      <height>20</height>
     </rect>
    </property>
    <property name="layoutDirection">
-    <enum>Qt::LeftToRight</enum>
+    <enum>Qt::LayoutDirection::LeftToRight</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">background-color: rgb(244, 244, 248);
@@ -92,7 +92,7 @@ color: rgb(199, 199, 202);</string>
     <string>9:41:00</string>
    </property>
    <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
    </property>
   </widget>
   <widget class="QLabel" name="stocknameLabel">
@@ -219,8 +219,24 @@ color: rgb(199, 199, 202);</string>
     <string>+</string>
    </property>
   </widget>
+  <widget class="QChartView" name="graphicsView">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>101</y>
+     <width>778</width>
+     <height>411</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QChartView</class>
+   <extends>QGraphicsView</extends>
+   <header>QCharts</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
-

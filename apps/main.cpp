@@ -3,7 +3,6 @@
 // #include "invest/example.h"
 #include "homepage/homepage.h"
 
-
 int main(int argc, char *argv[])
 {
     MyInvest mi;

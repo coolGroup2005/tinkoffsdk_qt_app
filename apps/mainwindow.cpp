@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->listView->setModel(model);
 
     // Connect listView click signal to slot
-    connect(ui->listView, &QListView::clicked, this, &MainWindow::on_listView_clicked);
+    connect(ui->listView, &QListView::activated, this, &MainWindow::on_listView_clicked);
 
     // Interaction with tab Statistics
     // Initialize models for the statistics lists
