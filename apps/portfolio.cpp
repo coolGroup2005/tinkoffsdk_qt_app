@@ -33,7 +33,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     setLayout(layout);
 
     token = getenv("TOKEN");
-    client = new InvestApiClient("invest-public-api.tinkoff.ru:443", token.toStdString());
+    client = new InvestApiClient("sandbox-invest-public-api.tinkoff.ru:443", token.toStdString()); //sandbox-
 
     updateBalance();
 }
