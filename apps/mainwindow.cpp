@@ -7,6 +7,7 @@
 #include <QStringList>
 #include <QStringListModel>
 #include <QMessageBox>
+#include <QStandardItemModel>
 
 #include <vector>
 
@@ -21,23 +22,50 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tabWidget->setTabText(3, "Home");
 
     // Iteraction with tab Home
-    QStringList list;
-    model = new QStringListModel;
-
     std::vector<ShareInfo> sharesList;
     sharesList = parseFigi();
-    
-    for (ShareInfo availableShare: sharesList)
+
+    const int numRows = sharesList.size();
+    const int numColumns = 3;
+
+    QStandardItemModel* model = new QStandardItemModel(numRows, numColumns);
+    model->setHeaderData(0, Qt::Horizontal, "Name", Qt::DisplayRole);
+    model->setHeaderData(1, Qt::Horizontal, "Figi", Qt::DisplayRole);
+    model->setHeaderData(2, Qt::Horizontal, "Trading Status", Qt::DisplayRole);
+    for (int i = 0; i < numRows; ++i)
     {
-        QString listItem = QString::fromStdString(availableShare.name + "\t" + availableShare.figi + "\t" + formatTradingStatus(availableShare.trading_status));
-        list << listItem;
+        QList<QStandardItem*> itemsList;
+        itemsList.append(new QStandardItem(QString::fromStdString(sharesList[i].name)));
+        itemsList.append(new QStandardItem(QString::fromStdString(sharesList[i].figi)));
+        itemsList.append(new QStandardItem(QString::fromStdString(formatTradingStatus(sharesList[i].trading_status))));
+        for (short j = 0; j < 3; ++j)
+        {
+            itemsList[j]->setEditable(false);
+            model->setItem(i, j, itemsList[j]);
+        }
     }
 
-    model->setStringList(list);
-    ui->listView->setModel(model);
+    // const int numRows = 10;
+    // const int numColumns = 10;
 
-    // Connect listView click signal to slot
-    connect(ui->listView, &QListView::activated, this, &MainWindow::on_listView_clicked);
+    // QStandardItemModel* model = new QStandardItemModel(numRows, numColumns);
+    // for (int row = 0; row < numRows; ++row)
+    // {
+    //     for (int column = 0; column < numColumns; ++column)
+    //     {
+    //         QString text = QString::fromStdString('A' + std::to_string(row)) + QString::number(column + 1);
+    //         QStandardItem* item = new QStandardItem(text);
+    //         model->setItem(row, column, item);
+    //     }
+    //  }
+
+    ui->sharesTableView->setModel(model);
+    ui->sharesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->sharesTableView->verticalHeader()->setVisible(false);
+    ui->sharesTableView->setStyleSheet("QHeaderView::section {background-color: lightgrey}");
+
+    // // Connect sharesTableView click signal to slot
+    connect(ui->sharesTableView, &QListView::activated, this, &MainWindow::on_sharesTableView_activated);
 
     // Interaction with tab Statistics
     // Initialize models for the statistics lists
@@ -77,13 +105,12 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::on_listView_clicked(const QModelIndex &index)
+void MainWindow::on_sharesTableView_activated(const QModelIndex &index)
 {
-    QString selectedItem = index.data().toString();
-    ui->lineEdit->setText(";;;  " + selectedItem);
+    QString selectedName = ui->sharesTableView->model()->index(index.row(),0).data().toString();
+    ui->lineEdit->setText(selectedName);
     MainWindow::openAkcii();
 }
-
 
 void MainWindow::openAkcii()
 {
@@ -111,3 +138,5 @@ void MainWindow::on_topActiveList_clicked(const QModelIndex &index)
     QString selectedItem = index.data().toString();
     QMessageBox::information(this, "Top Active Selected", "You selected: " + selectedItem);
 }
+
+

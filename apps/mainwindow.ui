@@ -56,7 +56,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="figi">
        <attribute name="title">
@@ -326,21 +326,12 @@
            </layout>
           </item>
           <item>
-           <widget class="QListView" name="listView">
+           <widget class="QTableView" name="sharesTableView">
             <property name="minimumSize">
              <size>
               <width>500</width>
               <height>0</height>
              </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QListView#listView {
-	border-radius: 10px;
-	background-color: rgb(218, 218, 218);
-}</string>
-            </property>
-            <property name="movement">
-             <enum>QListView::Static</enum>
             </property>
            </widget>
           </item>
