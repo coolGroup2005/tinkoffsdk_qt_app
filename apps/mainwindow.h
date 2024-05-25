@@ -6,6 +6,8 @@
 #include <QString>
 #include <QStringListModel>
 
+#include "portfolio.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -31,6 +33,7 @@ private:
     Ui::MainWindow *ui;
     QStringListModel *model;
     QList<QString> songs;
+    Portfolio *portfolio;
 };
 
 #endif // MAINWINDOW_H
