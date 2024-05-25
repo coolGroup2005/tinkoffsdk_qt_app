@@ -3,10 +3,12 @@
 
 #include <QWidget>
 #include <QLabel>
+#include <QComboBox>
 #include "investapiclient.h"
 #include "usersservice.h"
 #include "operationsservice.h"
 #include "sandboxservice.h"
+#include <ordersservice.h> // for adding shares into positions
 
 class Portfolio : public QWidget
 {
@@ -14,12 +16,17 @@ class Portfolio : public QWidget
 
 public:
     explicit Portfolio(QWidget *parent = nullptr);
-    void updateBalance();
+    void updateBalance(const QString& accountId);
+
+private slots:
+    void onAccountChanged(int index);
 
 private:
     QLabel *balanceLabel;
     InvestApiClient *client;
     QString token;
+    QComboBox *accountComboBox;
+    std::vector<QString> accountIds;
 };
 
 #endif // PORTFOLIOBALANCE_H

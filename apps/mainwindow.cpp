@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui->tabWidget->setTabText(0, "Database Fiji");
-    ui->tabWidget->setTabText(1, "Portfolio");
+    // ui->tabWidget->setTabText(1, "Portfolio");
     ui->tabWidget->setTabText(2, "Statistics");
     ui->tabWidget->setTabText(3, "Home");
 
