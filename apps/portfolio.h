@@ -6,6 +6,7 @@
 #include "investapiclient.h"
 #include "usersservice.h"
 #include "operationsservice.h"
+#include "sandboxservice.h"
 
 class Portfolio : public QWidget
 {
