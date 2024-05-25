@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "akcii.h"
 #include "ui_mainwindow.h"
+#include "portfolio.h"
 
 #include <QStringList>
 #include <QStringListModel>
@@ -15,6 +16,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tabWidget->setTabText(1, "Portfolio");
     ui->tabWidget->setTabText(2, "Statistics");
     ui->tabWidget->setTabText(3, "Home");
+
+    portfolio = new Portfolio(this);
+    ui->tabWidget->addTab(portfolio, "Portfolio");
 
     // Iteraction with tab Home
     QStringList list;
