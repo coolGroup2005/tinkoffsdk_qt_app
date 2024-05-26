@@ -64,9 +64,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->sharesTableView->verticalHeader()->setVisible(false);
     ui->sharesTableView->setStyleSheet("QHeaderView::section {background-color: lightgrey}");
 
-    // // Connect sharesTableView click signal to slot
-    connect(ui->sharesTableView, &QListView::activated, this, &MainWindow::on_sharesTableView_activated);
-
     // Interaction with tab Statistics
     // Initialize models for the statistics lists
     QStringListModel *topGainersModel = new QStringListModel(this);

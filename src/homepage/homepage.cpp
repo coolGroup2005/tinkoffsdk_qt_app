@@ -39,12 +39,12 @@ std::vector<ShareInfo> parseFigi()
     auto operationService = std::dynamic_pointer_cast<Operations>(client.service("operations"));
     auto getPortfolio = operationService->GetPortfolio(accountReply->accounts(accountReply->accounts_size() - 1).id(), PortfolioRequest_CurrencyRequest::PortfolioRequest_CurrencyRequest_RUB);
     auto portfolioReply = dynamic_cast<PortfolioResponse*>(getPortfolio.ptr().get());
-    auto PositionsList = portfolioReply->positions();
+    auto PositionsList = portfolioReply->positions(); // virtual_positions()
 
     std::vector<ShareInfo> sharesList;
     for (size_t i = 0; i < PositionsList.size(); i++)
     {
-        std::string figi = portfolioReply->positions(i).figi();
+        std::string figi = portfolioReply->positions(i).figi(); // virtual_positions()
         sharesList.push_back(getShareInfo(client, figi));
     }
 
