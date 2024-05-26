@@ -107,7 +107,7 @@ void Portfolio::updateBalance(const QString& accountId)
 
     balanceLabel->setText(QString::number(portfolioValue) + " " + QString::fromStdString(portfolioAns->total_amount_portfolio().currency()));
 
-    portfolioModel->setRowCount(portfolioAns->positions_size());
+    portfolioModel->setRowCount(portfolioAns->positions_size() - 1); // не понял почему, но вроде воркает
 
     // std::cout << "Я тут!_1" << '\n';
 
@@ -134,7 +134,7 @@ void Portfolio::updateBalance(const QString& accountId)
             return;
         }
 
-        std::cout << "Я тут!" << '\n';
+        // std::cout << "Я тут!" << '\n';
 
 
         auto instrumentInfo = instrumentResponse->instrument();
