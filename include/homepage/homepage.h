@@ -10,6 +10,8 @@
 #include "instrumentsservice.h"
 #include "operationsservice.h"
 
+#include <string>
+#include <vector>
 
 struct ShareInfo
 {
@@ -23,5 +25,16 @@ struct ShareInfo
 ShareInfo getShareInfo(InvestApiClient&, std::string&);
 std::vector<ShareInfo> parseFigi();
 std::string formatTradingStatus(unsigned int);
+
+struct AccountInfo
+{
+    std::string name;
+    std::string id;
+    std::string totalValue;
+    std::string relYield;
+
+    AccountInfo(std::string, std::string, std::string, std::string);
+};
+    std::vector<AccountInfo> getAccountInfo();
 
 #endif // __EXAMPLE_H__

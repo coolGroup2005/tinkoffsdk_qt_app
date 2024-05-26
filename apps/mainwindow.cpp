@@ -3,18 +3,6 @@
 #include "ui_mainwindow.h"
 #include "homepage/homepage.h"
 
-
-#include <QStringList>
-#include <QStringListModel>
-#include <QMessageBox>
-#include <QStandardItemModel>
-
-#include <QSqlQuery>
-#include <QSqlQueryModel>
-#include <QSortFilterProxyModel>
-
-#include <vector>
-
 QStandardItemModel* fillSharesList()
 {
     std::vector<ShareInfo> sharesList;
@@ -70,6 +58,17 @@ QStandardItemModel* testModel()
     return model;
 }
 
+QString accountsInfoText()
+{
+    std::vector<AccountInfo> accountsInfos = getAccountInfo();
+    QString outputText = "";
+    for (AccountInfo acc: accountsInfos)
+    {
+        outputText += acc.name + acc.id + acc.totalValue + acc.relYield;
+    }
+    return outputText;
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -81,22 +80,18 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tabWidget->setTabText(3, "Home");
 
     // Iteraction with tab Home
-    // Enable sorting of table of shares
-    QSqlQueryModel * myModel=new QSqlQueryModel(ui->sharesTableView);
-    QSqlQuery select;
-    myModel->setQuery(select);
-    QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(myModel);
-    proxyModel->setSourceModel(myModel);
-    ui->sharesTableView->setSortingEnabled(true); 
-    ui->sharesTableView->setModel(proxyModel);
-
     // Initialize model for table of shares
     QStandardItemModel* model = fillSharesList();
-
+    // Enable sorting of table of shares
+    QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel;
+    proxyModel->setSourceModel(model);
     ui->sharesTableView->setModel(model);
+    ui->sharesTableView->setSortingEnabled(true); 
     ui->sharesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->sharesTableView->verticalHeader()->setVisible(false);
     ui->sharesTableView->setStyleSheet("QHeaderView::section {background-color: lightgrey}");
+
+    ui->labelAccount->setText(accountsInfoText());
 
     // Interaction with tab Statistics
     // Initialize models for the statistics lists

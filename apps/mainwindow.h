@@ -5,6 +5,12 @@
 #include <QDialog>
 #include <QString>
 #include <QStringListModel>
+#include <QStringList>
+#include <QMessageBox>
+#include <QStandardItemModel>
+#include <QSortFilterProxyModel>
+
+#include <vector>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

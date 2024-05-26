@@ -1,7 +1,28 @@
 #include "homepage/homepage.h"
 
-#include <string>
-#include <vector>
+AccountInfo::AccountInfo(std::string name, std::string id, std::string totalValue, std::string relYield): name(name), id(id), totalValue(totalValue), relYield(relYield){};
+
+std::vector<AccountInfo> getAccountInfo()
+{
+    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
+
+    auto accountService = std::dynamic_pointer_cast<Users>(client.service("users"));
+    auto operationService = std::dynamic_pointer_cast<Operations>(client.service("operations"));
+    auto accountList = accountService->GetAccounts();
+    auto accountReply = dynamic_cast<GetAccountsResponse*>(accountList.ptr().get());
+    std::vector<AccountInfo> accountsInfo;
+    for (int i = 0; i < accountReply->accounts_size(); ++i)
+    {
+        std::string accountName = accountReply->accounts(i).name() + '\n';
+        std::string accountId = accountReply->accounts(i).id() + '\n';
+        auto getPortfolio = operationService->GetPortfolio(accountReply->accounts(i).id(), PortfolioRequest_CurrencyRequest::PortfolioRequest_CurrencyRequest_RUB);
+        auto portfolioReply = dynamic_cast<PortfolioResponse*>(getPortfolio.ptr().get());
+        std::string totalValue = "The total value of the portfolio:\n" + std::to_string(portfolioReply->total_amount_portfolio().units()) + " " + portfolioReply->total_amount_portfolio().currency() + '\n';
+        std::string yield = "Current relative portfolio yield:\n" + std::to_string(portfolioReply->expected_yield().units()) + "%";
+        accountsInfo.push_back({accountName, accountId, totalValue, yield});
+    }
+    return accountsInfo;
+}
 
 ShareInfo::ShareInfo(std::string name, std::string figi, unsigned int trading_status): name(name), figi(figi), trading_status(trading_status){};
 
@@ -37,6 +58,7 @@ std::vector<ShareInfo> parseFigi()
     // std::cout << accountReply->DebugString();
 
     auto operationService = std::dynamic_pointer_cast<Operations>(client.service("operations"));
+// TODO: Take into account the fact that there are several accounts, consider doing a combobox to switch between them
     auto getPortfolio = operationService->GetPortfolio(accountReply->accounts(accountReply->accounts_size() - 1).id(), PortfolioRequest_CurrencyRequest::PortfolioRequest_CurrencyRequest_RUB);
     auto portfolioReply = dynamic_cast<PortfolioResponse*>(getPortfolio.ptr().get());
     auto PositionsList = portfolioReply->positions(); // virtual_positions()

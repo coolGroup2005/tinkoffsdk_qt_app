@@ -355,23 +355,14 @@
           <item>
            <widget class="QLabel" name="label">
             <property name="text">
-             <string>Information about account</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt; font-weight:700;&quot;&gt;Information about account&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QTextEdit" name="textEdit_2">
-            <property name="maximumSize">
-             <size>
-              <width>250</width>
-              <height>100</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QTextEdit#textEdit_2 {
-	border-radius: 10px;
-	border: 1px solid rgb(218, 218, 218);
-}</string>
+           <widget class="QLabel" name="labelAccount">
+            <property name="text">
+             <string>TextLabel</string>
             </property>
            </widget>
           </item>
