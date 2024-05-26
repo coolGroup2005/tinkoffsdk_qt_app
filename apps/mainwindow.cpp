@@ -84,13 +84,16 @@ void MainWindow::on_listView_clicked(const QModelIndex &index)
 {
     QString selectedItem = index.data().toString();
     ui->lineEdit->setText(";;;  " + selectedItem);
-    MainWindow::openAkcii();
+    std::string figi = selectedItem.split("\t")[1].toStdString(); 
+    std::string stockName = selectedItem.section('\t', 0, 0).toStdString();   
+    std::cout << figi;
+    MainWindow::openAkcii(figi, stockName);
 }
 
 
-void MainWindow::openAkcii()
+void MainWindow::openAkcii(const std::string& figi, const std::string& stockName)
 {
-    akcii *window1 = new akcii(this);
+    akcii *window1 = new akcii(this, figi, stockName);
     window1->show();
 }
 

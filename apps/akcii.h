@@ -14,7 +14,7 @@ class akcii : public QDialog
     Q_OBJECT
 
 public:
-    explicit akcii(QWidget *parent = nullptr);
+    explicit akcii(QWidget *parent = nullptr, const std::string& figi = "", const std::string& stockName = "");
     ~akcii();
 
 private slots:
@@ -23,6 +23,8 @@ private slots:
 private:
     Ui::akcii *ui;
     QTimer *timer;
+    std::string figi;
+    std::string stockName;
 };
 
 #endif // AKCII_H

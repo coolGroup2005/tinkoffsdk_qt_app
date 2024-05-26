@@ -3,6 +3,11 @@
 #include <QtCharts>
 #include <QtSql>
 
+#include <QMessageBox>
+#include <QFile>
+#include <QSqlError>
+#include <QSqlQuery>
+
 #include "investapiclient.h"
 #include "sandboxservice.h"
 #include "marketdataservice.h"
@@ -11,11 +16,18 @@
 #include <vector>
 #include <sqlite3.h>
 
+void showError(const QString &message) {
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.setText(message);
+    msgBox.exec();
+}
+
 void insertDataIntoDatabase(const std::string& open_units, const std::string& open_nano, 
                             const std::string& high_units, const std::string& high_nano,
                             const std::string& low_units, const std::string& low_nano, 
                             const std::string& close_units, const std::string& close_nano, 
-                            const std::string& volume, const std::string& time_seconds) {
+                            const std::string& volume, const std::string& time_seconds) {    
     sqlite3* db;
     char* errMsg = 0;
 
@@ -35,6 +47,11 @@ void insertDataIntoDatabase(const std::string& open_units, const std::string& op
 
     rc = sqlite3_exec(db, sqlStatement.c_str(), 0, 0, &errMsg);
 
+    if (rc != SQLITE_OK) {
+        showError("SQL error: " + QString::fromStdString(errMsg));
+        sqlite3_free(errMsg);
+    }
+
     sqlStatement = "INSERT INTO candles (open_units, open_nano, high_units, high_nano, "
                    "low_units, low_nano, close_units, close_nano, volume, time_seconds) VALUES (" + 
                    open_units + ", " + open_nano + ", " + high_units + ", " + high_nano + ", " + 
@@ -47,13 +64,18 @@ void insertDataIntoDatabase(const std::string& open_units, const std::string& op
 }
 
 
-akcii::akcii(QWidget *parent)
+akcii::akcii(QWidget *parent, const std::string& figi, const std::string& stockName)
     : QDialog(parent)
     , ui(new Ui::akcii)
+    , figi(figi)
+    , stockName(stockName) 
 {
+    
     ui->setupUi(this);
     this->resize(840, 520);
-    this->setFixedSize(this->size()); //lock an ability to change the size
+    this->setMinimumSize(this->size());
+    //this->setFixedSize(this->size()); //lock an ability to change the size
+    ui->stocknameLabel->setText(QString::fromStdString(stockName));
 
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &akcii::updateDateTime);
@@ -66,9 +88,13 @@ akcii::akcii(QWidget *parent)
     auto accounts = sandbox->GetSandboxAccounts();
 
     auto marketdata = std::dynamic_pointer_cast<MarketData>(client.service("marketdata"));
-    auto candlesServiceReply = marketdata->GetCandles("BBG004730JJ5", 1716184798, 0, 1716368398, 0, CandleInterval::CANDLE_INTERVAL_HOUR);
-        
+    auto candlesServiceReply = marketdata->GetCandles(figi, 1716184798, 0, 1716368398, 0, CandleInterval::CANDLE_INTERVAL_HOUR);
     auto response = dynamic_cast<GetCandlesResponse*>(candlesServiceReply.ptr().get());
+
+    if (!response) {
+        showError("Failed to retrieve candle data.");
+        return;
+    }
 
     for (int i = 0; i < response->candles_size(); i++) {
         auto candle = response->candles(i);
@@ -88,12 +114,14 @@ akcii::akcii(QWidget *parent)
 
 
     QCandlestickSeries *series = new QCandlestickSeries();
+    series->setIncreasingColor(QColor(Qt::green));
+    series->setDecreasingColor(QColor(Qt::red));
     
     QSqlDatabase dbq = QSqlDatabase::addDatabase("QSQLITE");
     dbq.setDatabaseName("candles.db");
 
     if (!dbq.open()) {
-        qDebug() << "Unable to open the database:" << dbq.lastError().text();
+        qDebug() << "Unable to open the database: " << dbq.lastError().text();
         return;
     }
 
@@ -101,7 +129,7 @@ akcii::akcii(QWidget *parent)
     query.prepare("SELECT open_units, open_nano, high_units, high_nano, low_units, close_units, close_nano, volume, time_seconds FROM candles");
 
     if (!query.exec()) {
-        qDebug() << "Unable to make the correct query:" << query.lastError().text();
+        showError("Unable to make the correct query: " + query.lastError().text());
         return;
     }
 
@@ -111,6 +139,7 @@ akcii::akcii(QWidget *parent)
         qreal low = query.value("low_units").toDouble();
         qreal close = query.value("close_units").toDouble() + query.value("close_nano").toDouble() / 1e9;
         qint64 timestamp = query.value("time_seconds").toLongLong();
+        std::cout << timestamp << '\n';
         series->append(new QCandlestickSet(open, high, low, close, timestamp));
     }
 
@@ -120,8 +149,8 @@ akcii::akcii(QWidget *parent)
     chart->addSeries(series);
 
     QDateTimeAxis *axisX = new QDateTimeAxis();
-    axisX->setTickCount(10);
-    axisX->setFormat("MM-dd hh:mm");
+    axisX->setTickCount(5);
+    axisX->setFormat("dd.MM.yyyy hh:mm:ss");
     axisX->setTitleText("Time");
     chart->addAxis(axisX, Qt::AlignBottom);
     series->attachAxis(axisX);
@@ -130,6 +159,9 @@ akcii::akcii(QWidget *parent)
     axisY->setTitleText("Price");
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
+    chart->setTitle("Candlestick Chart");
+
+    chart->legend()->setVisible(false);
 
     chartView->setRenderHint(QPainter::Antialiasing);
 

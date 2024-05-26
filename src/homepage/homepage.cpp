@@ -15,7 +15,7 @@ std::ostream& operator<< (std::ostream& ss, const ShareInfo& shareParam)
 ShareInfo getShareInfo(InvestApiClient& client, std::string& figi)
 {
     auto instrumentService = std::dynamic_pointer_cast<Instruments>(client.service("instruments"));
-    auto answerInstruments = instrumentService->GetInstrumentBy(InstrumentIdType::INSTRUMENT_ID_TYPE_FIGI, "", "BBG004730JJ5");
+    auto answerInstruments = instrumentService->GetInstrumentBy(InstrumentIdType::INSTRUMENT_ID_TYPE_FIGI, "", figi);
     auto answerReply = dynamic_cast<InstrumentResponse*>(answerInstruments.ptr().get());
     // std::cout << answerReply->instrument().figi();
 
@@ -39,12 +39,12 @@ std::vector<ShareInfo> parseFigi()
     auto operationService = std::dynamic_pointer_cast<Operations>(client.service("operations"));
     auto getPortfolio = operationService->GetPortfolio(accountReply->accounts(accountReply->accounts_size() - 1).id(), PortfolioRequest_CurrencyRequest::PortfolioRequest_CurrencyRequest_RUB);
     auto portfolioReply = dynamic_cast<PortfolioResponse*>(getPortfolio.ptr().get());
-    auto PositionsList = portfolioReply->positions();
+    auto PositionsList = portfolioReply->virtual_positions();
 
     std::vector<ShareInfo> sharesList;
     for (size_t i = 0; i < PositionsList.size(); i++)
     {
-        std::string figi = portfolioReply->positions(i).figi();
+        std::string figi = portfolioReply->virtual_positions(i).figi();
         sharesList.push_back(getShareInfo(client, figi));
     }
 
