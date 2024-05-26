@@ -9,25 +9,19 @@
 #include <QMessageBox>
 #include <QStandardItemModel>
 
+#include <QSqlQuery>
+#include <QSqlQueryModel>
+#include <QSortFilterProxyModel>
+
 #include <vector>
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+QStandardItemModel* fillSharesList()
 {
-    ui->setupUi(this);
-    ui->tabWidget->setTabText(0, "Database Fiji");
-    ui->tabWidget->setTabText(1, "Portfolio");
-    ui->tabWidget->setTabText(2, "Statistics");
-    ui->tabWidget->setTabText(3, "Home");
-
-    // Iteraction with tab Home
     std::vector<ShareInfo> sharesList;
     sharesList = parseFigi();
 
     const int numRows = sharesList.size();
     const int numColumns = 3;
-
     QStandardItemModel* model = new QStandardItemModel(numRows, numColumns);
     model->setHeaderData(0, Qt::Horizontal, "Name", Qt::DisplayRole);
     model->setHeaderData(1, Qt::Horizontal, "Figi", Qt::DisplayRole);
@@ -44,20 +38,60 @@ MainWindow::MainWindow(QWidget *parent)
             model->setItem(i, j, itemsList[j]);
         }
     }
+    return model;
+}
 
-    // const int numRows = 10;
-    // const int numColumns = 10;
+// Test model for sorting
+QStandardItemModel* testModel()
+{
+    const int numRows = 5;
+    const int numColumns = 3;
+    QStandardItemModel* model = new QStandardItemModel(numRows, numColumns);
+    QStandardItem* item11 = new QStandardItem(QString::fromStdString("E"));
+    QStandardItem* item12 = new QStandardItem(QString::fromStdString("D"));
+    QStandardItem* item13 = new QStandardItem(QString::fromStdString("C"));
+    QStandardItem* item14 = new QStandardItem("B");
+    QStandardItem* item15 = new QStandardItem("A");
+    model->setItem(0, 0, item11);
+    model->setItem(1, 0, item12);
+    model->setItem(2, 0, item13);
+    model->setItem(3, 0, item14);
+    model->setItem(4, 0, item15);
+    QStandardItem* item21 = new QStandardItem("AAB");
+    QStandardItem* item22 = new QStandardItem("CAB");
+    QStandardItem* item23 = new QStandardItem("ABB");
+    QStandardItem* item24 = new QStandardItem("BAC");
+    QStandardItem* item25 = new QStandardItem("BAA");
+    model->setItem(0, 1, item21);
+    model->setItem(1, 1, item22);
+    model->setItem(2, 1, item23);
+    model->setItem(3, 1, item24);
+    model->setItem(4, 1, item25);
+    return model;
+}
 
-    // QStandardItemModel* model = new QStandardItemModel(numRows, numColumns);
-    // for (int row = 0; row < numRows; ++row)
-    // {
-    //     for (int column = 0; column < numColumns; ++column)
-    //     {
-    //         QString text = QString::fromStdString('A' + std::to_string(row)) + QString::number(column + 1);
-    //         QStandardItem* item = new QStandardItem(text);
-    //         model->setItem(row, column, item);
-    //     }
-    //  }
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    ui->tabWidget->setTabText(0, "Database Fiji");
+    ui->tabWidget->setTabText(1, "Portfolio");
+    ui->tabWidget->setTabText(2, "Statistics");
+    ui->tabWidget->setTabText(3, "Home");
+
+    // Iteraction with tab Home
+    // Enable sorting of table of shares
+    QSqlQueryModel * myModel=new QSqlQueryModel(ui->sharesTableView);
+    QSqlQuery select;
+    myModel->setQuery(select);
+    QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(myModel);
+    proxyModel->setSourceModel(myModel);
+    ui->sharesTableView->setSortingEnabled(true); 
+    ui->sharesTableView->setModel(proxyModel);
+
+    // Initialize model for table of shares
+    QStandardItemModel* model = fillSharesList();
 
     ui->sharesTableView->setModel(model);
     ui->sharesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
