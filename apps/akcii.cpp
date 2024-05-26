@@ -11,96 +11,16 @@
 #include <vector>
 #include <sqlite3.h>
 
-struct Time {
-    long seconds;
-};
+void insertDataIntoDatabase(const std::string& open_units, const std::string& open_nano, 
+                            const std::string& high_units, const std::string& high_nano,
+                            const std::string& low_units, const std::string& low_nano, 
+                            const std::string& close_units, const std::string& close_nano, 
+                            const std::string& volume, const std::string& time_seconds) {
+    sqlite3* db;
+    char* errMsg = 0;
 
-struct Price {
-    int units;
-    int nano;
-};
+    int rc = sqlite3_open("candles.db", &db);
 
-struct Candle_STRUCT {
-    Price open;
-    Price high;
-    Price low;
-    Price close;
-    int volume;
-    Time time;
-    bool is_complete;
-    int unknown_field_9;
-};
-
-std::vector<Candle_STRUCT> parseCandles(const std::string& input) {
-    std::vector<Candle_STRUCT> candles;
-    std::istringstream stream(input);
-    std::string line;
-    Candle_STRUCT currentCandle;
-    bool insideCandle = false;
-
-    while (std::getline(stream, line)) {
-        std::istringstream lineStream(line);
-        std::string key;
-        lineStream >> key;
-
-        if (key == "candles") {
-            if (insideCandle) {
-                candles.push_back(currentCandle);
-                currentCandle = Candle_STRUCT();
-            }
-            insideCandle = true;
-        } else if (key == "open" or key == "high" or key == "low" or key == "close") {
-            Price price;
-            std::string S, N;
-            std::getline(stream, S, ':');
-            std::getline(stream, S);
-            std::getline(stream, N, ':');
-            std::getline(stream, N);
-            price.units = std::stoi(S);
-            price.nano = std::stoi(N);
-
-            if (key == "open") currentCandle.open = price;
-            if (key == "high") currentCandle.high = price;
-            if (key == "low") currentCandle.low = price;
-            if (key == "close") currentCandle.close = price;
-
-        } else if (key == "volume") {
-            std::string volumeStr;
-            std::getline(stream, volumeStr, ':');
-            std::getline(stream, volumeStr);
-            currentCandle.volume = std::stoi(volumeStr);
-
-        } else if (key == "time") {
-            std::string secondsStr;
-            std::getline(stream, secondsStr, ':');
-            std::getline(stream, secondsStr);
-            currentCandle.time.seconds = std::stol(secondsStr);
-
-        } else if (key == "is_complete") {
-            std::string isCompleteStr;
-            std::getline(stream, isCompleteStr, ':');
-            std::getline(stream, isCompleteStr);
-            currentCandle.is_complete = (isCompleteStr == "true");
-
-        }
-    }
-    if (insideCandle) candles.push_back(currentCandle);
-    return candles;
-}
-
-// void printCandle(const Candle_STRUCT& candle) {
-//     std::cout << "Candle:" << std::endl;
-//     std::cout << "Open: " << candle.open.units << "." << candle.open.nano << std::endl;
-//     std::cout << "High: " << candle.high.units << "." << candle.high.nano << std::endl;
-//     std::cout << "Low: " << candle.low.units << "." << candle.low.nano << std::endl;
-//     std::cout << "Close: " << candle.close.units << "." << candle.close.nano << std::endl;
-//     std::cout << "Volume: " << candle.volume << std::endl;
-//     std::cout << "Time_seconds): " << candle.time.seconds << std::endl;
-//     std::cout << "Is Complete: " << (candle.is_complete ? "true": "false") << std::endl;
-// }
-
-void createCandlesTable(sqlite3* db) {
-    char* errorMessage;
     std::string sqlStatement = "CREATE TABLE IF NOT EXISTS candles ("
                                "open_units INTEGER, "
                                "open_nano INTEGER, "
@@ -111,30 +31,21 @@ void createCandlesTable(sqlite3* db) {
                                "close_units INTEGER, "
                                "close_nano INTEGER, "
                                "volume INTEGER, "
-                               "time_seconds INTEGER, "
-                               "is_complete INTEGER)";
+                               "time_seconds INTEGER);";
 
-    int result = sqlite3_exec(db, sqlStatement.c_str(), nullptr, nullptr, &errorMessage);
+    rc = sqlite3_exec(db, sqlStatement.c_str(), 0, 0, &errMsg);
+
+    sqlStatement = "INSERT INTO candles (open_units, open_nano, high_units, high_nano, "
+                   "low_units, low_nano, close_units, close_nano, volume, time_seconds) VALUES (" + 
+                   open_units + ", " + open_nano + ", " + high_units + ", " + high_nano + ", " + 
+                   low_units + ", " + low_nano + ", " + close_units + ", " + close_nano + ", " + 
+                   volume + ", " + time_seconds + ");";
+
+    rc = sqlite3_exec(db, sqlStatement.c_str(), 0, 0, &errMsg);
+
+    sqlite3_close(db);
 }
 
-void insertCandleData(sqlite3* db, const Candle_STRUCT& candle) {
-    std::stringstream sqlStatement;
-    sqlStatement << "INSERT INTO candles VALUES ("
-                 << candle.open.units << ", "
-                 << candle.open.nano << ", "
-                 << candle.high.units << ", "
-                 << candle.high.nano << ", "
-                 << candle.low.units << ", "
-                 << candle.low.nano << ", "
-                 << candle.close.units << ", "
-                 << candle.close.nano << ", "
-                 << candle.volume << ", "
-                 << candle.time.seconds << ", "
-                 << (candle.is_complete ? 1 : 0) << ")";
-
-    char* errorMessage;
-    int result = sqlite3_exec(db, sqlStatement.str().c_str(), nullptr, nullptr, &errorMessage);
-}
 
 akcii::akcii(QWidget *parent)
     : QDialog(parent)
@@ -148,25 +59,33 @@ akcii::akcii(QWidget *parent)
     connect(timer, &QTimer::timeout, this, &akcii::updateDateTime);
     timer->start(1000);
 
-    sqlite3* db;
-    int rc = sqlite3_open("candles.db", &db);
+    InvestApiClient client("sandbox-invest-public-api.tinkoff.ru:443", getenv("TOKEN")); //sandbox-
 
-    createCandlesTable(db);
-
-    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
     auto sandbox = std::dynamic_pointer_cast<Sandbox>(client.service("sandbox"));
     sandbox->OpenSandboxAccount();
     auto accounts = sandbox->GetSandboxAccounts();
 
     auto marketdata = std::dynamic_pointer_cast<MarketData>(client.service("marketdata"));
     auto candlesServiceReply = marketdata->GetCandles("BBG004730JJ5", 1716184798, 0, 1716368398, 0, CandleInterval::CANDLE_INTERVAL_HOUR);
-    
-    auto unparsedCandles = candlesServiceReply.ptr()->DebugString();
+        
+    auto response = dynamic_cast<GetCandlesResponse*>(candlesServiceReply.ptr().get());
 
-    std::vector<Candle_STRUCT> candles = parseCandles(unparsedCandles);
-    for (const auto& candle : candles) insertCandleData(db, candle);
+    for (int i = 0; i < response->candles_size(); i++) {
+        auto candle = response->candles(i);
+        std::string open_units = std::to_string(candle.open().units());
+        std::string open_nano = std::to_string(candle.open().nano());
+        std::string high_units = std::to_string(candle.high().units());
+        std::string high_nano = std::to_string(candle.high().nano());
+        std::string low_units = std::to_string(candle.low().units());
+        std::string low_nano = std::to_string(candle.low().nano());
+        std::string close_units = std::to_string(candle.close().units());
+        std::string close_nano = std::to_string(candle.close().nano());
+        std::string volume = std::to_string(candle.volume());
+        std::string time_seconds = std::to_string(candle.time().seconds());
 
-    sqlite3_close(db);
+        insertDataIntoDatabase(open_units, open_nano, high_units, high_nano, low_units, low_nano, close_units, close_nano, volume, time_seconds);
+    }
+
 
     QCandlestickSeries *series = new QCandlestickSeries();
     
