@@ -2,12 +2,26 @@
 #define __EXAMPLE_H__
 #include <iostream>
 
+#include "investapiclient.h"
+#include "marketdataservice.h"
+#include "usersservice.h"
+#include "ordersservice.h"
 
-class MyInvest
+#include "instrumentsservice.h"
+#include "operationsservice.h"
+
+
+struct ShareInfo
 {
-    public:
-    void getCandles() const;
+    std::string name;
+    std::string figi;
+    unsigned int trading_status;
 
+    ShareInfo(std::string, std::string, unsigned int);
 };
+
+ShareInfo getShareInfo(InvestApiClient&, std::string&);
+std::vector<ShareInfo> parseFigi();
+std::string formatTradingStatus(unsigned int);
 
 #endif // __EXAMPLE_H__
