@@ -7,6 +7,17 @@
 #include <QTimer>
 #include <QDialog>
 
+#include <QtCharts>
+#include <QtSql>
+#include <QMessageBox>
+#include <QFile>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QDateTime>
+#include <QVBoxLayout>
+
+#include <sqlite3.h>
+
 namespace Ui {
 class shares;
 }

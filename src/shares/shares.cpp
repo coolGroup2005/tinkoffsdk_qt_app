@@ -1,15 +1,5 @@
 #include "shares/shares.h"
 #include "ui_shares.h"
-#include <QtCharts>
-#include <QtSql>
-#include <QMessageBox>
-#include <QFile>
-#include <QSqlError>
-#include <QSqlQuery>
-#include <QDateTime>
-#include <QVBoxLayout>
-
-#include <sqlite3.h>
 
 void showError(const QString &message) {
     QMessageBox msgBox;
