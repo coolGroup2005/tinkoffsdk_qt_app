@@ -19,6 +19,10 @@ public:
 
 private slots:
     void updateDateTime();
+    void clearChart();
+    void clearDatabase();
+    void fetchCandlestickData();
+    void updateChart();
 
 private:
     Ui::akcii *ui;
