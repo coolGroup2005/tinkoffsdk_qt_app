@@ -23,8 +23,7 @@ public:
     ~MainWindow();
 
 private slots:
-    void openAkcii();
-
+    void openShares(const std::string& figi, const std::string& stockName);
     void on_listView_clicked(const QModelIndex &index);
     void on_topGainersList_clicked(const QModelIndex &index);
     void on_topLosersList_clicked(const QModelIndex &index);

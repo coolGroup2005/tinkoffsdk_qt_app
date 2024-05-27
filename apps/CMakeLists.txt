@@ -17,8 +17,6 @@ set(PROJECT_SOURCES
     main.cpp
     mainwindow.cpp
     mainwindow.h
-    akcii.cpp
-    akcii.h
     portfolio.cpp
     portfolio.h
 )
@@ -27,9 +25,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(tinkoff-app
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-
-
-        akcii.h akcii.cpp akcii.ui
         mainwindow.h mainwindow.cpp mainwindow.ui
         portfolio.h portfolio.cpp portfolio.ui
     )
@@ -61,10 +56,11 @@ target_link_libraries(
     Qt${QT_VERSION_MAJOR}::Sql
     invest_lib 
     homepage_lib
+    shares_lib
     tink_grpc_proto 
     TinkoffInvestSDK 
     sqlite3
-    ) # tink_grpc_proto TinkoffInvestSDK
+) # tink_grpc_proto TinkoffInvestSDK
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

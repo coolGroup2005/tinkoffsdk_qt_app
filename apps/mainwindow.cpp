@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "akcii.h"
+#include "shares/shares.h"
 #include "ui_mainwindow.h"
 #include "homepage/homepage.h"
 #include "portfolio.h"
@@ -16,9 +16,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui->tabWidget->setTabText(0, "Database Fiji");
-    // ui->tabWidget->setTabText(1, "Portfolio");
-    ui->tabWidget->setTabText(2, "Statistics");
-    ui->tabWidget->setTabText(3, "Home");
+    ui->tabWidget->setTabText(1, "Statistics");
+    ui->tabWidget->setTabText(2, "Home");
 
     portfolio = new Portfolio(this);
     ui->tabWidget->addTab(portfolio, "Portfolio");
@@ -84,13 +83,16 @@ void MainWindow::on_listView_clicked(const QModelIndex &index)
 {
     QString selectedItem = index.data().toString();
     ui->lineEdit->setText(";;;  " + selectedItem);
-    MainWindow::openAkcii();
+    std::string figi = selectedItem.split("\t")[1].toStdString(); 
+    std::string stockName = selectedItem.section('\t', 0, 0).toStdString();   
+    std::cout << figi;
+    MainWindow::openShares(figi, stockName);
 }
 
 
-void MainWindow::openAkcii()
+void MainWindow::openShares(const std::string& figi, const std::string& stockName)
 {
-    akcii *window1 = new akcii(this);
+    shares *window1 = new shares(this, figi, stockName);
     window1->show();
 }
 
