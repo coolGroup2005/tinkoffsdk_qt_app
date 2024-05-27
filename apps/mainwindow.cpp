@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "akcii.h"
+#include "shares/shares.h"
 #include "ui_mainwindow.h"
 #include "homepage/homepage.h"
 #include "portfolio.h"
@@ -86,13 +86,13 @@ void MainWindow::on_listView_clicked(const QModelIndex &index)
     std::string figi = selectedItem.split("\t")[1].toStdString(); 
     std::string stockName = selectedItem.section('\t', 0, 0).toStdString();   
     std::cout << figi;
-    MainWindow::openAkcii(figi, stockName);
+    MainWindow::openShares(figi, stockName);
 }
 
 
-void MainWindow::openAkcii(const std::string& figi, const std::string& stockName)
+void MainWindow::openShares(const std::string& figi, const std::string& stockName)
 {
-    akcii *window1 = new akcii(this, figi, stockName);
+    shares *window1 = new shares(this, figi, stockName);
     window1->show();
 }
 

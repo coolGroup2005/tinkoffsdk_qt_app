@@ -1,18 +1,13 @@
-#include "akcii.h"
-#include "ui_akcii.h"
+#include "shares/shares.h"
+#include "ui_shares.h"
 #include <QtCharts>
 #include <QtSql>
-
 #include <QMessageBox>
 #include <QFile>
-
+#include <QSqlError>
+#include <QSqlQuery>
 #include <QDateTime>
 #include <QVBoxLayout>
-#include <QTimer>
-
-#include "investapiclient.h"
-#include "sandboxservice.h"
-#include "marketdataservice.h"
 
 #include <sqlite3.h>
 
@@ -30,7 +25,6 @@ void insertDataIntoDatabase(const std::string& open_units, const std::string& op
                             const std::string& volume, const std::string& time_seconds) {    
     sqlite3* db;
     char* errMsg = 0;
-
     int rc = sqlite3_open("candles.db", &db);
 
     std::string sqlStatement = "CREATE TABLE IF NOT EXISTS candles ("
@@ -44,23 +38,24 @@ void insertDataIntoDatabase(const std::string& open_units, const std::string& op
                                "close_nano INTEGER, "
                                "volume INTEGER, "
                                "time_seconds INTEGER);";
-
     rc = sqlite3_exec(db, sqlStatement.c_str(), 0, 0, &errMsg);
+    if (rc != SQLITE_OK) {
+        showError("SQL error: " + QString::fromStdString(errMsg));
+        sqlite3_free(errMsg);
+    }
 
     sqlStatement = "INSERT INTO candles (open_units, open_nano, high_units, high_nano, "
                    "low_units, low_nano, close_units, close_nano, volume, time_seconds) VALUES (" + 
                    open_units + ", " + open_nano + ", " + high_units + ", " + high_nano + ", " + 
                    low_units + ", " + low_nano + ", " + close_units + ", " + close_nano + ", " + 
                    volume + ", " + time_seconds + ");";
-
     rc = sqlite3_exec(db, sqlStatement.c_str(), 0, 0, &errMsg);
-
     sqlite3_close(db);
 }
 
-akcii::akcii(QWidget *parent, const std::string& figi, const std::string& stockName)
+shares::shares(QWidget *parent, const std::string& figi, const std::string& stockName)
     : QDialog(parent)
-    , ui(new Ui::akcii)
+    , ui(new Ui::shares)
     , figi(figi)
     , stockName(stockName) 
 {
@@ -68,7 +63,9 @@ akcii::akcii(QWidget *parent, const std::string& figi, const std::string& stockN
     this->resize(840, 520);
     this->setMinimumSize(this->size());
     ui->stocknameLabel->setText(QString::fromStdString(stockName));
-    
+
+    connect(ui->updateButton, &QPushButton::clicked, this, &shares::fetchCandlestickData);
+
     ui->intervalComboBox->addItem("1 minute");
     ui->intervalComboBox->addItem("2 minutes");
     ui->intervalComboBox->addItem("3 minutes");
@@ -76,38 +73,34 @@ akcii::akcii(QWidget *parent, const std::string& figi, const std::string& stockN
     ui->intervalComboBox->addItem("10 minutes");
     ui->intervalComboBox->addItem("15 minutes");
     ui->intervalComboBox->addItem("30 minutes");
-
     ui->intervalComboBox->addItem("1 hour");
     ui->intervalComboBox->addItem("2 hours");
     ui->intervalComboBox->addItem("4 hours");
-
     ui->intervalComboBox->addItem("1 day");
     ui->intervalComboBox->addItem("1 week");
     ui->intervalComboBox->addItem("1 month");
 
     timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &akcii::updateDateTime);
+    connect(timer, &QTimer::timeout, this, &shares::updateDateTime);
     timer->start(1000);
 
-    // connect(ui->datefromInput, &QDateTimeEdit::dateTimeChanged, this, &akcii::fetchCandlestickData);
-    // connect(ui->datetoInput, &QDateTimeEdit::dateTimeChanged, this, &akcii::fetchCandlestickData);
-    // connect(ui->intervalComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &akcii::fetchCandlestickData);
-
-    connect(ui->updateButton, &QPushButton::clicked, this, &akcii::fetchCandlestickData);
+    updateDateTime();
 }
 
-akcii::~akcii() {delete ui;}
+shares::~shares() {
+    delete ui;
+}
 
-void akcii::fetchCandlestickData() {
+void shares::fetchCandlestickData() {
     QDateTime fromDateTime = ui->datefromInput->dateTime();
     QDateTime toDateTime = ui->datetoInput->dateTime();
-
     qint64 fromEpoch = fromDateTime.toSecsSinceEpoch();
     qint64 toEpoch = toDateTime.toSecsSinceEpoch();
 
     clearDatabase();
+    clearChart();
 
-    InvestApiClient client("sandbox-invest-public-api.tinkoff.ru:443", getenv("TOKEN")); //sandbox
+    InvestApiClient client("sandbox-invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
 
     QString intervalText = ui->intervalComboBox->currentText();
     CandleInterval interval = CandleInterval::CANDLE_INTERVAL_UNSPECIFIED;
@@ -117,6 +110,8 @@ void akcii::fetchCandlestickData() {
         interval = CandleInterval::CANDLE_INTERVAL_2_MIN;
     } else if (intervalText == "3 minutes") {
         interval = CandleInterval::CANDLE_INTERVAL_3_MIN;
+    } else if (intervalText == "5 minutes") {
+        interval = CandleInterval::CANDLE_INTERVAL_5_MIN;
     } else if (intervalText == "10 minutes") {
         interval = CandleInterval::CANDLE_INTERVAL_10_MIN;
     } else if (intervalText == "15 minutes") {
@@ -140,13 +135,12 @@ void akcii::fetchCandlestickData() {
     auto marketdata = std::dynamic_pointer_cast<MarketData>(client.service("marketdata"));
     auto candlesServiceReply = marketdata->GetCandles(figi, fromEpoch, 0, toEpoch, 0, interval);
     auto response = dynamic_cast<GetCandlesResponse*>(candlesServiceReply.ptr().get());
-
     if (!response) {
         showError("Failed to retrieve candle data.");
         return;
     }
 
-    for (int i = 0; i < response->candles_size(); i++) {
+    for (size_t i = 0; i < response->candles_size(); i++) {
         auto candle = response->candles(i);
         std::string open_units = std::to_string(candle.open().units());
         std::string open_nano = std::to_string(candle.open().nano());
@@ -158,26 +152,28 @@ void akcii::fetchCandlestickData() {
         std::string close_nano = std::to_string(candle.close().nano());
         std::string volume = std::to_string(candle.volume());
         std::string time_seconds = std::to_string(candle.time().seconds());
-
         insertDataIntoDatabase(open_units, open_nano, high_units, high_nano, low_units, low_nano, close_units, close_nano, volume, time_seconds);
     }
 
     updateChart();
 }
 
-void akcii::updateChart() {
+void shares::updateChart() {
     QCandlestickSeries *series = new QCandlestickSeries();
     series->setIncreasingColor(QColor(Qt::green));
     series->setDecreasingColor(QColor(Qt::red));
     
     QSqlDatabase dbq = QSqlDatabase::addDatabase("QSQLITE");
     dbq.setDatabaseName("candles.db");
+    if (!dbq.open()) {
+        qDebug() << "Unable to open the database: " << dbq.lastError().text(); // без этой параши не работает
+        return;
+    }
 
     QSqlQuery query;
     query.prepare("SELECT open_units, open_nano, high_units, high_nano, low_units, low_nano, close_units, close_nano, volume, time_seconds FROM candles");
-
     if (!query.exec()) {
-        showError("Unable to make the correct query. Check your Internet connection.");
+        showError("Unable to make the correct query: " + query.lastError().text());
         return;
     }
 
@@ -217,25 +213,24 @@ void akcii::updateChart() {
     ui->graphicsView->setLayout(layout);
 }
 
-void akcii::clearDatabase() {
+void shares::clearDatabase() {
     sqlite3* db;
     int rc = sqlite3_open("candles.db", &db);
-
     if (rc == SQLITE_OK) {
         std::string sqlStatement = "DELETE FROM candles";
         char* errMsg = 0;
         rc = sqlite3_exec(db, sqlStatement.c_str(), 0, 0, &errMsg);
         if (rc != SQLITE_OK) {
-            showError("Internal error. Try later.");
+            showError("SQL error: " + QString::fromStdString(errMsg));
             sqlite3_free(errMsg);
         }
         sqlite3_close(db);
     } else {
-        showError("Can't open database");
+        showError("Can't open database: " + QString::number(rc));
     }
 }
 
-void akcii::clearChart() {
+void shares::clearChart() {
     QLayout *layout = ui->graphicsView->layout();
     if (layout != nullptr) {
         QLayoutItem *item;
@@ -247,7 +242,7 @@ void akcii::clearChart() {
     }
 }
 
-void akcii::updateDateTime() {
+void shares::updateDateTime() {
     QDateTime currentDateTime = QDateTime::currentDateTime();
     ui->dateLabel->setText(currentDateTime.toString("dddd, MMMM d"));
     ui->timeLabel->setText(currentDateTime.toString("h:mm:ss"));

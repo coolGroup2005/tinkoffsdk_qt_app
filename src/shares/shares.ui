@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>akcii</class>
- <widget class="QDialog" name="akcii">
+ <class>shares</class>
+ <widget class="QDialog" name="shares">
   <property name="geometry">
    <rect>
     <x>0</x>
