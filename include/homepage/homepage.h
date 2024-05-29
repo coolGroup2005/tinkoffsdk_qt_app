@@ -1,5 +1,5 @@
-#ifndef __EXAMPLE_H__
-#define __EXAMPLE_H__
+#ifndef __HOMEPAGE_H__
+#define __HOMEPAGE_H__
 #include <iostream>
 
 #include "investapiclient.h"
@@ -37,4 +37,4 @@ struct AccountInfo
 };
     std::vector<AccountInfo> getAccountInfo();
 
-#endif // __EXAMPLE_H__
+#endif // __HOMEPAGE_H__

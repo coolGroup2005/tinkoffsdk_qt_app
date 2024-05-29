@@ -92,6 +92,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->sharesTableView->setStyleSheet("QHeaderView::section {background-color: lightgrey}");
 
     ui->labelAccount->setText(accountsInfoText());
+    ui->labelAccount->setStyleSheet("QLabel {"
+                             "border-style: solid;"
+                             "border-width: 1px;"
+                             "border-color: rgba(60, 60, 60, 0.8); "
+                             "}");
 
     // Interaction with tab Statistics
     // Initialize models for the statistics lists
