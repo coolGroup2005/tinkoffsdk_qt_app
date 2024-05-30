@@ -11,7 +11,7 @@
 
 // int main(int argc, char *argv[])
 // {
-//     InvestApiClient client("sandbox-invest-public-api.tinkoff.ru:443", getenv("TOKEN")); //sandbox-
+//     InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN")); //sandbox-
 
 //     auto operationService = std::dynamic_pointer_cast<Operations>(client.service("operations"));
 //     // auto operationsStreamService = std::dynamic_pointer_cast<OperationsStreamService>(client.service("operationsstreamservice")); // самойлов его не сделал)
@@ -23,7 +23,7 @@
 //     auto accountID1 = dynamic_cast<GetAccountsResponse*>(accountListOfID.ptr().get());
 //     auto accountID12 = accountID1->accounts(0).id();
 
-//     // std::cout << accountListOfID.ptr()->DebugString() << "\n";
+//     std::cout << accountListOfID.ptr()->DebugString() << "\n";
 //     // std::cout << "Я тут" << '\n';
 //     // auto postOrderRequest = ordersService->PostOrder("BBG004730RP0", 2, 0, 0, tinkoff::public_::invest::api::contract::v1::OrderDirection::ORDER_DIRECTION_BUY, accountID12, tinkoff::public_::invest::api::contract::v1::OrderType::ORDER_TYPE_BESTPRICE, "123"); // не работает по выходным (ОЧЕВ)
 //     // auto postOrderResponse = dynamic_cast<PostOrderResponse*>(postOrderRequest.ptr().get());

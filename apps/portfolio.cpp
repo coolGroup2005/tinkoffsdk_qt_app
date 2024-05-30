@@ -29,19 +29,27 @@
 Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
 {
     balanceLabel = new QLabel(this);
+    yieldLabel = new QLabel(this);
     accountComboBox = new QComboBox(this);
     portfolioTableView = new QTableView(this);
     portfolioModel = new QStandardItemModel(this);
     portfolioModel->setHorizontalHeaderLabels({"Ticker", "Name", "Quantity", "Current Price", "Value"});
 
+    virtualPortfolioTableView = new QTableView(this);
+    virtualPortfolioModel = new QStandardItemModel(this);
+    virtualPortfolioModel->setHorizontalHeaderLabels({"Ticker", "Name", "Quantity", "Current Price", "Value"});
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(accountComboBox);
     layout->addWidget(balanceLabel);
+    layout->addWidget(yieldLabel);
     layout->addWidget(portfolioTableView);
+    layout->addWidget(new QLabel("Virtual Positions", this));
+    layout->addWidget(virtualPortfolioTableView);
     setLayout(layout);
 
     token = getenv("TOKEN");
-    client = new InvestApiClient("sandbox-invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
+    client = new InvestApiClient("invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
 
     auto accountService = std::dynamic_pointer_cast<Users>(client->service("users"));
 
@@ -71,6 +79,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     }
 
     portfolioTableView->setModel(portfolioModel);
+    virtualPortfolioTableView->setModel(virtualPortfolioModel);
 }
 
 void Portfolio::updateBalance(const QString& accountId)
@@ -105,7 +114,7 @@ void Portfolio::updateBalance(const QString& accountId)
 
     auto portfolioValue = portfolioAns->total_amount_portfolio().units();
 
-    balanceLabel->setText(QString::number(portfolioValue) + " " + QString::fromStdString(portfolioAns->total_amount_portfolio().currency()));
+    balanceLabel->setText("Balance: " + QString::number(portfolioValue) + " " + QString::fromStdString(portfolioAns->total_amount_portfolio().currency()));
 
     portfolioModel->setRowCount(portfolioAns->positions_size() - 1); // не понял почему, но вроде воркает
     // auto portfolio1 = portfolioAns->positions(0);
@@ -155,7 +164,64 @@ void Portfolio::updateBalance(const QString& accountId)
         rowItems.append(new QStandardItem(QString::number(position.current_price().units() * position.quantity().units()) + " " + QString::fromStdString(position.current_price().currency())));
         portfolioModel->appendRow(rowItems);
     }
+
+    auto virtualPositions = portfolioAns->virtual_positions();
+
+    virtualPortfolioModel->setRowCount(virtualPositions.size() - 1);
+
+    for (int i = 0; i < virtualPositions.size(); ++i) {
+        const auto& position = virtualPositions[i];
+
+        auto instrumentUID = position.instrument_uid();
+
+        auto instrumentRequest = instrumentsService->GetInstrumentBy(tinkoff::public_::invest::api::contract::v1::InstrumentIdType::INSTRUMENT_ID_TYPE_UID, "", instrumentUID);
+        auto instrumentResponse = dynamic_cast<InstrumentResponse*>(instrumentRequest.ptr().get());
+
+        if (!instrumentResponse) {
+            qDebug() << "Failed to get instrumentResponse";
+            return;
+        }
+
+        auto instrumentInfo = instrumentResponse->instrument();
+        auto instrumentName = instrumentInfo.name();
+        auto instrumentTicker = instrumentInfo.ticker();
+
+        QList<QStandardItem*> rowItems;
+        rowItems.append(new QStandardItem(QString::fromStdString(instrumentTicker)));
+        rowItems.append(new QStandardItem(QString::fromStdString(instrumentName)));
+        rowItems.append(new QStandardItem(QString::number(position.quantity().units())));
+        rowItems.append(new QStandardItem(QString::number(position.current_price().units()) + " " + QString::fromStdString(position.current_price().currency())));
+        rowItems.append(new QStandardItem(QString::number(position.current_price().units() * position.quantity().units()) + " " + QString::fromStdString(position.current_price().currency())));
+        virtualPortfolioModel->appendRow(rowItems);
+    }
+
+    auto yield = portfolioAns->expected_yield();
+
+    double yieldValue = yield.units() + yield.nano() * 1e-9;
+    yieldLabel->setText("Expected Yield: " + QString::number(yieldValue) + "%");
 }
+
+// void Portfolio::updateExpectedYield(const Quotation& yield)
+// {
+//     double yieldValue = yield.units() + yield.nano() * 1e-9;
+//     yieldLabel->setText("Expected Yield: " + QString::number(yieldValue) + "%");
+// }
+
+// void Portfolio::updateVirtualPositions(const google::protobuf::RepeatedPtrField<VirtualPortfolioPosition>& virtualPositions)
+// {
+//     virtualPortfolioModel->setRowCount(virtualPositions.size());
+
+//     for (int i = 0; i < virtualPositions.size(); ++i) {
+//         const auto& position = virtualPositions[i];
+
+//         QList<QStandardItem*> rowItems;
+//         // rowItems.append(new QStandardItem(QString::fromStdString(position.name())));
+//         rowItems.append(new QStandardItem(QString::number(position.quantity().units())));
+//         rowItems.append(new QStandardItem(QString::number(position.current_price().units()) + " " + QString::fromStdString(position.current_price().currency())));
+//         rowItems.append(new QStandardItem(QString::number(position.current_price().units() * position.quantity().units()) + " " + QString::fromStdString(position.current_price().currency())));
+//         virtualPortfolioModel->appendRow(rowItems);
+//     }
+// }
 
 void Portfolio::onAccountChanged(int index)
 {
