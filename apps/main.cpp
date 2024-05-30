@@ -1,13 +1,13 @@
 // #include <QApplication>
 // #include "mainwindow.h"
 // // #include "invest/example.h"
-// #include "homepage/homepage.h"
+#include "homepage/homepage.h"
 
-// #include "investapiclient.h"
-// #include "usersservice.h"
-// #include "operationsservice.h"
-// #include "sandboxservice.h"
-// #include <ordersservice.h> // for adding shares into positions
+#include "investapiclient.h"
+#include "usersservice.h"
+#include "operationsservice.h"
+#include "sandboxservice.h"
+#include <ordersservice.h> // for adding shares into positions
 
 // int main(int argc, char *argv[])
 // {
@@ -42,6 +42,14 @@
 
 #include <QApplication>
 #include "mainwindow.h"
+#include "investapiclient.h"
+#include "marketdataservice.h"
+#include "usersservice.h"
+#include "ordersservice.h"
+
+#include "instrumentsservice.h"
+#include "operationsservice.h"
+
 // #include "invest/example.h"
 
 int main(int argc, char *argv[])
@@ -51,5 +59,10 @@ int main(int argc, char *argv[])
     MainWindow mainWindow;
     mainWindow.show();
 
+    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
+    std::string figi = "BBG006L8G4H1";
+    // ShareInfo share = getShareInfoStatistics(client, figi);
+    int a = 2;
+    float x = getShareChange(a, figi);
     return app.exec();
 }

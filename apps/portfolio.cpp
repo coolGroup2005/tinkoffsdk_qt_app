@@ -114,7 +114,7 @@ void Portfolio::updateBalance(const QString& accountId)
     for (int i = 0; i < portfolioAns->positions_size(); ++i) {
         const auto& position = portfolioAns->positions(i);
 
-        std::cout << portfolioRequest.ptr()->DebugString() << '\n';
+        // std::cout << portfolioRequest.ptr()->DebugString() << '\n';
         
         auto instrumentUID = position.instrument_uid();
 
@@ -134,7 +134,7 @@ void Portfolio::updateBalance(const QString& accountId)
             return;
         }
 
-        std::cout << "Я тут!" << '\n';
+        // std::cout << "Я тут!" << '\n';
 
 
         auto instrumentInfo = instrumentResponse->instrument();
