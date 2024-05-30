@@ -32,7 +32,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     accountComboBox = new QComboBox(this);
     portfolioTableView = new QTableView(this);
     portfolioModel = new QStandardItemModel(this);
-    portfolioModel->setHorizontalHeaderLabels({"Ticker", "Name", "Quantity", "Current Price"});
+    portfolioModel->setHorizontalHeaderLabels({"Ticker", "Name", "Quantity", "Current Price", "Value"});
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(accountComboBox);
@@ -108,13 +108,14 @@ void Portfolio::updateBalance(const QString& accountId)
     balanceLabel->setText(QString::number(portfolioValue) + " " + QString::fromStdString(portfolioAns->total_amount_portfolio().currency()));
 
     portfolioModel->setRowCount(portfolioAns->positions_size() - 1); // не понял почему, но вроде воркает
+    // auto portfolio1 = portfolioAns->positions(0);
 
-    // std::cout << "Я тут!_1" << '\n';
+    // std::cout << portfolioAns->positions(0) << '\n';
 
     for (int i = 0; i < portfolioAns->positions_size(); ++i) {
         const auto& position = portfolioAns->positions(i);
 
-        std::cout << portfolioRequest.ptr()->DebugString() << '\n';
+        // std::cout << position.figi() << '\t' << i << '\n';
         
         auto instrumentUID = position.instrument_uid();
 
@@ -141,6 +142,7 @@ void Portfolio::updateBalance(const QString& accountId)
         auto instrumentName = instrumentInfo.name();
         auto instrumentTicker = instrumentInfo.ticker();
 
+        // auto positionQuantity = position.quantity();
         // auto shareInfo = shareResponse->instrument();
         // auto shareName = shareInfo.name();
         // auto shareTicker = shareInfo.ticker();
@@ -150,6 +152,7 @@ void Portfolio::updateBalance(const QString& accountId)
         rowItems.append(new QStandardItem(QString::fromStdString(instrumentName)));
         rowItems.append(new QStandardItem(QString::number(position.quantity().units())));
         rowItems.append(new QStandardItem(QString::number(position.current_price().units()) + " " + QString::fromStdString(position.current_price().currency())));
+        rowItems.append(new QStandardItem(QString::number(position.current_price().units() * position.quantity().units()) + " " + QString::fromStdString(position.current_price().currency())));
         portfolioModel->appendRow(rowItems);
     }
 }

@@ -23,13 +23,20 @@
 //     auto accountID1 = dynamic_cast<GetAccountsResponse*>(accountListOfID.ptr().get());
 //     auto accountID12 = accountID1->accounts(0).id();
 
-//     std::cout << accountListOfID.ptr()->DebugString() << "\n";
+//     // std::cout << accountListOfID.ptr()->DebugString() << "\n";
+//     // std::cout << "Я тут" << '\n';
+//     // auto postOrderRequest = ordersService->PostOrder("BBG004730RP0", 2, 0, 0, tinkoff::public_::invest::api::contract::v1::OrderDirection::ORDER_DIRECTION_BUY, accountID12, tinkoff::public_::invest::api::contract::v1::OrderType::ORDER_TYPE_BESTPRICE, "123"); // не работает по выходным (ОЧЕВ)
+//     // auto postOrderResponse = dynamic_cast<PostOrderResponse*>(postOrderRequest.ptr().get());
+//     // std::cout << postOrderResponse->execution_report_status() << '\n';
 
-//     // auto PostOrderRequest = ordersService->PostOrder("962e2a95-02a9-4171-abd7-aa198dbe643a", 2, ); // не работает по выходным (ОЧЕВ)
+//     // auto getOrdersRequest = ordersService->GetOrders(accountID12);
+//     // std::cout << getOrdersRequest.ptr()->DebugString() << '\n';
 
 //     // auto sandboxPayInRequest = sandboxService->SandboxPayIn(accountID12, "RUB", 100500, 0);
+//     // auto OpenSandboxAccountRequest = sandboxService->OpenSandboxAccount();
 
 //     auto portfolioRequest = operationService->GetPortfolio(accountID12, PortfolioRequest_CurrencyRequest::PortfolioRequest_CurrencyRequest_RUB);
+
 //     auto portfolioAns = dynamic_cast<PortfolioResponse*>(portfolioRequest.ptr().get());
 //     auto portfolioValue = portfolioAns->total_amount_portfolio().units();
 
