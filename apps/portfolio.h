@@ -25,13 +25,19 @@ private slots:
     void onAccountChanged(int index);
 
 private:
+    void updateExpectedYield(const Quotation& yield);
+    void updateVirtualPositions(const google::protobuf::RepeatedPtrField<VirtualPortfolioPosition>& virtualPositions);
+
     QLabel *balanceLabel;
+    QLabel *yieldLabel;
     InvestApiClient *client;
     QString token;
     QComboBox *accountComboBox;
     std::vector<QString> accountIds;
     QTableView *portfolioTableView;
     QStandardItemModel *portfolioModel;
+    QTableView *virtualPortfolioTableView;
+    QStandardItemModel *virtualPortfolioModel;
 };
 
 #endif // PORTFOLIOBALANCE_H
