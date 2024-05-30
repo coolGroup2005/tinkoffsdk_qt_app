@@ -1,7 +1,13 @@
 #include "mainwindow.h"
-#include "akcii.h"
+#include "shares/shares.h"
 #include "ui_mainwindow.h"
 #include "homepage/homepage.h"
+#include "portfolio.h"
+#include <QStringList>
+#include <QStringListModel>
+#include <QMessageBox>
+
+#include <vector>
 
 QStandardItemModel* fillSharesList()
 {
@@ -69,15 +75,18 @@ QString accountsInfoText()
     return outputText;
 }
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     ui->tabWidget->setTabText(0, "Database Fiji");
-    ui->tabWidget->setTabText(1, "Portfolio");
-    ui->tabWidget->setTabText(2, "Statistics");
-    ui->tabWidget->setTabText(3, "Home");
+    ui->tabWidget->setTabText(1, "Statistics");
+    ui->tabWidget->setTabText(2, "Home");
+
+    portfolio = new Portfolio(this);
+    ui->tabWidget->addTab(portfolio, "Portfolio");
 
     // Iteraction with tab Home
     // Initialize model for table of shares
@@ -129,7 +138,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->top_active_list, &QListView::clicked, this, &MainWindow::on_topActiveList_clicked);
 }
 
-
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -138,14 +146,18 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_sharesTableView_activated(const QModelIndex &index)
 {
-    QString selectedName = ui->sharesTableView->model()->index(index.row(),0).data().toString();
-    ui->lineEdit->setText(selectedName);
-    MainWindow::openAkcii();
+    QString stockName = ui->sharesTableView->model()->index(index.row(),0).data().toString();
+    QString figi = ui->sharesTableView->model()->index(index.row(),1).data().toString();
+
+    ui->lineEdit->setText(stockName);
+
+    MainWindow::openShares(figi.toStdString(), stockName.toStdString());
 }
 
-void MainWindow::openAkcii()
+
+void MainWindow::openShares(const std::string& figi, const std::string& stockName)
 {
-    akcii *window1 = new akcii(this);
+    shares *window1 = new shares(this, figi, stockName);
     window1->show();
 }
 
