@@ -102,3 +102,30 @@ target_sources(shares_lib
     ${UI_HEADERS}
 )
 # target_link_libraries(ort ortools::ortools)
+
+
+
+
+
+file(GLOB 
+        HEADER_LIST4 
+        CONFIGURE_DEPENDS
+        "${DSBAProj_SOURCE_DIR}/include/statistics/*.h" 
+)
+
+add_library(statistics_lib 
+        statistics/statistics.cpp 
+        ${HEADER_LIST4} 
+        )
+
+# set include directories for statistics_lib
+target_include_directories(statistics_lib 
+        PUBLIC 
+        ../include
+        )
+
+target_link_libraries(statistics_lib 
+        PRIVATE 
+        tink_grpc_proto 
+        TinkoffInvestSDK
+        )
