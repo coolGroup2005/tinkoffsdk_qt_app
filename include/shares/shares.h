@@ -6,7 +6,6 @@
 #include "marketdataservice.h"
 #include <QTimer>
 #include <QDialog>
-
 #include <QtCharts>
 #include <QtSql>
 #include <QMessageBox>
@@ -35,7 +34,9 @@ private slots:
     void clearChart();
     void clearDatabase();
     void fetchCandlestickData();
-    void updateChart();
+    void updateCandleChart();
+    void updateLineChart();
+    void showTooltip(const QPointF &point, bool state);
 
 private:
     Ui::shares *ui;
