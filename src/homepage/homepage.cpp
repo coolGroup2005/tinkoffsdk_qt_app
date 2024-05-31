@@ -1,10 +1,12 @@
 #include "homepage/homepage.h"
-
+#include <QDebug> 
 #include <string>
 #include <vector>
 #include <chrono>
 #include <ctime>
 #include <cmath>
+#include <utility>
+
 
 ShareInfo::ShareInfo(std::string name, std::string figi, unsigned int trading_status): 
                     name(name), 
@@ -39,46 +41,10 @@ ShareInfo getShareInfo(InvestApiClient& client, std::string& figi)
     return share;
 }
 
-ShareInfo getShareInfoStatistics(InvestApiClient& client, std::string& figi)
-{
-    auto instrumentService = std::dynamic_pointer_cast<Instruments>(client.service("instruments"));
-    // auto answerInstruments = instrumentService->GetInstrumentBy(InstrumentIdType::INSTRUMENT_ID_TYPE_FIGI, "", figi);
-
-    auto answerShares = instrumentService->ShareBy(InstrumentIdType::INSTRUMENT_ID_TYPE_FIGI, "", figi);
-    auto answerShareReply = dynamic_cast<ShareResponse*>(answerShares.ptr().get());
-    // std::cout << answerReply->instrument().figi();
-
-    unsigned int tradingStatus = answerShareReply->instrument().trading_status();
-    std::string name = answerShareReply->instrument().name();
-    std::string currency = answerShareReply->instrument().currency();
-    MoneyValue nominal = answerShareReply->instrument().nominal();
-    nominal.units();
-    ShareInfo share {name, figi, tradingStatus, currency, nominal};
-
-    // std::cout << share.name << '\t' << share.currency <<  std::endl;
-    // return share;
-    
-
-    auto answerShares1 = instrumentService->Shares(INSTRUMENT_STATUS_BASE);
-    auto answerShareReply1 = dynamic_cast<SharesResponse*>(answerShares1.ptr().get());
-
-    // instruments(0)
-    // std::cout << answerShareReply->instruments_size();
-    // std::cout << answerShareReply->instruments(0).name();
-
-    // tinkoff::public_::invest::api::contract::v1::SharesResponse
-    for (int i = 0; i < answerShareReply1->instruments_size() - 1; i++) {
-        std::cout << answerShareReply1->instruments(i).figi() << '\t' << answerShareReply1->instruments(i).name() << '\n';
-    }
-
-    return share ;
-    
-}
-
 
 float getShareChange(int& intervalType, std::string& figi) {
 
-    std::cout << "aaaaaaa\n";
+    // std::cout << "aaaaaaa\n";
 
     auto now = std::chrono::system_clock::now();
     std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
@@ -106,41 +72,155 @@ float getShareChange(int& intervalType, std::string& figi) {
         }
     }
 
-    std::cout << "bbbbbbbb\n";
+    // std::cout << "bbbbbbbb\n";
 
 
     InvestApiClient client("sandbox-invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
 
-    CandleInterval interval = CandleInterval::CANDLE_INTERVAL_UNSPECIFIED;
-    interval = CandleInterval::CANDLE_INTERVAL_DAY;
+    // CandleInterval interval = CandleInterval::CANDLE_INTERVAL_UNSPECIFIED;
+    // interval = CandleInterval::CANDLE_INTERVAL_DAY;
     
 
     auto marketdata = std::dynamic_pointer_cast<MarketData>(client.service("marketdata"));
-    auto candlesServiceReply = marketdata->GetCandles(figi, dateFromToTime, 0, currentTime, 0, interval);
+    if (!marketdata) {
+        qDebug() << "error marketdata";
+        return -1;
+    }
+    auto candlesServiceReply = marketdata->GetCandles(figi, dateFromToTime, 0, currentTime, 0, CandleInterval::CANDLE_INTERVAL_DAY);
 
     auto response = dynamic_cast<GetCandlesResponse*>(candlesServiceReply.ptr().get());
+    if (!response) {
+        qDebug() << "error response";
+        return -1;
+    }
 
-    // std::string volume = std::to_string(candle.volume());
-    auto open_units = response->candles(0).open().units();
-    auto open_nano = response->candles(0).open().nano();
+    if (response->candles_size() == 0) {
+        qDebug() << "No candles found in the response";
+        return -1; 
+    }
 
-    auto close_units = response->candles(response->candles_size() - 1).close().units();
-    auto close_nano = response->candles(response->candles_size() - 1).close().nano();
+    auto firstCandle = response->candles(0);
+    auto lastCandle = response->candles(response->candles_size() - 1);
 
-    float total_open = open_units + open_nano/(std::pow(10, std::to_string(open_nano).length()));
-    float total_close = close_units + close_nano/(std::pow(10, std::to_string(close_nano).length()));
+    auto open_units = firstCandle.open().units();
+    auto open_nano = firstCandle.open().nano();
+    auto close_units = lastCandle.close().units();
+    auto close_nano = lastCandle.close().nano();
 
-    std::cout << total_open << std::endl;
-    std::cout << total_close << std::endl;
-    std::cout << std::to_string(close_nano).length() << std::endl;
-    std::cout << "open/close " << open_units << '\t' << close_units << '\n';
-    std::cout << "open/close " << open_nano << '\t' << close_nano << '\n';
+    if (!open_units && !open_nano) {
+        qDebug() << "Invalid open units or nano";
+        return -1;
+    }
+
+    if (!close_units && !close_nano) {
+        qDebug() << "Invalid close units or nano";
+        return -1;
+    }
+
+    float total_open = open_units + open_nano / (std::pow(10, std::to_string(open_nano).length()));
+    float total_close = close_units + close_nano / (std::pow(10, std::to_string(close_nano).length()));
 
     float x = (total_close - total_open) * 100 / total_open;
-    std::cout << x << std::endl;
     return x;
+
+        // std::string volume = std::to_string(candle.volume());
+    //     auto open_units = response->candles(0).open().units();
+    //     auto open_nano = response->candles(0).open().nano();
+
+    //     if (!open_units || !open_nano) {
+    //         qDebug() << "error open_units";
+    //         return -1;
+    //     }
+
+
+    // auto close_units = response->candles(response->candles_size() - 1).close().units();
+    // auto close_nano = response->candles(response->candles_size() - 1).close().nano();
+
+    // if (!close_nano || !close_units) {
+    //     qDebug() << "error close_nano";
+    //     return -1;
+    // }
+
+    // float total_open = open_units + open_nano/(std::pow(10, std::to_string(open_nano).length()));
+    // float total_close = close_units + close_nano/(std::pow(10, std::to_string(close_nano).length()));
+
+
+    // // std::cout << total_open << std::endl;
+    // // std::cout << total_close << std::endl;
+    // // std::cout << std::to_string(close_nano).length() << std::endl;
+    // // std::cout << "open/close " << open_units << '\t' << close_units << '\n';
+    // // std::cout << "open/close " << open_nano << '\t' << close_nano << '\n';
+
+
+    // float x = (total_close - total_open) * 100 / total_open;
+    // // std::cout << x << std::endl;
+    // return x;
     
 }
+
+std::vector<std::pair<ShareInfo, float>> getAllSharesWithChange(InvestApiClient& client, int& interval)
+{
+    // auto answerInstruments = instrumentService->GetInstrumentBy(InstrumentIdType::INSTRUMENT_ID_TYPE_FIGI, "", figi);
+
+    // auto answerShares = instrumentService->ShareBy(InstrumentIdType::INSTRUMENT_ID_TYPE_FIGI, "", figi);
+    // auto answerShareReply = dynamic_cast<ShareResponse*>(answerShares.ptr().get());
+    // std::cout << answerReply->instrument().figi();
+
+    // unsigned int tradingStatus = answerShareReply->instrument().trading_status();
+    // std::string name = answerShareReply->instrument().name();
+    // std::string currency = answerShareReply->instrument().currency();
+    // MoneyValue nominal = answerShareReply->instrument().nominal();
+    // nominal.units();
+    // ShareInfo share {name, figi, tradingStatus, currency, nominal};
+
+    // std::cout << share.name << '\t' << share.currency <<  std::endl;
+    // return share;
+
+
+    std::vector<std::pair<ShareInfo, float>> allShares;
+    auto instrumentService = std::dynamic_pointer_cast<Instruments>(client.service("instruments"));
+
+    auto answerShares = instrumentService->Shares(INSTRUMENT_STATUS_BASE);
+    auto answerShareReply = dynamic_cast<SharesResponse*>(answerShares.ptr().get());
+
+    std::cout << answerShareReply->instruments_size();
+
+    for (int i = 0; i < answerShareReply->instruments_size() - 1; i++) {
+
+        unsigned int tradingStatus = answerShareReply->instruments(i).trading_status();
+        // std::cout << i << "trading status: " << tradingStatus << std::endl;
+
+        if (tradingStatus == 5) {
+            std::string name =  answerShareReply->instruments(i).name();
+            std::string figi =  answerShareReply->instruments(i).figi();
+            std::string currency = answerShareReply->instruments(i).currency();
+            MoneyValue nominal =  answerShareReply->instruments(i).nominal();
+            ShareInfo share {name, figi, tradingStatus, currency, nominal};
+
+            float a = 10;
+            try {
+                float shareChange = getShareChange(interval, share.figi);
+                // std::cout << share.figi << '\t' << share.name << '\t' << shareChange << '\n';
+                auto pair = std::make_pair(share, shareChange);
+                allShares.push_back(pair);
+            } catch (...) {
+                std::cerr << "error getAllSharesWithChange " << '\n';
+                continue;
+            }
+        }
+
+    // std::cout << allShares.size();
+    }
+
+
+    // for (int i = 0; i < allShares.size(); ++i) {
+    //     std::cout << allShares[i].first.name << '\t' << allShares[i].second << '\n';
+    // }
+    return allShares;
+    
+}
+
+
 
 
 

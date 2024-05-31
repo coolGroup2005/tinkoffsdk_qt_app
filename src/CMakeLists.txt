@@ -28,13 +28,16 @@ add_library(invest_lib
 
 target_include_directories(invest_lib 
         PUBLIC 
-        ../include)
+        ../include
+        ${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
+        )
 
 # link invest_lib along with other required libraries
 target_link_libraries(invest_lib 
         PRIVATE # The PRIVATE keyword means that the library will be used by this project, but it will not be available to other projects via this project’s interface
         tink_grpc_proto 
         TinkoffInvestSDK
+        Qt${QT_VERSION_MAJOR}::Widgets
         )
 
 # the file() command is used to find all header files for homepage_lib
@@ -63,13 +66,14 @@ add_library(shares_lib #name of your library
 target_include_directories(homepage_lib 
         PUBLIC # Paths in PUBLIC section are used by projects that link to this library
         ../include
+        ${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
         )
 
 target_link_libraries(homepage_lib 
         PRIVATE # The PRIVATE keyword means that the library will be used by this project, but it will not be available to other projects via this project’s interface
         tink_grpc_proto 
         TinkoffInvestSDK
-        
+        Qt${QT_VERSION_MAJOR}::Widgets
         )
 
 
@@ -82,6 +86,7 @@ file(GLOB HEADER_LIST3
 target_include_directories(shares_lib 
         PUBLIC # Paths in PUBLIC section are used by projects that link to this library
         ../include
+        ${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
         )
 
 
