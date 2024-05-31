@@ -50,20 +50,24 @@ ShareInfo getShareInfo(InvestApiClient& client, std::string& figi)
 
 void clearDatabaseStatistics() {
     sqlite3* db;
-    int rc = sqlite3_open("companies.db", &db);
+    char* errMsg = 0;
+    int rc = sqlite3_open("statistics.db", &db);
+
     if (rc == SQLITE_OK) {
-        std::string sqlStatement = "DELETE FROM companies";
-        char* errMsg = 0;
+        std::string sqlStatement = "DELETE FROM statistics";
         rc = sqlite3_exec(db, sqlStatement.c_str(), 0, 0, &errMsg);
         if (rc != SQLITE_OK) {
-            // showError("SQL error: " + QString::fromStdString(errMsg));
+            std::cerr << "SQL error: " << errMsg << std::endl;
             sqlite3_free(errMsg);
+        } else {
+            std::cout << "Database cleared" << std::endl;
         }
         sqlite3_close(db);
     } else {
-        // showError("Can't open database: " + QString::number(rc));
+        std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
     }
 }
+
 
 float getShareChange(int& intervalType, std::string& figi) {
 
@@ -220,7 +224,6 @@ SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval)
             MoneyValue nominal =  answerShareReply->instruments(i).nominal();
             ShareInfo share {name, figi, tradingStatus, currency, nominal};
 
-            float a = 10;
             try {
                 float shareChange = getShareChange(interval, share.figi);
                 // std::cout << share.figi << '\t' << share.name << '\t' << shareChange << '\n';
@@ -251,14 +254,21 @@ void insertStatisticsIntoDatabase(SharesVector& sharesVector) {
     // Sort the sharesVector by priceChange in ascending order
     std::sort(sharesVector.begin(), sharesVector.end(), 
             [](const std::pair<ShareInfo, float>& a, const std::pair<ShareInfo, float>& b) {
+                // bool i = a.second < b.second;
+                // std::cout << a.second << " " << b.second << i << std::endl;
                 return a.second < b.second;
             });
+
+    for (const auto& sharePair : sharesVector) {
+        std::cout << sharePair.first.figi << " " << sharePair.second << std::endl;
+    }
 
     sqlite3* db;
     char* errMsg = 0;
     int rc = sqlite3_open("statistics.db", &db);
 
     std::string sqlStatement = "CREATE TABLE IF NOT EXISTS statistics ("
+                               "ID INTEGER PRIMARY KEY  AUTOINCREMENT, "
                                "company_name TEXT, "
                                "company_figi TEXT, "
                                "total_price_change REAL);";
