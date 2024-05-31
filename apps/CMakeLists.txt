@@ -19,6 +19,11 @@ set(PROJECT_SOURCES
     mainwindow.h
     portfolio.cpp
     portfolio.h
+
+    favouritesModel.cpp
+    favouritesModel.h
+    favouritesProxyModel.cpp
+    favouritesProxyModel.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

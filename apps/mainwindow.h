@@ -12,6 +12,8 @@
 
 #include <vector>
 
+#include "favouritesModel.h"
+#include "favouritesProxyModel.h"
 #include "portfolio.h"
 
 QT_BEGIN_NAMESPACE
@@ -37,8 +39,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    QStringListModel *model;
-    QList<QString> songs;
+    FavouritesModel *favouritesModel;
+    ProxyModel *proxyModel;
     Portfolio *portfolio;
 };
 

@@ -69,7 +69,7 @@ target_link_libraries(homepage_lib
         PRIVATE # The PRIVATE keyword means that the library will be used by this project, but it will not be available to other projects via this project’s interface
         tink_grpc_proto 
         TinkoffInvestSDK
-        
+        Qt${QT_VERSION_MAJOR}::Widgets 
         )
 
 

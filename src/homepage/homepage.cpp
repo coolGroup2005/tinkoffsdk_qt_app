@@ -1,6 +1,8 @@
 #include "homepage/homepage.h"
 
+
 AccountInfo::AccountInfo(std::string name, std::string id, std::string totalValue, std::string relYield): name(name), id(id), totalValue(totalValue), relYield(relYield){};
+
 
 std::vector<AccountInfo> getAccountInfo()
 {
@@ -22,55 +24,6 @@ std::vector<AccountInfo> getAccountInfo()
         accountsInfo.push_back({accountName, accountId, totalValue, yield});
     }
     return accountsInfo;
-}
-
-ShareInfo::ShareInfo(std::string name, std::string figi, unsigned int trading_status): name(name), figi(figi), trading_status(trading_status){};
-
-
-std::ostream& operator<< (std::ostream& ss, const ShareInfo& shareParam)
-{
-    ss << "Company: " << shareParam.name << '\n' << "Figi: " << shareParam.figi << '\n' << "Trading status: " << shareParam.trading_status << '\n';
-    return ss;
-}
-
-ShareInfo getShareInfo(InvestApiClient& client, std::string& figi)
-{
-    auto instrumentService = std::dynamic_pointer_cast<Instruments>(client.service("instruments"));
-    auto answerInstruments = instrumentService->GetInstrumentBy(InstrumentIdType::INSTRUMENT_ID_TYPE_FIGI, "", figi);
-    auto answerReply = dynamic_cast<InstrumentResponse*>(answerInstruments.ptr().get());
-    // std::cout << answerReply->instrument().figi();
-
-    std::string name = answerReply->instrument().name();
-    unsigned int tradingStatus = answerReply->instrument().trading_status();
-
-    ShareInfo share {name, figi, tradingStatus};
-    return share;
-}
-
-
-std::vector<ShareInfo> parseFigi()
-{
-    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
-
-    auto accountService = std::dynamic_pointer_cast<Users>(client.service("users"));
-    auto accountList = accountService->GetAccounts();
-    auto accountReply = dynamic_cast<GetAccountsResponse*>(accountList.ptr().get());
-    // std::cout << accountReply->DebugString();
-
-    auto operationService = std::dynamic_pointer_cast<Operations>(client.service("operations"));
-// TODO: Take into account the fact that there are several accounts, consider doing a combobox to switch between them
-    auto getPortfolio = operationService->GetPortfolio(accountReply->accounts(accountReply->accounts_size() - 1).id(), PortfolioRequest_CurrencyRequest::PortfolioRequest_CurrencyRequest_RUB);
-    auto portfolioReply = dynamic_cast<PortfolioResponse*>(getPortfolio.ptr().get());
-    auto PositionsList = portfolioReply->positions(); // virtual_positions()
-
-    std::vector<ShareInfo> sharesList;
-    for (size_t i = 0; i < PositionsList.size(); i++)
-    {
-        std::string figi = portfolioReply->positions(i).figi(); // virtual_positions()
-        sharesList.push_back(getShareInfo(client, figi));
-    }
-
-    return sharesList;
 }
 
 
@@ -115,4 +68,100 @@ std::string formatTradingStatus(unsigned int statusId)
         default:
             return "ERROR";
     }
+}
+
+
+QString accountsInfoText()
+{
+    std::vector<AccountInfo> accountsInfos = getAccountInfo();
+    QString outputText = "";
+    for (AccountInfo acc: accountsInfos)
+    {
+        outputText += acc.name + acc.id + acc.totalValue + acc.relYield;
+    }
+    return outputText;
+}
+
+
+ShareInfo::ShareInfo(std::string name, std::string figi, unsigned int trading_status): name(name), figi(figi), trading_status(formatTradingStatus(trading_status)){};
+
+
+std::ostream& operator<< (std::ostream& ss, const ShareInfo& shareParam)
+{
+    ss << "Company: " << shareParam.name << '\n' << "Figi: " << shareParam.figi << '\n' << "Trading status: " << shareParam.trading_status << '\n';
+    return ss;
+}
+
+
+ShareInfo getShareInfo(InvestApiClient& client, std::string& figi)
+{
+    auto instrumentService = std::dynamic_pointer_cast<Instruments>(client.service("instruments"));
+    auto answerInstruments = instrumentService->GetInstrumentBy(InstrumentIdType::INSTRUMENT_ID_TYPE_FIGI, "", figi);
+    auto answerReply = dynamic_cast<InstrumentResponse*>(answerInstruments.ptr().get());
+    // std::cout << answerReply->instrument().figi();
+
+    std::string name = answerReply->instrument().name();
+    unsigned int tradingStatus = answerReply->instrument().trading_status();
+
+    ShareInfo share {name, figi, tradingStatus};
+    return share;
+}
+
+
+std::vector<ShareInfo> parseFigi()
+{
+    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
+
+    auto accountService = std::dynamic_pointer_cast<Users>(client.service("users"));
+    auto accountList = accountService->GetAccounts();
+    auto accountReply = dynamic_cast<GetAccountsResponse*>(accountList.ptr().get());
+    // std::cout << accountReply->DebugString();
+
+    auto operationService = std::dynamic_pointer_cast<Operations>(client.service("operations"));
+// TODO: Take into account the fact that there are several accounts, consider doing a combobox to switch between them
+    auto getPortfolio = operationService->GetPortfolio(accountReply->accounts(accountReply->accounts_size() - 1).id(), PortfolioRequest_CurrencyRequest::PortfolioRequest_CurrencyRequest_RUB);
+    auto portfolioReply = dynamic_cast<PortfolioResponse*>(getPortfolio.ptr().get());
+    auto PositionsList = portfolioReply->positions(); // virtual_positions()
+
+    std::vector<ShareInfo> sharesList;
+    for (size_t i = 0; i < PositionsList.size(); i++)
+    {
+        std::string figi = portfolioReply->positions(i).figi(); // virtual_positions()
+        sharesList.push_back(getShareInfo(client, figi));
+    }
+
+    return sharesList;
+}
+
+
+std::vector<ShareInfo> parseTest()
+{
+    std::vector<ShareInfo> sharesList;
+    sharesList.push_back({"Контора лапочек", "ASD742964EDR", 5});
+    sharesList.push_back({"Жмых Эйрлайнс", "APG543789BDK", 12});
+    sharesList.push_back({"ООО Зеленоглазое такси", "WKV349048HCK", 14});
+    sharesList.push_back({"Таганрогская фабрика стульев", "WKC492840FPK", 1});
+    sharesList.push_back({"НИУ ВШИ", "RLA920548RIS", 6});
+    sharesList.push_back({"Рога и копыта", "JFK530593EJF", 2});
+    sharesList.push_back({"Галина", "SIL830204THC", 7});
+    sharesList.push_back({"Pythonzilla Inc.", "LFH673839FHJ", 0});
+    sharesList.push_back({"Мебельная фабрика стильные кухни", "FUS948285UDJ", 6});
+    sharesList.push_back({"Kakao M", "YSP732957USL", 3});
+    sharesList.push_back({"Колыбелькин", "DKS749275HFI", 2});
+    sharesList.push_back({"Уют Обед", "HFK582020WIF", 5});
+    sharesList.push_back({"Polymetal", "DKS682024HDD", 9});
+    sharesList.push_back({"Лаборатория Лос-Аламоса", "SLF402058EOE", 7});
+    sharesList.push_back({"ЗИЛ", "NAO362603OPS", 13});
+    sharesList.push_back({"Эн+", "OCP239030RKD", 2});
+    sharesList.push_back({"Татнефть", "FKL573924PGF", 8});
+    sharesList.push_back({"АО Красногорский завод им. С.А. Зверева", "DJL759274DSJ", 4});
+
+    // sharesList.push_back({"Лаборатория Лос-Аламоса", "USK482024XJF", 0});
+    // sharesList.push_back({"Лаборатория Лос-Аламоса", "PSN340482EGC", 8});
+    // sharesList.push_back({"Лаборатория Лос-Аламоса", "TIR594208PAK", 11});
+    // sharesList.push_back({"Лаборатория Лос-Аламоса", "APD438205LQE", 13});
+    // sharesList.push_back({"Лаборатория Лос-Аламоса", "SFE665435", 3});
+    // sharesList.push_back({"Лаборатория Лос-Аламоса", "OFH753893YUR", 9});
+
+    return sharesList;
 }

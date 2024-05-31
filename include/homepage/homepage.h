@@ -12,19 +12,26 @@
 
 #include <string>
 #include <vector>
+#include <QString>
+
 
 struct ShareInfo
 {
     std::string name;
     std::string figi;
-    unsigned int trading_status;
+    std::string trading_status;
 
     ShareInfo(std::string, std::string, unsigned int);
 };
 
+
 ShareInfo getShareInfo(InvestApiClient&, std::string&);
 std::vector<ShareInfo> parseFigi();
 std::string formatTradingStatus(unsigned int);
+QString accountsInfoText();
+
+std::vector<ShareInfo> parseTest();
+
 
 struct AccountInfo
 {
