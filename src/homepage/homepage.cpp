@@ -6,6 +6,10 @@
 #include <ctime>
 #include <cmath>
 #include <utility>
+#include <string>
+#include <sqlite3.h>
+#include <filesystem>
+#include <algorithm>
 
 
 ShareInfo::ShareInfo(std::string name, std::string figi, unsigned int trading_status): 
@@ -41,6 +45,25 @@ ShareInfo getShareInfo(InvestApiClient& client, std::string& figi)
     return share;
 }
 
+
+
+
+void clearDatabaseStatistics() {
+    sqlite3* db;
+    int rc = sqlite3_open("companies.db", &db);
+    if (rc == SQLITE_OK) {
+        std::string sqlStatement = "DELETE FROM companies";
+        char* errMsg = 0;
+        rc = sqlite3_exec(db, sqlStatement.c_str(), 0, 0, &errMsg);
+        if (rc != SQLITE_OK) {
+            // showError("SQL error: " + QString::fromStdString(errMsg));
+            sqlite3_free(errMsg);
+        }
+        sqlite3_close(db);
+    } else {
+        // showError("Can't open database: " + QString::number(rc));
+    }
+}
 
 float getShareChange(int& intervalType, std::string& figi) {
 
@@ -158,7 +181,7 @@ float getShareChange(int& intervalType, std::string& figi) {
     
 }
 
-std::vector<std::pair<ShareInfo, float>> getAllSharesWithChange(InvestApiClient& client, int& interval)
+SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval)
 {
     // auto answerInstruments = instrumentService->GetInstrumentBy(InstrumentIdType::INSTRUMENT_ID_TYPE_FIGI, "", figi);
 
@@ -177,7 +200,7 @@ std::vector<std::pair<ShareInfo, float>> getAllSharesWithChange(InvestApiClient&
     // return share;
 
 
-    std::vector<std::pair<ShareInfo, float>> allShares;
+    SharesVector allShares;
     auto instrumentService = std::dynamic_pointer_cast<Instruments>(client.service("instruments"));
 
     auto answerShares = instrumentService->Shares(INSTRUMENT_STATUS_BASE);
@@ -216,11 +239,64 @@ std::vector<std::pair<ShareInfo, float>> getAllSharesWithChange(InvestApiClient&
     // for (int i = 0; i < allShares.size(); ++i) {
     //     std::cout << allShares[i].first.name << '\t' << allShares[i].second << '\n';
     // }
+    clearDatabaseStatistics();
     return allShares;
     
 }
 
 
+
+
+void insertStatisticsIntoDatabase(SharesVector& sharesVector) {    
+    // Sort the sharesVector by priceChange in ascending order
+    std::sort(sharesVector.begin(), sharesVector.end(), 
+            [](const std::pair<ShareInfo, float>& a, const std::pair<ShareInfo, float>& b) {
+                return a.second < b.second;
+            });
+
+    sqlite3* db;
+    char* errMsg = 0;
+    int rc = sqlite3_open("statistics.db", &db);
+
+    std::string sqlStatement = "CREATE TABLE IF NOT EXISTS statistics ("
+                               "company_name TEXT, "
+                               "company_figi TEXT, "
+                               "total_price_change REAL);";
+    rc = sqlite3_exec(db, sqlStatement.c_str(), 0, 0, &errMsg);
+    if (rc != SQLITE_OK) {
+        std::cerr << "SQL error: " << errMsg << std::endl;
+        sqlite3_free(errMsg);
+    }
+
+    std::cout << "Database created" << std::endl;
+
+    sqlite3_stmt* stmt;
+    sqlStatement = "INSERT INTO statistics (company_name, company_figi, total_price_change) VALUES (?, ?, ?);";
+    rc = sqlite3_prepare_v2(db, sqlStatement.c_str(), -1, &stmt, 0);
+    if (rc != SQLITE_OK) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+    } else {
+        for (const auto& sharePair : sharesVector) {
+            const ShareInfo& share = sharePair.first;
+            float priceChange = sharePair.second;
+
+            sqlite3_bind_text(stmt, 1, share.name.c_str(), -1, SQLITE_STATIC);
+            sqlite3_bind_text(stmt, 2, share.figi.c_str(), -1, SQLITE_STATIC);
+            sqlite3_bind_double(stmt, 3, priceChange);
+
+            rc = sqlite3_step(stmt);
+            if (rc != SQLITE_DONE) {
+                std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+                break;
+            }
+            sqlite3_reset(stmt); // Reset the statement for the next iteration
+        }
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+
+    std::cout << "Inserted all" << std::endl;
+}
 
 
 

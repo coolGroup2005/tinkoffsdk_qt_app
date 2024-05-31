@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
     
     int a = 2;
     auto allShares = getAllSharesWithChange(client, a);
-
+    insertStatisticsIntoDatabase(allShares);
     // float x = getShareChange(a, figi);
     return app.exec();
 }

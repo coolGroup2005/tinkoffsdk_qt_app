@@ -74,6 +74,8 @@ target_link_libraries(homepage_lib
         tink_grpc_proto 
         TinkoffInvestSDK
         Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::Sql
+        sqlite3
         )
 
 
