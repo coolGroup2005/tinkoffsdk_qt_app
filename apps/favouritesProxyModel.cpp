@@ -1,14 +1,14 @@
 #include "favouritesProxyModel.h"
 
 
-ProxyModel::ProxyModel(QObject* parent) : QSortFilterProxyModel(parent) {}
+ProxyModel::ProxyModel(QObject* parent) : QSortFilterProxyModel(parent), _trading_status("ALL") {}
 
 
 bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex& source_parent) const
 {
     QModelIndex tradeStatusIndex = sourceModel()->index(source_row, 2, source_parent);
 
-    if (sourceModel()->data(tradeStatusIndex) != _trading_status)
+    if (sourceModel()->data(tradeStatusIndex) != _trading_status && _trading_status != "ALL")
         return false;
 
     return true;

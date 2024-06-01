@@ -10,32 +10,7 @@
 
 #include <vector>
 
-// QStandardItemModel* fillSharesList()
-// {
-//     std::vector<ShareInfo> sharesList;
-//     sharesList = parseFigi();
-
-//     const int numRows = sharesList.size();
-//     const int numColumns = 3;
-//     QStandardItemModel* model = new QStandardItemModel(numRows, numColumns);
-//     model->setHeaderData(0, Qt::Horizontal, "Name", Qt::DisplayRole);
-//     model->setHeaderData(1, Qt::Horizontal, "Figi", Qt::DisplayRole);
-//     model->setHeaderData(2, Qt::Horizontal, "Trading Status", Qt::DisplayRole);
-//     for (int i = 0; i < numRows; ++i)
-//     {
-//         QList<QStandardItem*> itemsList;
-//         itemsList.append(new QStandardItem(QString::fromStdString(sharesList[i].name)));
-//         itemsList.append(new QStandardItem(QString::fromStdString(sharesList[i].figi)));
-//         itemsList.append(new QStandardItem(QString::fromStdString(formatTradingStatus(sharesList[i].trading_status))));
-//         for (short j = 0; j < 3; ++j)
-//         {
-//             itemsList[j]->setEditable(false);
-//             model->setItem(i, j, itemsList[j]);
-//         }
-//     }
-//     return model;
-// }
-
+#include <QListWidget>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -53,11 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Iteraction with tab Home
     proxyModel->setSourceModel(favouritesModel);
-    // TODO: implement getting filter from user
-    proxyModel->setTradingStatus("SESSION OPEN");
-
+    createCheckboxList();
     ui->sharesTableView->setModel(proxyModel);
-    // ui->sharesTableView->setSortingEnabled(true); 
     ui->sharesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->sharesTableView->verticalHeader()->setVisible(false);
     ui->sharesTableView->setStyleSheet("QHeaderView::section {background-color: lightgrey}");
@@ -106,7 +78,67 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::on_sharesTableView_activated(const QModelIndex &index)
+void MainWindow::createCheckboxList()
+{
+    QStringList  itemLabels = {"STATUS UNSPECIFIED", "NOT AVAILABLE FOR TRADING", 
+                            "OPENING PERIOD", "CLOSING PERIOD", "BREAK IN TRADING", 
+                            "NORMAL TRADING", "CLOSING AUCTION", "DARK POOL AUCTION", 
+                            "DISCRETE AUCTION", "OPENING AUCTION PERIOD", "TRADING AT CLOSING AUCTION PRICE", 
+                            "SESSION ASSIGNED", "SESSION CLOSE", "SESSION OPEN", 
+                            "DEALER NORMAL TRADING", "DEALER BREAK IN TRADING", "DEALER NOT AVAILABLE FOR TRADING"};
+
+    QStringListIterator it(itemLabels);
+    while (it.hasNext())
+    {
+        QListWidgetItem *listItem = new QListWidgetItem(it.next(), ui->listWidget);
+        listItem->setCheckState(Qt::Unchecked);
+        listItem->setFlags(listItem->flags() & ~Qt::ItemIsSelectable);
+        ui->listWidget->addItem(listItem);
+    }
+
+    connectCheckboxes();
+}
+
+
+void MainWindow::connectCheckboxes() 
+{
+    for (int i = 0; i < ui->listWidget->count(); ++i) {
+        QListWidgetItem *item = ui->listWidget->item(i);
+        connect(ui->listWidget, &QListWidget::itemChanged, this, &MainWindow::checkItemsChecked);
+    }
+}
+
+
+void MainWindow::checkItemsChecked(QListWidgetItem* changedItem)
+{
+    if (changedItem->checkState() == Qt::Checked) 
+    {
+        for (int i = 0; i < ui->listWidget->count(); ++i) 
+        {
+            QListWidgetItem *item = ui->listWidget->item(i);
+            if (item != changedItem) 
+                item->setCheckState(Qt::Unchecked);
+        }
+        updateFilter();
+    }
+    else
+        proxyModel->setTradingStatus("ALL");
+}
+
+void MainWindow::updateFilter() 
+{
+    QString filterString;
+    for (int i = 0; i < ui->listWidget->count(); ++i) {
+        QListWidgetItem *item = ui->listWidget->item(i);
+        if (item->checkState() == Qt::Checked) {
+            filterString = item->text();
+        }
+    }
+    proxyModel->setTradingStatus(filterString);
+}
+
+
+void MainWindow::on_sharesTableView_doubleClicked(const QModelIndex &index)
 {
     QString stockName = ui->sharesTableView->model()->index(index.row(),0).data().toString();
     QString figi = ui->sharesTableView->model()->index(index.row(),1).data().toString();
