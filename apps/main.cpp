@@ -1,6 +1,7 @@
 // #include <QApplication>
 // #include "mainwindow.h"
 #include "homepage/homepage.h"
+#include "statistics/statistics.h"
 
 #include "investapiclient.h"
 #include "usersservice.h"
@@ -70,6 +71,12 @@ int main(int argc, char *argv[])
     int a = 2;
     auto allShares = getAllSharesWithChange(client, a);
     insertStatisticsIntoDatabase(allShares);
+    std::vector<std::pair<std::string, float>> top = getTopGainers();
+    // for (const auto& sharePair : top) {
+    //     std::cout << "Company: " << sharePair.first << "\n"
+    //               << "Price Change: " << sharePair.second << "%\n"
+    //               << "-----------------------------\n";
+    // }
     // float x = getShareChange(a, figi);
     return app.exec();
 }

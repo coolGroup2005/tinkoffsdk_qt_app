@@ -113,7 +113,7 @@ target_sources(shares_lib
 
 
 
-
+# set include directories for statistics_lib ===============================================
 file(GLOB 
         HEADER_LIST4 
         CONFIGURE_DEPENDS
@@ -125,14 +125,17 @@ add_library(statistics_lib
         ${HEADER_LIST4} 
         )
 
-# set include directories for statistics_lib
 target_include_directories(statistics_lib 
         PUBLIC 
         ../include
+        ${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
         )
 
 target_link_libraries(statistics_lib 
         PRIVATE 
         tink_grpc_proto 
         TinkoffInvestSDK
+        Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::Sql
+        sqlite3
         )

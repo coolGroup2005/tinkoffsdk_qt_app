@@ -57,6 +57,7 @@ target_link_libraries(
     invest_lib 
     homepage_lib
     shares_lib
+    statistics_lib
     tink_grpc_proto 
     TinkoffInvestSDK 
     sqlite3

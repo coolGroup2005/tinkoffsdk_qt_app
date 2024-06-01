@@ -10,3 +10,4 @@ apps/mainwindow.ui.autosave
 docs/CMakeLists.txt.autosave
 candles.db
 .DS_Store
+statistics.session.sql

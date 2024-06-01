@@ -27,18 +27,19 @@ struct ShareInfo
 
 };
 
-typedef std::vector<std::pair<ShareInfo, float>> SharesVector;
+// typedef std::vector<std::pair<ShareInfo, float>> SharesVector;
 
 ShareInfo getShareInfo(InvestApiClient&, std::string&);
 
-SharesVector getAllSharesWithChange(InvestApiClient&, int&);
+// SharesVector getAllSharesWithChange(InvestApiClient&, int&);
+// std::vector<std::pair<std::string, float>> getTopGainers();
 
 std::vector<ShareInfo> parseFigi();
 std::string formatTradingStatus(unsigned int);
 
-float getShareChange(int& intervalType, std::string& figi);
-void clearDatabaseStatistics();
+// float getShareChange(int& intervalType, std::string& figi);
+// void clearDatabaseStatistics();
 
-void insertStatisticsIntoDatabase(SharesVector&);
+// void insertStatisticsIntoDatabase(SharesVector&);
 
 #endif // __EXAMPLE_H__
