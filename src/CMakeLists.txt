@@ -28,13 +28,16 @@ add_library(invest_lib
 
 target_include_directories(invest_lib 
         PUBLIC 
-        ../include)
+        ../include
+        ${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
+        )
 
 # link invest_lib along with other required libraries
 target_link_libraries(invest_lib 
         PRIVATE # The PRIVATE keyword means that the library will be used by this project, but it will not be available to other projects via this project’s interface
         tink_grpc_proto 
         TinkoffInvestSDK
+        Qt${QT_VERSION_MAJOR}::Widgets
         )
 
 # the file() command is used to find all header files for homepage_lib
@@ -63,13 +66,16 @@ add_library(shares_lib #name of your library
 target_include_directories(homepage_lib 
         PUBLIC # Paths in PUBLIC section are used by projects that link to this library
         ../include
+        ${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
         )
 
 target_link_libraries(homepage_lib 
         PRIVATE # The PRIVATE keyword means that the library will be used by this project, but it will not be available to other projects via this project’s interface
         tink_grpc_proto 
         TinkoffInvestSDK
-        
+        Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::Sql
+        sqlite3
         )
 
 
@@ -82,6 +88,7 @@ file(GLOB HEADER_LIST3
 target_include_directories(shares_lib 
         PUBLIC # Paths in PUBLIC section are used by projects that link to this library
         ../include
+        ${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
         )
 
 
@@ -102,3 +109,33 @@ target_sources(shares_lib
     ${UI_HEADERS}
 )
 # target_link_libraries(ort ortools::ortools)
+
+
+
+
+# set include directories for statistics_lib ===============================================
+file(GLOB 
+        HEADER_LIST4 
+        CONFIGURE_DEPENDS
+        "${DSBAProj_SOURCE_DIR}/include/statistics/*.h" 
+)
+
+add_library(statistics_lib 
+        statistics/statistics.cpp 
+        ${HEADER_LIST4} 
+        )
+
+target_include_directories(statistics_lib 
+        PUBLIC 
+        ../include
+        ${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
+        )
+
+target_link_libraries(statistics_lib 
+        PRIVATE 
+        tink_grpc_proto 
+        TinkoffInvestSDK
+        Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::Sql
+        sqlite3
+        )

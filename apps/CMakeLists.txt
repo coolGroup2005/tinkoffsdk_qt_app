@@ -19,6 +19,8 @@ set(PROJECT_SOURCES
     mainwindow.h
     portfolio.cpp
     portfolio.h
+    figi.h 
+    figi.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -27,6 +29,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         mainwindow.h mainwindow.cpp mainwindow.ui
         portfolio.h portfolio.cpp portfolio.ui
+        figi.h figi.cpp
+        figi.ui
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET tinkoff-app APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -57,6 +61,7 @@ target_link_libraries(
     invest_lib 
     homepage_lib
     shares_lib
+    statistics_lib
     tink_grpc_proto 
     TinkoffInvestSDK 
     sqlite3
