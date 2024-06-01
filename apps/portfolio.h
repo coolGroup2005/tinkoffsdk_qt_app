@@ -25,6 +25,8 @@ public:
 private slots:
     void onAccountChanged(int index);
     void onUpdateButtonClicked();
+    void onTableDoubleClicked(const QModelIndex &index);
+    void onVirtualTableDoubleClicked(const QModelIndex &index);
 
 private:
     void updateExpectedYield(const Quotation& yield);

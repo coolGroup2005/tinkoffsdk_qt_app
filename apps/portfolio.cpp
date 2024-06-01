@@ -120,6 +120,9 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
         accountComboBox->addItem(account.name().c_str(), QVariant(account.id().c_str()));
     }
 
+    
+    connect(portfolioTableView, &QTableView::doubleClicked, this, &Portfolio::onTableDoubleClicked);
+    connect(virtualPortfolioTableView, &QTableView::doubleClicked, this, &Portfolio::onVirtualTableDoubleClicked);
     connect(accountComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onAccountChanged(int)));
     connect(updateButton, &QPushButton::clicked, this, &Portfolio::onUpdateButtonClicked);
 
@@ -290,4 +293,34 @@ void Portfolio::onUpdateButtonClicked()
         virtualPortfolioModel->setRowCount(0);
         updateBalance(accountId);
     }
+}
+
+void Portfolio::onTableDoubleClicked(const QModelIndex &index)
+{
+    if (!index.isValid())
+        return;
+
+    int row = index.row();
+    QString ticker = portfolioModel->item(row, 0)->text();
+    QString name = portfolioModel->item(row, 1)->text();
+
+    std::cout << "13213213123" << '\n';
+
+    // тут вызвать функцию показа свечей + добавить в хедер инклюд
+    // showCandlestickChart(ticker, name);
+}
+
+void Portfolio::onVirtualTableDoubleClicked(const QModelIndex &index)
+{
+    if (!index.isValid())
+        return;
+
+    int row = index.row();
+    QString ticker = portfolioModel->item(row, 0)->text();
+    QString name = portfolioModel->item(row, 1)->text();
+
+    std::cout << "виртуалка" << '\n';
+
+    // тут вызвать функцию показа свечей + добавить в хедер инклюд
+    // showCandlestickChart(ticker, name);
 }
