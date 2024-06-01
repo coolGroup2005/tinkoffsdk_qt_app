@@ -112,24 +112,16 @@ std::vector<ShareInfo> parseFigi()
 {
     InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
 
-    auto accountService = std::dynamic_pointer_cast<Users>(client.service("users"));
-    auto accountList = accountService->GetAccounts();
-    auto accountReply = dynamic_cast<GetAccountsResponse*>(accountList.ptr().get());
-    // std::cout << accountReply->DebugString();
-
-    auto operationService = std::dynamic_pointer_cast<Operations>(client.service("operations"));
-// TODO: Take into account the fact that there are several accounts, consider doing a combobox to switch between them
-    auto getPortfolio = operationService->GetPortfolio(accountReply->accounts(accountReply->accounts_size() - 1).id(), PortfolioRequest_CurrencyRequest::PortfolioRequest_CurrencyRequest_RUB);
-    auto portfolioReply = dynamic_cast<PortfolioResponse*>(getPortfolio.ptr().get());
-    auto PositionsList = portfolioReply->positions(); // virtual_positions()
+    auto instrumentService = std::dynamic_pointer_cast<Instruments>(client.service("instruments"));
+    auto instrumentAnswer = instrumentService->GetFavorites();
+    auto favouritesList =  dynamic_cast<GetFavoritesResponse*>(instrumentAnswer.ptr().get());
 
     std::vector<ShareInfo> sharesList;
-    for (size_t i = 0; i < PositionsList.size(); i++)
+    for (size_t i = 0; i < favouritesList->favorite_instruments_size(); ++i)
     {
-        std::string figi = portfolioReply->positions(i).figi(); // virtual_positions()
+        std::string figi = favouritesList->favorite_instruments(0).figi();
         sharesList.push_back(getShareInfo(client, figi));
     }
-
     return sharesList;
 }
 

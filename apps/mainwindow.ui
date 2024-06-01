@@ -267,7 +267,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="5,1">
+         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,1">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <item>
@@ -340,20 +340,6 @@
             <property name="topMargin">
              <number>48</number>
             </property>
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt; font-weight:700;&quot;&gt;Information about account&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="labelAccount">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_6">
               <item>
