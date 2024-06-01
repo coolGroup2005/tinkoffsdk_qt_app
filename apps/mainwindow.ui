@@ -61,87 +61,6 @@
       <property name="currentIndex">
        <number>1</number>
       </property>
-      <widget class="QWidget" name="figi">
-       <attribute name="title">
-        <string>Tab 1</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Enter company name</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <property name="bottomMargin">
-           <number>100</number>
-          </property>
-          <item>
-           <widget class="QTextEdit" name="textEdit">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QTextEdit#textEdit {
-	border-radius: 10px;
-	background-color: rgb(222, 222,  222);
-}</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton#pushButton {
-	margin: 0;
-	background-color: rgb(193, 193, 193);
-	padding: 5px;
-	border-radius: 8px;
-}</string>
-            </property>
-            <property name="text">
-             <string>PushButton</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>Suggestions:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QTableView" name="tableView">
-          <property name="styleSheet">
-           <string notr="true">QTableView#tableView {
-	border-radius: 10px;
-	background-color: rgb(222, 222, 222);
-}</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="statistics">
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
@@ -166,6 +85,7 @@
             <property name="font">
              <font>
               <pointsize>30</pointsize>
+              <bold>true</bold>
              </font>
             </property>
             <property name="styleSheet">
@@ -306,6 +226,11 @@
                 <height>40</height>
                </size>
               </property>
+              <property name="font">
+               <font>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="text">
                <string>Top Gainers</string>
               </property>
@@ -332,6 +257,11 @@
                 <width>16777215</width>
                 <height>40</height>
                </size>
+              </property>
+              <property name="font">
+               <font>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="text">
                <string>Top Losers</string>

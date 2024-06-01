@@ -18,16 +18,15 @@ MainWindow::MainWindow(QWidget *parent)
     databaseFigi(new DatabaseFigi(this))
 {
     ui->setupUi(this);
-    ui->tabWidget->setTabText(0, "Database Fiji");
-    ui->tabWidget->setTabText(1, "Statistics");
-    ui->tabWidget->setTabText(2, "Home");
+    ui->tabWidget->setTabText(0, "Statistics");
+    ui->tabWidget->setTabText(1, "Home");
 
     portfolio = new Portfolio(this);
     ui->tabWidget->addTab(portfolio, "Portfolio");
     ui->tabWidget->addTab(databaseFigi, "Database Figi");
 
 
-    // Iteraction with tab Home
+    // Iteraction with tab Home ====================================================
     QStringList list;
     model = new QStringListModel;
 
@@ -42,18 +41,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     model->setStringList(list);
     ui->listView->setModel(model);
+    // END Home ===================================================================
+
+
+    // Interaction with tab Statistics ============================================
     ui->checkBoxStatistics->setChecked(true);
 
     connect(ui->listView, &QListView::activated, this, &MainWindow::on_listView_clicked);
-
-    // Connect list view clicked signals to slots
     connect(ui->top_gainers_list, &QListView::clicked, this, &MainWindow::on_topGainersList_clicked);
     connect(ui->top_losers_list, &QListView::clicked, this, &MainWindow::on_topLosersList_clicked);
-    // connect(ui->top_active_list, &QListView::clicked, this, &MainWindow::on_topActiveList_clicked);
-
     connect(ui->updateStatisticsButton, &QPushButton::clicked, this, &MainWindow::updateStatistics);
-    connect(ui->checkBoxStatistics, &QCheckBox::stateChanged, this, &MainWindow::on_checkBoxStatistics_stateChanged);
-
 
     ui->intervalStatisticsCombobox->addItem("1 day");
     ui->intervalStatisticsCombobox->addItem("1 week");
@@ -61,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     databaseFigi->insertSharesIntoDatabase();
     updateStatistics();
-    // Interaction with tab Statistics ===============================================================
+    // END Statistics ================================================================
 }
 
 
@@ -83,23 +80,14 @@ void MainWindow::updateStatistics()
 
     ui->top_gainers_list->setModel(topGainersModel);
     ui->top_losers_list->setModel(topLosersModel);
-    // ui->top_active_list->setModel(topActiveModel);
-
-    // updateStatistics();
 }
 
 
-
-void MainWindow::on_checkBoxStatistics_stateChanged(int state)
-{
-    
-}
 void MainWindow::on_topGainersList_clicked(const QModelIndex &index)
 {
     QString selectedItem = index.data().toString();
     QMessageBox::information(this, "Top Gainer Selected", "You selected: " + selectedItem);
 }
-
 
 void MainWindow::on_topLosersList_clicked(const QModelIndex &index)
 {
@@ -107,15 +95,6 @@ void MainWindow::on_topLosersList_clicked(const QModelIndex &index)
     QMessageBox::information(this, "Top Loser Selected", "You selected: " + selectedItem);
 }
 
-
-void MainWindow::on_topActiveList_clicked(const QModelIndex &index)
-{
-    QString selectedItem = index.data().toString();
-    QMessageBox::information(this, "Top Active Selected", "You selected: " + selectedItem);
-}
-
-
-// END =====================================================================================
 
 
 MainWindow::~MainWindow()

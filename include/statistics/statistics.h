@@ -40,32 +40,7 @@ signals:
 
 
 
-class DatabaseFigi : public QWidget {
-    Q_OBJECT
 
-public:
-    explicit DatabaseFigi(QWidget *parent = nullptr);
-    void insertSharesIntoDatabase();
-
-private slots:
-    void onSearchButtonClicked();
-
-private:
-    QVBoxLayout *mainLayout;
-    QHBoxLayout *searchLayout;
-    QLabel *enterLabel;
-    QTextEdit *textEdit;
-    QPushButton *searchButton;
-    QLabel *suggestionsLabel;
-    QTableView *tableView;
-    QStandardItemModel *tableModel;
-    QSqlDatabase db;
-
-    void initializeUI();
-    void initializeDatabase();
-    void setupConnections();
-    void loadAllShares();
-};
 
 SharesVector getAllSharesWithChange(InvestApiClient&, int&, bool);
 std::vector<std::pair<std::string, float>> getTopFromDb(std::string type);
