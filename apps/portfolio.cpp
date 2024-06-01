@@ -21,17 +21,16 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
 
     updateButton->setStyleSheet(
         "QPushButton {"
-        "    background-color: rgb(193, 193, 193);"  
-        "    border-radius: 15px;"  
-        "    padding: 10px 20px;"  
+        "    background-color: rgb(193, 193, 193);"
+        "    border-radius: 15px;"
+        "    padding: 10px 20px;"
         "}"
         "QPushButton:hover {"
-        "    background-color: rgb(170, 170, 170);"  
+        "    background-color: rgb(170, 170, 170);"
         "}"
         "QPushButton:pressed {"
-        "    background-color: rgb(150, 150, 150);"  
-        "}"
-    );
+        "    background-color: rgb(150, 150, 150);"
+        "}");
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(accountComboBox);
@@ -95,7 +94,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     virtualPortfolioTableView->verticalHeader()->setVisible(false);
 
     token = getenv("TOKEN");
-    client = new InvestApiClient("sandbox-invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
+    client = new InvestApiClient("invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
 
     auto accountService = std::dynamic_pointer_cast<Users>(client->service("users"));
 
@@ -177,30 +176,14 @@ void Portfolio::updateBalance(const QString &accountId)
     }
     else
     {
-
-        // std::cout << portfolioAns->positions().size() << '\n';
-        // auto portfolio1 = portfolioAns->positions(0);
-
-        // std::cout << portfolioAns->positions(0) << '\n';
-
         for (int i = 0; i < portfolioAns->positions_size(); ++i)
         {
             const auto &position = portfolioAns->positions(i);
 
-            // std::cout << position.figi() << '\t' << i << '\n';
-
             auto instrumentUID = position.instrument_uid();
-
-            // if (position.instrument_type() == "currency"){
-            //     auto instrumentRequest = instrumentsService->GetInstrumentBy(tinkoff::public_::invest::api::contract::v1::InstrumentIdType::INSTRUMENT_ID_TYPE_UID, "", instrumentUID);
-            //     auto instrumentResponse = dynamic_cast<CurrencyResponse*>(instrumentRequest.ptr().get());
-            // }
 
             auto instrumentRequest = instrumentsService->GetInstrumentBy(tinkoff::public_::invest::api::contract::v1::InstrumentIdType::INSTRUMENT_ID_TYPE_UID, "", instrumentUID);
             auto instrumentResponse = dynamic_cast<InstrumentResponse *>(instrumentRequest.ptr().get());
-
-            // auto instrumentRequest = instrumentsService->ShareBy(tinkoff::public_::invest::api::contract::v1::InstrumentIdType::INSTRUMENT_ID_TYPE_UID, "", instrumentUID);
-            // auto shareResponse = dynamic_cast<ShareResponse*>(instrumentRequest.ptr().get());
 
             if (!instrumentResponse)
             {
@@ -208,23 +191,29 @@ void Portfolio::updateBalance(const QString &accountId)
                 return;
             }
 
-            // std::cout << "Я тут!" << '\n';
-
             auto instrumentInfo = instrumentResponse->instrument();
             auto instrumentName = instrumentInfo.name();
             auto instrumentTicker = instrumentInfo.ticker();
 
-            // auto positionQuantity = position.quantity();
-            // auto shareInfo = shareResponse->instrument();
-            // auto shareName = shareInfo.name();
-            // auto shareTicker = shareInfo.ticker();
-
             QList<QStandardItem *> rowItems;
-            rowItems.append(new QStandardItem(QString::fromStdString(instrumentTicker)));
-            rowItems.append(new QStandardItem(QString::fromStdString(instrumentName)));
-            rowItems.append(new QStandardItem(QString::number(position.quantity().units())));
-            rowItems.append(new QStandardItem(QString::number(position.current_price().units()) + " " + QString::fromStdString(position.current_price().currency())));
-            rowItems.append(new QStandardItem(QString::number(position.current_price().units() * position.quantity().units()) + " " + QString::fromStdString(position.current_price().currency())));
+            QStandardItem *tickerItem = new QStandardItem(QString::fromStdString(instrumentTicker));
+            QStandardItem *nameItem = new QStandardItem(QString::fromStdString(instrumentName));
+            QStandardItem *quantityItem = new QStandardItem(QString::number(position.quantity().units()));
+            QStandardItem *priceItem = new QStandardItem(QString::number(position.current_price().units()) + " " + QString::fromStdString(position.current_price().currency()));
+            QStandardItem *valueItem = new QStandardItem(QString::number(position.current_price().units() * position.quantity().units()) + " " + QString::fromStdString(position.current_price().currency()));
+
+            tickerItem->setFlags(tickerItem->flags() & ~Qt::ItemIsEditable);
+            nameItem->setFlags(nameItem->flags() & ~Qt::ItemIsEditable);
+            quantityItem->setFlags(quantityItem->flags() & ~Qt::ItemIsEditable);
+            priceItem->setFlags(priceItem->flags() & ~Qt::ItemIsEditable);
+            valueItem->setFlags(valueItem->flags() & ~Qt::ItemIsEditable);
+
+            rowItems.append(tickerItem);
+            rowItems.append(nameItem);
+            rowItems.append(quantityItem);
+            rowItems.append(priceItem);
+            rowItems.append(valueItem);
+
             portfolioModel->appendRow(rowItems);
         }
     }
@@ -237,9 +226,6 @@ void Portfolio::updateBalance(const QString &accountId)
     }
     else
     {
-
-        // virtualPortfolioModel->setRowCount(virtualPositions.size() - 1);
-
         for (int i = 0; i < virtualPositions.size(); ++i)
         {
             const auto &position = virtualPositions[i];
@@ -260,11 +246,24 @@ void Portfolio::updateBalance(const QString &accountId)
             auto instrumentTicker = instrumentInfo.ticker();
 
             QList<QStandardItem *> rowItems;
-            rowItems.append(new QStandardItem(QString::fromStdString(instrumentTicker)));
-            rowItems.append(new QStandardItem(QString::fromStdString(instrumentName)));
-            rowItems.append(new QStandardItem(QString::number(position.quantity().units())));
-            rowItems.append(new QStandardItem(QString::number(position.current_price().units()) + " " + QString::fromStdString(position.current_price().currency())));
-            rowItems.append(new QStandardItem(QString::number(position.current_price().units() * position.quantity().units()) + " " + QString::fromStdString(position.current_price().currency())));
+            QStandardItem *ticker = new QStandardItem(QString::fromStdString(instrumentTicker));
+            QStandardItem *nameItem = new QStandardItem(QString::fromStdString(instrumentName));
+            QStandardItem *quantityItem = new QStandardItem(QString::number(position.quantity().units()));
+            QStandardItem *priceItem = new QStandardItem(QString::number(position.current_price().units()) + " " + QString::fromStdString(position.current_price().currency()));
+            QStandardItem *valueItem = new QStandardItem(QString::number(position.current_price().units() * position.quantity().units()) + " " + QString::fromStdString(position.current_price().currency()));
+            
+            ticker->setFlags(ticker->flags() & ~Qt::ItemIsEditable);
+            nameItem->setFlags(nameItem->flags() & ~Qt::ItemIsEditable);
+            quantityItem->setFlags(quantityItem->flags() & ~Qt::ItemIsEditable);
+            priceItem->setFlags(priceItem->flags() & ~Qt::ItemIsEditable);
+            valueItem->setFlags(valueItem->flags() & ~Qt::ItemIsEditable);
+
+            rowItems.append(ticker);
+            rowItems.append(nameItem);
+            rowItems.append(quantityItem);
+            rowItems.append(priceItem);
+            rowItems.append(valueItem);
+
             virtualPortfolioModel->appendRow(rowItems);
         }
     }
