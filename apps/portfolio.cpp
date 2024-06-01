@@ -312,14 +312,32 @@ void Portfolio::onTableDoubleClicked(const QModelIndex &index)
 
 void Portfolio::onVirtualTableDoubleClicked(const QModelIndex &index)
 {
-    if (!index.isValid())
+    if (!index.isValid()) {
+        qDebug() << "Invalid index!";
         return;
+    }
 
     int row = index.row();
-    QString ticker = portfolioModel->item(row, 0)->text();
-    QString name = portfolioModel->item(row, 1)->text();
+    QStandardItem* nameItem = virtualPortfolioModel->item(row, 1);
 
-    std::cout << "виртуалка" << '\n';
+    if (!nameItem) {
+        qDebug() << "Invalid name item at row:" << row;
+        return;
+    }
+
+    QStandardItem* tickerItem = virtualPortfolioModel->item(row, 0);
+
+    if (!tickerItem) {
+        qDebug() << "Invalid ticker item at row:" << row;
+        return;
+    }
+
+    QString name = nameItem->text();
+    QString ticker = tickerItem->text();
+
+    // qDebug() << "Double clicked on virtual table row:" << row << "Name:" << name << "Ticker:" << ticker;
+
+    // std::cout << "виртуалка" << '\n';
 
     // тут вызвать функцию показа свечей + добавить в хедер инклюд
     // showCandlestickChart(ticker, name);
