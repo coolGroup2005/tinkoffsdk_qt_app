@@ -56,6 +56,9 @@ shares::shares(QWidget *parent, const std::string& figi, const std::string& stoc
     this->setMinimumSize(this->size());
     ui->stocknameLabel->setText(QString::fromStdString(stockName));
 
+    ui->graphicsLineView->chart()->setBackgroundBrush(QBrush(QColor("#ebeae7")));
+    ui->graphicsCandleView->chart()->setBackgroundBrush(QBrush(QColor("#ebeae7")));
+
     connect(ui->updateButton, &QPushButton::clicked, this, &shares::fetchCandlestickData);
 
     ui->intervalComboBox->addItem("1 minute");
@@ -71,6 +74,34 @@ shares::shares(QWidget *parent, const std::string& figi, const std::string& stoc
     ui->intervalComboBox->addItem("1 day");
     ui->intervalComboBox->addItem("1 week");
     ui->intervalComboBox->addItem("1 month");
+
+    this->setStyleSheet(R"(
+        QWidget {
+            background-color: #ebeae7;
+            color: #525252;
+            border-color: #525252;
+        }
+        QLabel {
+            color: #525252;
+        }
+        QLineEdit, QComboBox {
+            background-color: #d3d2d0;
+            border-radius: 15px;
+            color: #525252;
+            border-color: #525252;
+        }
+        QPushButton {
+            background-color: rgb(193, 193, 193);
+            border-radius: 15px;
+        }
+        QPushButton:hover {
+            background-color: rgb(170, 170, 170);
+        }
+        QPushButton:pressed {
+            background-color: rgb(150, 150, 150);
+        }
+    )");
+
 
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &shares::updateDateTime);
@@ -191,16 +222,23 @@ void shares::updateCandleChart() {
 
     QChart *chart = new QChart();
     chart->addSeries(series);
+    chart->setBackgroundBrush(QBrush(QColor("#ebeae7")));  
 
     QDateTimeAxis *axisX = new QDateTimeAxis();
     axisX->setTickCount(10);
-    axisX->setFormat("dd.MM.yyyy hh:mm:ss");
+    axisX->setFormat("dd.MM.yyyy<br>hh:mm:ss");
     axisX->setTitleText("Time");
+    axisX->setLinePenColor(QColor("#d3d2d0"));
+    axisX->setGridLinePen(QColor("#d3d2d0"));
+    //axisX->setLabelsAngle(-45);
     chart->addAxis(axisX, Qt::AlignBottom);
     series->attachAxis(axisX);
 
     QValueAxis *axisY = new QValueAxis();
     axisY->setTitleText("Price");
+    axisY->setLinePenColor(QColor("#d3d2d0"));
+    axisY->setGridLinePen(QColor("#d3d2d0"));
+    //axisY->setLabelsAngle(-45);
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
 
@@ -329,14 +367,20 @@ void shares::updateLineChart() {
 
     QDateTimeAxis *axisX = new QDateTimeAxis();
     axisX->setTickCount(10);
-    axisX->setFormat("dd.MM.yyyy hh:mm:ss");
+    axisX->setFormat("dd.MM.yyyy<br>hh:mm:ss");
     axisX->setTitleText("Time");
+    axisX->setLinePenColor(QColor("#d3d2d0"));
+    axisX->setGridLinePen(QColor("#d3d2d0"));
+    //axisX->setLabelsAngle(-45);
     lineChart->addAxis(axisX, Qt::AlignBottom);
     areaSeries->attachAxis(axisX);
     scatterSeries->attachAxis(axisX);
 
     QValueAxis *axisY = new QValueAxis();
     axisY->setTitleText("Price");
+    axisY->setLinePenColor(QColor("#d3d2d0"));
+    axisY->setGridLinePen(QColor("#d3d2d0"));
+    //axisY->setLabelsAngle(-45);
     lineChart->addAxis(axisY, Qt::AlignLeft);
     areaSeries->attachAxis(axisY);
     scatterSeries->attachAxis(axisY);
@@ -346,6 +390,7 @@ void shares::updateLineChart() {
     QChartView *lineChartView = new QChartView(lineChart);
     lineChartView->setRubberBand(QChartView::HorizontalRubberBand);
     lineChartView->setRenderHint(QPainter::Antialiasing);
+    lineChart->setBackgroundBrush(QBrush(QColor("#ebeae7")));
 
     QVBoxLayout *lineLayout = new QVBoxLayout();
     lineLayout->addWidget(lineChartView);
