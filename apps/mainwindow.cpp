@@ -1,7 +1,8 @@
 #include "mainwindow.h"
-#include "akcii.h"
+#include "shares/shares.h"
 #include "ui_mainwindow.h"
 #include "homepage/homepage.h"
+#include "statistics/statistics.h"
 #include "portfolio.h"
 
 #include <QStringList>
@@ -12,18 +13,20 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , ui(new Ui::MainWindow),
+    statisticsManager(new StatisticsManager(this)),
+    databaseFigi(new DatabaseFigi(this))
 {
     ui->setupUi(this);
-    ui->tabWidget->setTabText(0, "Database Fiji");
-    // ui->tabWidget->setTabText(1, "Portfolio");
-    ui->tabWidget->setTabText(2, "Statistics");
-    ui->tabWidget->setTabText(3, "Home");
+    ui->tabWidget->setTabText(0, "Statistics");
+    ui->tabWidget->setTabText(1, "Home");
 
     portfolio = new Portfolio(this);
     ui->tabWidget->addTab(portfolio, "Portfolio");
+    ui->tabWidget->addTab(databaseFigi, "Database Figi");
 
-    // Iteraction with tab Home
+
+    // Iteraction with tab Home ====================================================
     QStringList list;
     model = new QStringListModel;
 
@@ -32,46 +35,66 @@ MainWindow::MainWindow(QWidget *parent)
     
     for (ShareInfo availableShare: sharesList)
     {
-        QString listItem = QString::fromStdString(availableShare.name + "\t" + availableShare.figi + "\t" + formatTradingStatus(availableShare.trading_status));
+        QString listItem = QString::fromStdString(availableShare.name + "\t" + availableShare.figi + "\t" + availableShare.trading_status);
         list << listItem;
     }
 
     model->setStringList(list);
     ui->listView->setModel(model);
+    // END Home ===================================================================
 
-    // Connect listView click signal to slot
+
+    // Interaction with tab Statistics ============================================
+    ui->checkBoxStatistics->setChecked(true);
+
     connect(ui->listView, &QListView::activated, this, &MainWindow::on_listView_clicked);
+    connect(ui->top_gainers_list, &QListView::clicked, this, &MainWindow::on_topGainersList_clicked);
+    connect(ui->top_losers_list, &QListView::clicked, this, &MainWindow::on_topLosersList_clicked);
+    connect(ui->updateStatisticsButton, &QPushButton::clicked, this, &MainWindow::updateStatistics);
 
-    // Interaction with tab Statistics
-    // Initialize models for the statistics lists
+    ui->intervalStatisticsCombobox->addItem("1 day");
+    ui->intervalStatisticsCombobox->addItem("1 week");
+    ui->intervalStatisticsCombobox->addItem("1 month");
+
+    databaseFigi->insertSharesIntoDatabase();
+    updateStatistics();
+    // END Statistics ================================================================
+}
+
+
+void MainWindow::updateStatistics()
+{
     QStringListModel *topGainersModel = new QStringListModel(this);
     QStringListModel *topLosersModel = new QStringListModel(this);
     QStringListModel *topActiveModel = new QStringListModel(this);
 
-    // Example data for the statistics lists
-    QStringList topGainers = {"Gainer 1", "Gainer 2", "Gainer 3"};
-    QStringList topLosers = {"Loser 1", "Loser 2", "Loser 3"};
-    QStringList topActive = {"Active 1", "Active 2", "Active 3"};
 
-    topGainersModel->setStringList(topGainers);
-    topLosersModel->setStringList(topLosers);
-    topActiveModel->setStringList(topActive);
+    QString intervalTextStatistics = ui->intervalStatisticsCombobox->currentText();
+    int intervalToPass = (intervalTextStatistics == "1 day") ? 0 : (intervalTextStatistics == "1 month") ? 1 : 2;
 
-    // Set models for the statistics list views
+    bool cropped = ui->checkBoxStatistics->isChecked();
+    statisticsManager->updateStatistics(intervalToPass, topGainersModel, topLosersModel, topActiveModel, cropped);
+
+    QStringList topLosers = {"Press UPD Button and wait a little"};
+    QStringList topActive = {"Press UPD Button and wait a little"};
+
     ui->top_gainers_list->setModel(topGainersModel);
     ui->top_losers_list->setModel(topLosersModel);
-    ui->top_active_list->setModel(topActiveModel);
-
-    ui->top_gainers_list->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    ui->top_losers_list->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    ui->top_active_list->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-
-    // Connect list view clicked signals to slots
-    connect(ui->top_gainers_list, &QListView::clicked, this, &MainWindow::on_topGainersList_clicked);
-    connect(ui->top_losers_list, &QListView::clicked, this, &MainWindow::on_topLosersList_clicked);
-    connect(ui->top_active_list, &QListView::clicked, this, &MainWindow::on_topActiveList_clicked);
 }
+
+
+void MainWindow::on_topGainersList_clicked(const QModelIndex &index)
+{
+    QString selectedItem = index.data().toString();
+    QMessageBox::information(this, "Top Gainer Selected", "You selected: " + selectedItem);
+}
+
+void MainWindow::on_topLosersList_clicked(const QModelIndex &index)
+{
+    QString selectedItem = index.data().toString();
+    QMessageBox::information(this, "Top Loser Selected", "You selected: " + selectedItem);
+}
+
 
 
 MainWindow::~MainWindow()
@@ -84,33 +107,15 @@ void MainWindow::on_listView_clicked(const QModelIndex &index)
 {
     QString selectedItem = index.data().toString();
     ui->lineEdit->setText(";;;  " + selectedItem);
-    MainWindow::openAkcii();
+    std::string figi = selectedItem.split("\t")[1].toStdString(); 
+    std::string stockName = selectedItem.section('\t', 0, 0).toStdString();   
+    std::cout << figi;
+    MainWindow::openShares(figi, stockName);
 }
 
 
-void MainWindow::openAkcii()
+void MainWindow::openShares(const std::string& figi, const std::string& stockName)
 {
-    akcii *window1 = new akcii(this);
+    shares *window1 = new shares(this, figi, stockName);
     window1->show();
-}
-
-
-void MainWindow::on_topGainersList_clicked(const QModelIndex &index)
-{
-    QString selectedItem = index.data().toString();
-    QMessageBox::information(this, "Top Gainer Selected", "You selected: " + selectedItem);
-}
-
-
-void MainWindow::on_topLosersList_clicked(const QModelIndex &index)
-{
-    QString selectedItem = index.data().toString();
-    QMessageBox::information(this, "Top Loser Selected", "You selected: " + selectedItem);
-}
-
-
-void MainWindow::on_topActiveList_clicked(const QModelIndex &index)
-{
-    QString selectedItem = index.data().toString();
-    QMessageBox::information(this, "Top Active Selected", "You selected: " + selectedItem);
 }
