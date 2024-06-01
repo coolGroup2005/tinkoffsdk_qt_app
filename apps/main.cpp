@@ -41,23 +41,25 @@
 //     // auto postOrderResponse = dynamic_cast<PostOrderResponse*>(postOrderRequest.ptr().get());
 //     // std::cout << postOrderResponse->execution_report_status() << '\n';
 
-//     auto replyOrder = sandboxService->PostSandboxOrder("BBG00PYL6D50", 100, 0, 0, ORDER_DIRECTION_BUY,
-// accountID12, ORDER_TYPE_MARKET, "12341234123875");
-//     std::cout << replyOrder.ptr()->DebugString() << '\n';
+//     // auto getOrdersRequest = ordersService->GetOrders(accountID12);
+//     // std::cout << getOrdersRequest.ptr()->DebugString() << '\n';
+
+//     // auto sandboxPayInRequest = sandboxService->SandboxPayIn(accountID12, "RUB", 100500, 0);
+//     // auto OpenSandboxAccountRequest = sandboxService->OpenSandboxAccount();
 
 //     auto portfolioRequest = operationService->GetPortfolio(accountID12, PortfolioRequest_CurrencyRequest::PortfolioRequest_CurrencyRequest_RUB);
 //     auto sandboxPayInRequest = sandboxService->SandboxPayIn(accountID12, "RUB", 100500, 0);
 
-//     auto portfolioRequest = operationService->GetPortfolio(accountID12, PortfolioRequest_CurrencyRequest::PortfolioRequest_CurrencyRequest_RUB);
+//     // auto portfolioRequest = operationService->GetPortfolio(accountID12, PortfolioRequest_CurrencyRequest::PortfolioRequest_CurrencyRequest_RUB);
 
-//     auto portfolioAns = dynamic_cast<PortfolioResponse*>(portfolioRequest.ptr().get());
-//     auto portfolioValue = portfolioAns->total_amount_portfolio().units();
+//     // auto portfolioAns = dynamic_cast<PortfolioResponse*>(portfolioRequest.ptr().get());
+//     // auto portfolioValue = portfolioAns->total_amount_portfolio().units();
 
 //     auto getMarginAttributesRequest = accountService->GetMarginAttributes(accountID12);
 //     std::cout << portfolioRequest.ptr()->DebugString() << '\n';
 //     auto getMarginAttributesResponse = dynamic_cast<GetMarginAttributesResponse*>(getMarginAttributesRequest.ptr().get());
 
-//     std::cout << portfolioValue << " " << portfolioAns->total_amount_portfolio().currency() << '\n';
+//     // std::cout << portfolioValue << " " << portfolioAns->total_amount_portfolio().currency() << '\n';
 // }
 
 
