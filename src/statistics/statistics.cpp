@@ -10,7 +10,10 @@
 #include <sqlite3.h>
 #include <filesystem>
 #include <algorithm>
-
+#include <QSqlError>
+#include <QSqlRecord>
+#include <QMessageBox>
+#include <QDebug>
 
 
 const int MOEX_START_HOUR = 9;
@@ -82,83 +85,6 @@ void clearDatabaseStatistics() {
 }
 
 
-// float getShareChange(int& intervalType, std::string& figi) {
-
-
-//     auto now = std::chrono::system_clock::now();
-//     std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
-//     std::time_t dateFromToTime;
-
-//     switch (intervalType) {
-//         case 0: {
-//             auto dateFrom = now - std::chrono::hours(24);
-//             dateFromToTime = std::chrono::system_clock::to_time_t(dateFrom);
-//             break;
-//         }
-//         case 1: {
-//             auto dateFrom = now - std::chrono::hours(24 * 7);
-//             dateFromToTime = std::chrono::system_clock::to_time_t(dateFrom);
-//             break;
-//         }
-//         case 2: {
-//             auto dateFrom = now - std::chrono::hours(24 * 30);
-//             dateFromToTime = std::chrono::system_clock::to_time_t(dateFrom);
-//             break;
-//         }
-//         default: {
-//             std::cerr << "Invalid interval type" << std::endl;
-//             return -1;
-//         }
-//     }
-
-
-
-//     InvestApiClient client("sandbox-invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
-
-    
-
-//     auto marketdata = std::dynamic_pointer_cast<MarketData>(client.service("marketdata"));
-//     if (!marketdata) {
-//         qDebug() << "error marketdata";
-//         return -1;
-//     }
-//     auto candlesServiceReply = marketdata->GetCandles(figi, dateFromToTime, 0, currentTime, 0, CandleInterval::CANDLE_INTERVAL_DAY);
-
-//     auto response = dynamic_cast<GetCandlesResponse*>(candlesServiceReply.ptr().get());
-//     if (!response) {
-//         qDebug() << "error response";
-//         return -1;
-//     }
-
-//     if (response->candles_size() == 0) {
-//         qDebug() << "No candles found in the response";
-//         return -1; 
-//     }
-
-//     auto firstCandle = response->candles(0);
-//     auto lastCandle = response->candles(response->candles_size() - 1);
-
-//     auto open_units = firstCandle.open().units();
-//     auto open_nano = firstCandle.open().nano();
-//     auto close_units = lastCandle.close().units();
-//     auto close_nano = lastCandle.close().nano();
-
-//     if (!open_units && !open_nano) {
-//         qDebug() << "Invalid open units or nano";
-//         return -1;
-//     }
-
-//     if (!close_units && !close_nano) {
-//         qDebug() << "Invalid close units or nano";
-//         return -1;
-//     }
-
-//     float total_open = open_units + open_nano / (std::pow(10, std::to_string(open_nano).length()));
-//     float total_close = close_units + close_nano / (std::pow(10, std::to_string(close_nano).length()));
-
-//     float x = (total_close - total_open) * 100 / total_open;
-//     return x;
-//     }
 
 
 float getShareChange(std::string& figi, std::time_t& dateFromToTime, std::time_t& currentTime)  {
@@ -167,14 +93,14 @@ float getShareChange(std::string& figi, std::time_t& dateFromToTime, std::time_t
     auto marketdata = std::dynamic_pointer_cast<MarketData>(client.service("marketdata"));
     if (!marketdata) {
         qDebug() << "error marketdata";
-        return -1;
+        return 10000;
     }
 
     auto candlesServiceReply = marketdata->GetCandles(figi, dateFromToTime, 0, currentTime, 0, CandleInterval::CANDLE_INTERVAL_DAY);
     auto response = dynamic_cast<GetCandlesResponse*>(candlesServiceReply.ptr().get());
     if (!response) {
         qDebug() << "error response";
-        return -1;
+        return 10000;
     }
 
     if (response->candles_size() == 0) {
@@ -207,7 +133,7 @@ float getShareChange(std::string& figi, std::time_t& dateFromToTime, std::time_t
     return x;
 }
 
-SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval)
+SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval, bool cropped)
 {
     SharesVector allShares;
     auto instrumentService = std::dynamic_pointer_cast<Instruments>(client.service("instruments"));
@@ -243,8 +169,9 @@ SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval)
 
     dateFromToTime = adjustToWorkingTime(dateFromToTime);
     currentTime = adjustToWorkingTime(currentTime);
+    int size = cropped ? (answerShareReply->instruments_size() - 1)/9 : answerShareReply->instruments_size() - 1;
 
-    for (int i = 0; i < answerShareReply->instruments_size() - 1; i++) {
+    for (int i = 0; i < size; i++) {
         unsigned int tradingStatus = answerShareReply->instruments(i).trading_status();
         std::string currency = answerShareReply->instruments(i).currency();
             // std::cout << i << "trading status: " << tradingStatus << std::endl;
@@ -259,7 +186,7 @@ SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval)
 
             try {
                 float shareChange = getShareChange(share.figi, dateFromToTime, currentTime);
-                std::cout << share.figi << '\t' << share.name << '\t' << shareChange << '\n';
+                // std::cout << share.figi << '\t' << share.name << '\t' << shareChange << '\n';
                 if (shareChange != 10000) {
                     auto pair = std::make_pair(share, shareChange);
                     allShares.push_back(pair);
@@ -283,7 +210,6 @@ SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval)
 
 
 
-
 void insertStatisticsIntoDatabase(SharesVector& sharesVector) {    
     std::sort(sharesVector.begin(), sharesVector.end(), 
             [](const std::pair<ShareInfo, float>& a, const std::pair<ShareInfo, float>& b) {
@@ -291,10 +217,6 @@ void insertStatisticsIntoDatabase(SharesVector& sharesVector) {
                 // std::cout << a.second << " " << b.second << i << std::endl;
                 return a.second < b.second;
             });
-
-    for (const auto& sharePair : sharesVector) {
-        std::cout << sharePair.first.figi << " " << sharePair.second << std::endl;
-    }
 
     sqlite3* db;
     char* errMsg = 0;
@@ -311,7 +233,7 @@ void insertStatisticsIntoDatabase(SharesVector& sharesVector) {
         sqlite3_free(errMsg);
     }
 
-    std::cout << "Database created" << std::endl;
+    std::cout << "Database created statistics" << std::endl;
 
     sqlite3_stmt* stmt;
     sqlStatement = "INSERT INTO statistics (company_name, company_figi, total_price_change) VALUES (?, ?, ?);";
@@ -338,16 +260,15 @@ void insertStatisticsIntoDatabase(SharesVector& sharesVector) {
     sqlite3_finalize(stmt);
     sqlite3_close(db);
 
-    std::cout << "Inserted all" << std::endl;
+    std::cout << "Inserted all statistics window" << std::endl;
 }
 
-std::vector<std::pair<std::string, float>> getTopGainers() {
+std::vector<std::pair<std::string, float>> getTopFromDb(std::string type) {
     std::vector<std::pair<std::string, float>> topShares;
     sqlite3* db;
     sqlite3_stmt* stmt;
     int rc;
 
-    std::cout << "1111111\n";
     rc = sqlite3_open("statistics.db", &db);
     if (rc != SQLITE_OK) {
         std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
@@ -356,8 +277,8 @@ std::vector<std::pair<std::string, float>> getTopGainers() {
 
     std::string sql = "SELECT company_name, company_figi, total_price_change "
                     "FROM statistics "
-                    "ORDER BY total_price_change DESC "
-                    "LIMIT 5";
+                    "ORDER BY total_price_change " + type + " " +
+                    "LIMIT 7";
 
     rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
     if (rc != SQLITE_OK) {
@@ -368,22 +289,52 @@ std::vector<std::pair<std::string, float>> getTopGainers() {
 
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        // ShareInfo share;
-        // share.figi = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
 
         std::string name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
         float priceChange = static_cast<float>(sqlite3_column_double(stmt, 2));
 
-        std::cout << name << " " << priceChange << std::endl;
+        // std::cout << name << " " << priceChange << std::endl;
         auto pair = std::make_pair(name, priceChange);
         topShares.push_back(pair);
     }
-
-    // for (int i = 0; i < topShares.size() - 1; i++) {
-    //     std::cout << "Company: " << topShares[i].first << "\n";
-    // }
 
     sqlite3_finalize(stmt);
     sqlite3_close(db);
     return topShares;
 }
+
+
+StatisticsManager::StatisticsManager(QObject *parent) : QObject(parent)
+{
+}
+
+void StatisticsManager::updateStatistics(int interval, QStringListModel* topGainersModel, QStringListModel* topLosersModel, QStringListModel* topActiveModel, bool cropped)
+{
+    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
+    auto allShares = getAllSharesWithChange(client, interval, cropped);
+    insertStatisticsIntoDatabase(allShares);
+    std::vector<std::pair<std::string, float>> bottom = getTopFromDb("ASC");
+    std::vector<std::pair<std::string, float>> top = getTopFromDb("DESC");
+
+    QStringList topGainers;
+    QStringList topLosers;
+
+    for (const auto& sharePair : top) {
+        // qDebug() << "Company: " << QString::fromStdString(sharePair.first) << "\n"
+        //          << "Price Change: " << sharePair.second << "%\n"
+        //          << "-----------------------------\n";
+        QString gainer = QString::fromStdString(sharePair.first) + " (" + QString::number(sharePair.second) + ")";
+        topGainers.append(gainer);
+    }
+
+     for (const auto& sharePair : bottom) {
+        QString loser = QString::fromStdString(sharePair.first) + " (" + QString::number(sharePair.second) + ")";
+        topLosers.append(loser);
+    }
+
+    topGainersModel->setStringList(topGainers);
+    topLosersModel->setStringList(topLosers);
+
+    emit statisticsUpdated();
+}
+

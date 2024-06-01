@@ -69,20 +69,5 @@ int main(int argc, char *argv[])
     MainWindow mainWindow;
     mainWindow.show();
 
-    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
-    std::string figi = "BBG006L8G4H1";
-
-    // ShareInfo share = getShareInfoStatistics(client, figi);
-    
-    int a = 2;
-    auto allShares = getAllSharesWithChange(client, a);
-    insertStatisticsIntoDatabase(allShares);
-    std::vector<std::pair<std::string, float>> top = getTopGainers();
-    // for (const auto& sharePair : top) {
-    //     std::cout << "Company: " << sharePair.first << "\n"
-    //               << "Price Change: " << sharePair.second << "%\n"
-    //               << "-----------------------------\n";
-    // }
-    // float x = getShareChange(a, figi);
     return app.exec();
 }

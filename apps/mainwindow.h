@@ -7,6 +7,9 @@
 #include <QStringListModel>
 
 #include "portfolio.h"
+#include "statistics/statistics.h"
+#include "figi.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -27,12 +30,15 @@ private slots:
     void on_listView_clicked(const QModelIndex &index);
     void on_topGainersList_clicked(const QModelIndex &index);
     void on_topLosersList_clicked(const QModelIndex &index);
-    void on_topActiveList_clicked(const QModelIndex &index);
+    void updateStatistics();
+
 private:
     Ui::MainWindow *ui;
     QStringListModel *model;
     QList<QString> songs;
     Portfolio *portfolio;
+    StatisticsManager *statisticsManager;
+    DatabaseFigi *databaseFigi;
 };
 
 #endif // MAINWINDOW_H
