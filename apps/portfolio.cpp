@@ -25,6 +25,7 @@
 #include <QVBoxLayout>
 #include <cstdlib>
 #include <QDebug> // for finding segmentation fault
+#include <QHeaderView>
 
 Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
 {
@@ -47,6 +48,60 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     layout->addWidget(new QLabel("Virtual Positions", this));
     layout->addWidget(virtualPortfolioTableView);
     setLayout(layout);
+
+    this->setStyleSheet(R"(
+        QWidget {
+            background-color: #ebeae7;
+            color: #525252;
+        }
+        QLabel {
+            color: #525252;
+        }
+        QLineEdit, QComboBox {
+            background-color: #d3d2d0;
+            border-radius: 15px;
+            color: #525252;
+            padding: 10px;
+        }
+        QHeaderView::section {
+            background-color: lightgrey;
+        }
+        QComboBox::down-arrow {
+            image: none;
+        }
+        QTableView {
+            gridline-color: #b0b0af;
+            background-color: #d3d2d0;
+            border: 1px solid #d3d2d0;
+            border-radius: 20px;
+        }
+        QTableView::item {
+            background-color: #d3d2d0;
+        }
+        QTableView::item:selected {
+            background-color: #b5cbd8;
+            color: #000000;
+        }
+        QPushButton {
+            background-color: rgb(193, 193, 193);
+            border-radius: 20px;
+            padding: 10px;
+        }
+        QPushButton:hover {
+            background-color: rgb(170, 170, 170);
+        }
+        QPushButton:pressed {
+            background-color: rgb(150, 150, 150);
+        }
+    )");
+
+    portfolioTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    virtualPortfolioTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    portfolioTableView->verticalHeader()->setVisible(false);
+    virtualPortfolioTableView->verticalHeader()->setVisible(false);
+
+
+
 
     token = getenv("TOKEN");
     client = new InvestApiClient("invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
