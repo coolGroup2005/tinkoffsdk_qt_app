@@ -1,26 +1,3 @@
-// #include "investapiclient.h"
-// #include "usersservice.h"
-// #include "operationsservice.h"
-
-// int main(int argc, char *argv[])
-// {
-//     InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
-
-//     auto operationService = std::dynamic_pointer_cast<Operations>(client.service("operations"));
-//     // auto operationsStreamService = std::dynamic_pointer_cast<OperationsStreamService>(client.service("operationsstreamservice")); // самойлов его не сделал)
-//     auto accountService = std::dynamic_pointer_cast<Users>(client.service("users"));
-
-//     auto accountListOfID = accountService->GetAccounts();
-//     auto accountID1 = dynamic_cast<GetAccountsResponse*>(accountListOfID.ptr().get());
-//     auto accountID12 = accountID1->accounts(0).id();
-
-//     auto portfolioRequest = operationService->GetPortfolio(accountID12, PortfolioRequest_CurrencyRequest::PortfolioRequest_CurrencyRequest_RUB);
-//     auto portfolioAns = dynamic_cast<PortfolioResponse*>(portfolioRequest.ptr().get());
-//     auto portfolioValue = portfolioAns->total_amount_portfolio().units();
-
-//     std::cout << portfolioValue << " " << portfolioAns->total_amount_portfolio().currency() << '\n';
-// }
-
 #include "portfolio.h"
 #include <QVBoxLayout>
 #include <cstdlib>
@@ -40,6 +17,8 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     virtualPortfolioModel = new QStandardItemModel(this);
     virtualPortfolioModel->setHorizontalHeaderLabels({"Ticker", "Name", "Quantity", "Current Price", "Value"});
 
+    updateButton = new QPushButton("Update", this);
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(accountComboBox);
     layout->addWidget(balanceLabel);
@@ -47,6 +26,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     layout->addWidget(portfolioTableView);
     layout->addWidget(new QLabel("Virtual Positions", this));
     layout->addWidget(virtualPortfolioTableView);
+    layout->addWidget(updateButton);
     setLayout(layout);
 
     this->setStyleSheet(R"(
@@ -128,6 +108,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     }
 
     connect(accountComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onAccountChanged(int)));
+    connect(updateButton, &QPushButton::clicked, this, &Portfolio::onUpdateButtonClicked);
 
     if (!accountIds.empty())
     {
@@ -280,30 +261,20 @@ void Portfolio::updateBalance(const QString &accountId)
     yieldLabel->setText("Expected Yield: " + QString::number(yieldValue) + "%");
 }
 
-// void Portfolio::updateExpectedYield(const Quotation& yield)
-// {
-//     double yieldValue = yield.units() + yield.nano() * 1e-9;
-//     yieldLabel->setText("Expected Yield: " + QString::number(yieldValue) + "%");
-// }
-
-// void Portfolio::updateVirtualPositions(const google::protobuf::RepeatedPtrField<VirtualPortfolioPosition>& virtualPositions)
-// {
-//     virtualPortfolioModel->setRowCount(virtualPositions.size());
-
-//     for (int i = 0; i < virtualPositions.size(); ++i) {
-//         const auto& position = virtualPositions[i];
-
-//         QList<QStandardItem*> rowItems;
-//         // rowItems.append(new QStandardItem(QString::fromStdString(position.name())));
-//         rowItems.append(new QStandardItem(QString::number(position.quantity().units())));
-//         rowItems.append(new QStandardItem(QString::number(position.current_price().units()) + " " + QString::fromStdString(position.current_price().currency())));
-//         rowItems.append(new QStandardItem(QString::number(position.current_price().units() * position.quantity().units()) + " " + QString::fromStdString(position.current_price().currency())));
-//         virtualPortfolioModel->appendRow(rowItems);
-//     }
-// }
-
 void Portfolio::onAccountChanged(int index)
 {
     QString accountId = accountComboBox->itemData(index).toString();
     updateBalance(accountId);
+}
+
+void Portfolio::onUpdateButtonClicked()
+{
+    int currentIndex = accountComboBox->currentIndex();
+    if (currentIndex >= 0)
+    {
+        QString accountId = accountComboBox->itemData(currentIndex).toString();
+        portfolioModel->setRowCount(0);
+        virtualPortfolioModel->setRowCount(0);
+        updateBalance(accountId);
+    }
 }
