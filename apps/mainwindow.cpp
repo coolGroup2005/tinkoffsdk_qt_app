@@ -14,7 +14,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow),
-    statisticsManager(new StatisticsManager(this))
+    statisticsManager(new StatisticsManager(this)),
+    databaseFigi(new DatabaseFigi(this))
 {
     ui->setupUi(this);
     ui->tabWidget->setTabText(0, "Database Fiji");
@@ -23,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     portfolio = new Portfolio(this);
     ui->tabWidget->addTab(portfolio, "Portfolio");
+    ui->tabWidget->addTab(databaseFigi, "Database Figi");
+
 
     // Iteraction with tab Home
     QStringList list;
@@ -56,9 +59,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->intervalStatisticsCombobox->addItem("1 week");
     ui->intervalStatisticsCombobox->addItem("1 month");
 
+    databaseFigi->insertSharesIntoDatabase();
     updateStatistics();
     // Interaction with tab Statistics ===============================================================
 }
+
 
 void MainWindow::updateStatistics()
 {
@@ -82,6 +87,8 @@ void MainWindow::updateStatistics()
 
     // updateStatistics();
 }
+
+
 
 void MainWindow::on_checkBoxStatistics_stateChanged(int state)
 {

@@ -4,6 +4,16 @@
 #include <vector>
 #include <QObject>
 #include <QStringListModel>
+#include <QWidget>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QTextEdit>
+#include <QPushButton>
+#include <QTableView>
+#include <QStandardItemModel>
 
 #include "investapiclient.h"
 #include "marketdataservice.h"
@@ -26,6 +36,35 @@ public:
 
 signals:
     void statisticsUpdated();
+};
+
+
+
+class DatabaseFigi : public QWidget {
+    Q_OBJECT
+
+public:
+    explicit DatabaseFigi(QWidget *parent = nullptr);
+    void insertSharesIntoDatabase();
+
+private slots:
+    void onSearchButtonClicked();
+
+private:
+    QVBoxLayout *mainLayout;
+    QHBoxLayout *searchLayout;
+    QLabel *enterLabel;
+    QTextEdit *textEdit;
+    QPushButton *searchButton;
+    QLabel *suggestionsLabel;
+    QTableView *tableView;
+    QStandardItemModel *tableModel;
+    QSqlDatabase db;
+
+    void initializeUI();
+    void initializeDatabase();
+    void setupConnections();
+    void loadAllShares();
 };
 
 SharesVector getAllSharesWithChange(InvestApiClient&, int&, bool);

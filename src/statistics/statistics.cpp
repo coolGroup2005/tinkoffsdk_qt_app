@@ -10,7 +10,10 @@
 #include <sqlite3.h>
 #include <filesystem>
 #include <algorithm>
-
+#include <QSqlError>
+#include <QSqlRecord>
+#include <QMessageBox>
+#include <QDebug>
 
 
 const int MOEX_START_HOUR = 9;
@@ -82,83 +85,6 @@ void clearDatabaseStatistics() {
 }
 
 
-// float getShareChange(int& intervalType, std::string& figi) {
-
-
-//     auto now = std::chrono::system_clock::now();
-//     std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
-//     std::time_t dateFromToTime;
-
-//     switch (intervalType) {
-//         case 0: {
-//             auto dateFrom = now - std::chrono::hours(24);
-//             dateFromToTime = std::chrono::system_clock::to_time_t(dateFrom);
-//             break;
-//         }
-//         case 1: {
-//             auto dateFrom = now - std::chrono::hours(24 * 7);
-//             dateFromToTime = std::chrono::system_clock::to_time_t(dateFrom);
-//             break;
-//         }
-//         case 2: {
-//             auto dateFrom = now - std::chrono::hours(24 * 30);
-//             dateFromToTime = std::chrono::system_clock::to_time_t(dateFrom);
-//             break;
-//         }
-//         default: {
-//             std::cerr << "Invalid interval type" << std::endl;
-//             return -1;
-//         }
-//     }
-
-
-
-//     InvestApiClient client("sandbox-invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
-
-    
-
-//     auto marketdata = std::dynamic_pointer_cast<MarketData>(client.service("marketdata"));
-//     if (!marketdata) {
-//         qDebug() << "error marketdata";
-//         return -1;
-//     }
-//     auto candlesServiceReply = marketdata->GetCandles(figi, dateFromToTime, 0, currentTime, 0, CandleInterval::CANDLE_INTERVAL_DAY);
-
-//     auto response = dynamic_cast<GetCandlesResponse*>(candlesServiceReply.ptr().get());
-//     if (!response) {
-//         qDebug() << "error response";
-//         return -1;
-//     }
-
-//     if (response->candles_size() == 0) {
-//         qDebug() << "No candles found in the response";
-//         return -1; 
-//     }
-
-//     auto firstCandle = response->candles(0);
-//     auto lastCandle = response->candles(response->candles_size() - 1);
-
-//     auto open_units = firstCandle.open().units();
-//     auto open_nano = firstCandle.open().nano();
-//     auto close_units = lastCandle.close().units();
-//     auto close_nano = lastCandle.close().nano();
-
-//     if (!open_units && !open_nano) {
-//         qDebug() << "Invalid open units or nano";
-//         return -1;
-//     }
-
-//     if (!close_units && !close_nano) {
-//         qDebug() << "Invalid close units or nano";
-//         return -1;
-//     }
-
-//     float total_open = open_units + open_nano / (std::pow(10, std::to_string(open_nano).length()));
-//     float total_close = close_units + close_nano / (std::pow(10, std::to_string(close_nano).length()));
-
-//     float x = (total_close - total_open) * 100 / total_open;
-//     return x;
-//     }
 
 
 float getShareChange(std::string& figi, std::time_t& dateFromToTime, std::time_t& currentTime)  {
@@ -260,7 +186,7 @@ SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval, bool
 
             try {
                 float shareChange = getShareChange(share.figi, dateFromToTime, currentTime);
-                std::cout << share.figi << '\t' << share.name << '\t' << shareChange << '\n';
+                // std::cout << share.figi << '\t' << share.name << '\t' << shareChange << '\n';
                 if (shareChange != 10000) {
                     auto pair = std::make_pair(share, shareChange);
                     allShares.push_back(pair);
@@ -292,9 +218,9 @@ void insertStatisticsIntoDatabase(SharesVector& sharesVector) {
                 return a.second < b.second;
             });
 
-    for (const auto& sharePair : sharesVector) {
-        std::cout << sharePair.first.figi << " " << sharePair.second << std::endl;
-    }
+    // for (const auto& sharePair : sharesVector) {
+    //     std::cout << sharePair.first.figi << " " << sharePair.second << std::endl;
+    // }
 
     sqlite3* db;
     char* errMsg = 0;
@@ -311,7 +237,7 @@ void insertStatisticsIntoDatabase(SharesVector& sharesVector) {
         sqlite3_free(errMsg);
     }
 
-    std::cout << "Database created" << std::endl;
+    std::cout << "Database created statistics" << std::endl;
 
     sqlite3_stmt* stmt;
     sqlStatement = "INSERT INTO statistics (company_name, company_figi, total_price_change) VALUES (?, ?, ?);";
@@ -338,7 +264,7 @@ void insertStatisticsIntoDatabase(SharesVector& sharesVector) {
     sqlite3_finalize(stmt);
     sqlite3_close(db);
 
-    std::cout << "Inserted all" << std::endl;
+    std::cout << "Inserted all statistics window" << std::endl;
 }
 
 std::vector<std::pair<std::string, float>> getTopFromDb(std::string type) {
@@ -373,7 +299,7 @@ std::vector<std::pair<std::string, float>> getTopFromDb(std::string type) {
         std::string name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
         float priceChange = static_cast<float>(sqlite3_column_double(stmt, 2));
 
-        std::cout << name << " " << priceChange << std::endl;
+        // std::cout << name << " " << priceChange << std::endl;
         auto pair = std::make_pair(name, priceChange);
         topShares.push_back(pair);
     }
@@ -420,4 +346,141 @@ void StatisticsManager::updateStatistics(int interval, QStringListModel* topGain
     topLosersModel->setStringList(topLosers);
 
     emit statisticsUpdated();
+}
+
+DatabaseFigi::DatabaseFigi(QWidget *parent)
+    : QWidget(parent),
+      textEdit(new QTextEdit(this)),
+      tableView(new QTableView(this)),
+      tableModel(new QStandardItemModel(this))
+{
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    QLabel *label = new QLabel("Enter company name", this);
+    QPushButton *searchButton = new QPushButton("Search", this);
+
+    QHBoxLayout *searchLayout = new QHBoxLayout();
+    searchLayout->addWidget(textEdit);
+    searchLayout->addWidget(searchButton);
+
+    mainLayout->addWidget(label);
+    mainLayout->addLayout(searchLayout);
+    mainLayout->addWidget(new QLabel("Suggestions:", this));
+    mainLayout->addWidget(tableView);
+
+    tableView->setModel(tableModel);
+    connect(searchButton, &QPushButton::clicked, this, &DatabaseFigi::onSearchButtonClicked);
+
+    loadAllShares();  // Load the entire table on initialization
+}
+
+void DatabaseFigi::initializeUI() {
+    mainLayout = new QVBoxLayout(this);
+
+    enterLabel = new QLabel("Enter company name");
+    mainLayout->addWidget(enterLabel);
+
+    searchLayout = new QHBoxLayout();
+    textEdit = new QTextEdit();
+    textEdit->setMaximumSize(QSize(16777215, 40));
+    textEdit->setStyleSheet("QTextEdit#textEdit { border-radius: 10px; background-color: rgb(222, 222,  222); }");
+    searchButton = new QPushButton("Search");
+    searchButton->setMinimumSize(QSize(0, 40));
+    searchButton->setMaximumSize(QSize(16777215, 40));
+    searchButton->setStyleSheet("QPushButton#searchButton { margin: 0; background-color: rgb(193, 193, 193); padding: 5px; border-radius: 8px; }");
+    searchLayout->addWidget(textEdit);
+    searchLayout->addWidget(searchButton);
+    mainLayout->addLayout(searchLayout);
+
+    suggestionsLabel = new QLabel("Suggestions:");
+    mainLayout->addWidget(suggestionsLabel);
+
+    tableView = new QTableView();
+    tableView->setStyleSheet("QTableView#tableView { border-radius: 10px; background-color: rgb(222, 222, 222); }");
+    tableView->setModel(tableModel);
+    mainLayout->addWidget(tableView);
+}
+
+void DatabaseFigi::initializeDatabase() {
+    std::cout << " initializeDatabase--------------------------------" << std::endl;
+
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("figi.db"); 
+    if (!db.open()) {
+        qDebug() << "Error: connection with database failed";
+    } else {
+        qDebug() << "Database: connection ok";
+    }
+
+    QSqlQuery query;
+    query.exec("CREATE TABLE figi (name TEXT, figi TEXT, trading_status INTEGER)");
+}
+
+void DatabaseFigi::setupConnections() {
+    std::cout << " setupConnections--------------------------------" << std::endl;
+
+    connect(searchButton, &QPushButton::clicked, this, &DatabaseFigi::onSearchButtonClicked);
+}
+
+void DatabaseFigi::insertSharesIntoDatabase() {
+    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
+    auto instrumentService = std::dynamic_pointer_cast<Instruments>(client.service("instruments"));
+    auto answerShares = instrumentService->Shares(INSTRUMENT_STATUS_BASE);
+    auto answerShareReply = dynamic_cast<SharesResponse*>(answerShares.ptr().get());
+
+    QSqlQuery query;
+    query.prepare("INSERT INTO figi (name, figi, trading_status) VALUES (:name, :figi, :trading_status)");
+    std::cout << " before INSERT--------------------------------" << std::endl;
+
+    for (int i = 0; i < answerShareReply->instruments_size() - 1; i++) {
+        std::cout << answerShareReply->instruments(i).name() << std::endl;
+            query.bindValue(":name", QString::fromStdString(answerShareReply->instruments(i).name()));
+            query.bindValue(":figi", QString::fromStdString(answerShareReply->instruments(i).figi()));
+            query.bindValue(":trading_status", answerShareReply->instruments(i).trading_status());
+            if (!query.exec()) {
+                qDebug() << "Error inserting into table: " << query.lastError();
+            }
+    }
+}
+
+void DatabaseFigi::onSearchButtonClicked() {
+    QString searchText = textEdit->toPlainText();
+    QSqlQuery query;
+    query.prepare("SELECT name, figi, trading_status FROM shares WHERE name LIKE :name");
+    query.bindValue(":name", "%" + searchText + "%");
+
+    if (!query.exec()) {
+        qDebug() << "Error searching table: " << query.lastError();
+        return;
+    }
+
+    tableModel->clear();
+    tableModel->setHorizontalHeaderLabels({"Name", "FIGI", "Trading Status"});
+
+    while (query.next()) {
+        QList<QStandardItem *> items;
+        items.append(new QStandardItem(query.value("name").toString()));
+        items.append(new QStandardItem(query.value("figi").toString()));
+        items.append(new QStandardItem(query.value("trading_status").toString()));
+        tableModel->appendRow(items);
+    }
+}
+
+void DatabaseFigi::loadAllShares() {
+    QSqlQuery query("SELECT name, figi, trading_status FROM shares");
+
+    if (!query.exec()) {
+        qDebug() << "Error loading all shares: " << query.lastError();
+        return;
+    }
+
+    tableModel->clear();
+    tableModel->setHorizontalHeaderLabels({"Name", "FIGI", "Trading Status"});
+
+    while (query.next()) {
+        QList<QStandardItem *> items;
+        items.append(new QStandardItem(query.value("name").toString()));
+        items.append(new QStandardItem(query.value("figi").toString()));
+        items.append(new QStandardItem(query.value("trading_status").toString()));
+        tableModel->appendRow(items);
+    }
 }

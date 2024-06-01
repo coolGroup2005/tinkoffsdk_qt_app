@@ -30,7 +30,7 @@ private slots:
     void on_topLosersList_clicked(const QModelIndex &index);
     void on_topActiveList_clicked(const QModelIndex &index);
     void on_checkBoxStatistics_stateChanged(int state);
-
+    
     void updateStatistics();
 
 private:
@@ -39,6 +39,7 @@ private:
     QList<QString> songs;
     Portfolio *portfolio;
     StatisticsManager *statisticsManager;
+    DatabaseFigi *databaseFigi;
 };
 
 #endif // MAINWINDOW_H
