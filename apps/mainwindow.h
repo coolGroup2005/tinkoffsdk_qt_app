@@ -14,6 +14,9 @@
 #include "favouritesModel.h"
 #include "favouritesProxyModel.h"
 #include "portfolio.h"
+#include "statistics/statistics.h"
+#include "figi.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -34,7 +37,8 @@ private slots:
     void on_sharesTableView_doubleClicked(const QModelIndex &index);
     void on_topGainersList_clicked(const QModelIndex &index);
     void on_topLosersList_clicked(const QModelIndex &index);
-    void on_topActiveList_clicked(const QModelIndex &index);
+    void updateStatistics();
+
 
     void createCheckboxList();
     void connectCheckboxes();
@@ -46,6 +50,8 @@ private:
     FavouritesModel *favouritesModel;
     ProxyModel *proxyModel;
     Portfolio *portfolio;
+    StatisticsManager *statisticsManager;
+    DatabaseFigi *databaseFigi;
 };
 
 #endif // MAINWINDOW_H

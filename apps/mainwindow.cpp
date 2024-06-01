@@ -17,14 +17,16 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , favouritesModel(new FavouritesModel)
     , proxyModel(new ProxyModel)
+    , statisticsManager(new StatisticsManager(this))
+    , databaseFigi(new DatabaseFigi(this))
 {
     ui->setupUi(this);
-    ui->tabWidget->setTabText(0, "Database Fiji");
-    ui->tabWidget->setTabText(1, "Statistics");
-    ui->tabWidget->setTabText(2, "Home");
+    ui->tabWidget->setTabText(0, "Statistics");
+    ui->tabWidget->setTabText(1, "Home");
 
     portfolio = new Portfolio(this);
     ui->tabWidget->addTab(portfolio, "Portfolio");
+    ui->tabWidget->addTab(databaseFigi, "Database Figi");
 
     // Iteraction with tab Home
     proxyModel->setSourceModel(favouritesModel);
@@ -34,41 +36,48 @@ MainWindow::MainWindow(QWidget *parent)
     ui->sharesTableView->verticalHeader()->setVisible(false);
     ui->sharesTableView->setStyleSheet("QHeaderView::section {background-color: lightgrey}");
 
-    // Interaction with tab Statistics
-    // Initialize models for the statistics lists
-    QStringListModel *topGainersModel = new QStringListModel(this);
-    QStringListModel *topLosersModel = new QStringListModel(this);
-    QStringListModel *topActiveModel = new QStringListModel(this);
+    // Interaction with tab Statistics ============================================
+    ui->checkBoxStatistics->setChecked(true);
 
-    // Example data for the statistics lists
-    QStringList topGainers = {"Gainer 1", "Gainer 2", "Gainer 3"};
-    QStringList topLosers = {"Loser 1", "Loser 2", "Loser 3"};
-    QStringList topActive = {"Active 1", "Active 2", "Active 3"};
-
-    topGainersModel->setStringList(topGainers);
-    topLosersModel->setStringList(topLosers);
-    topActiveModel->setStringList(topActive);
-
-    // Set models for the statistics list views
-    ui->top_gainers_list->setModel(topGainersModel);
-    ui->top_losers_list->setModel(topLosersModel);
-    ui->top_active_list->setModel(topActiveModel);
-
-    ui->top_gainers_list->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    ui->top_losers_list->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    ui->top_active_list->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-
-    // Connect list view clicked signals to slots
+    // connect(ui->listView, &QListView::activated, this, &MainWindow::on_listView_clicked);
     connect(ui->top_gainers_list, &QListView::clicked, this, &MainWindow::on_topGainersList_clicked);
     connect(ui->top_losers_list, &QListView::clicked, this, &MainWindow::on_topLosersList_clicked);
-    connect(ui->top_active_list, &QListView::clicked, this, &MainWindow::on_topActiveList_clicked);
+    connect(ui->updateStatisticsButton, &QPushButton::clicked, this, &MainWindow::updateStatistics);
+
+    ui->intervalStatisticsCombobox->addItem("1 day");
+    ui->intervalStatisticsCombobox->addItem("1 week");
+    ui->intervalStatisticsCombobox->addItem("1 month");
+
+    databaseFigi->insertSharesIntoDatabase();
+    updateStatistics();
+    // END Statistics ================================================================
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::updateStatistics()
+{
+    QStringListModel *topGainersModel = new QStringListModel(this);
+    QStringListModel *topLosersModel = new QStringListModel(this);
+    QStringListModel *topActiveModel = new QStringListModel(this);
+
+
+    QString intervalTextStatistics = ui->intervalStatisticsCombobox->currentText();
+    int intervalToPass = (intervalTextStatistics == "1 day") ? 0 : (intervalTextStatistics == "1 month") ? 1 : 2;
+
+    bool cropped = ui->checkBoxStatistics->isChecked();
+    statisticsManager->updateStatistics(intervalToPass, topGainersModel, topLosersModel, topActiveModel, cropped);
+
+    QStringList topLosers = {"Press UPD Button and wait a little"};
+    QStringList topActive = {"Press UPD Button and wait a little"};
+
+    ui->top_gainers_list->setModel(topGainersModel);
+    ui->top_losers_list->setModel(topLosersModel);
+}
+
 
 
 void MainWindow::createCheckboxList()
@@ -163,10 +172,12 @@ void MainWindow::on_topLosersList_clicked(const QModelIndex &index)
 }
 
 
-void MainWindow::on_topActiveList_clicked(const QModelIndex &index)
+void MainWindow::on_listView_clicked(const QModelIndex &index)
 {
     QString selectedItem = index.data().toString();
-    QMessageBox::information(this, "Top Active Selected", "You selected: " + selectedItem);
+    ui->lineEdit->setText(";;;  " + selectedItem);
+    std::string figi = selectedItem.split("\t")[1].toStdString(); 
+    std::string stockName = selectedItem.section('\t', 0, 0).toStdString();   
+    std::cout << figi;
+    MainWindow::openShares(figi, stockName);
 }
-
-

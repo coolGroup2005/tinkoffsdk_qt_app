@@ -6,6 +6,7 @@
 #include <QComboBox>
 #include <QTableView>
 #include <QStandardItemModel>
+#include <QPushButton>
 #include "investapiclient.h"
 #include "usersservice.h"
 #include "operationsservice.h"
@@ -23,6 +24,9 @@ public:
 
 private slots:
     void onAccountChanged(int index);
+    void onUpdateButtonClicked();
+    void onTableDoubleClicked(const QModelIndex &index);
+    void onVirtualTableDoubleClicked(const QModelIndex &index);
 
 private:
     void updateExpectedYield(const Quotation& yield);
@@ -38,6 +42,7 @@ private:
     QStandardItemModel *portfolioModel;
     QTableView *virtualPortfolioTableView;
     QStandardItemModel *virtualPortfolioModel;
+    QPushButton *updateButton;
 };
 
 #endif // PORTFOLIOBALANCE_H
