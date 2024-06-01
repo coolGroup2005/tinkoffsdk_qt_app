@@ -19,6 +19,20 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
 
     updateButton = new QPushButton("Update", this);
 
+    updateButton->setStyleSheet(
+        "QPushButton {"
+        "    background-color: rgb(193, 193, 193);"  
+        "    border-radius: 15px;"  
+        "    padding: 10px 20px;"  
+        "}"
+        "QPushButton:hover {"
+        "    background-color: rgb(170, 170, 170);"  
+        "}"
+        "QPushButton:pressed {"
+        "    background-color: rgb(150, 150, 150);"  
+        "}"
+    );
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(accountComboBox);
     layout->addWidget(balanceLabel);
