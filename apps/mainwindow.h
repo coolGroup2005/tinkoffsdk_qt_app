@@ -19,7 +19,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(QWidget *parent = nullptr, const QString& token = "");
     ~MainWindow();
 
 private slots:
@@ -33,6 +33,7 @@ private:
     QStringListModel *model;
     QList<QString> songs;
     Portfolio *portfolio;
+    QString token;
 };
 
 #endif // MAINWINDOW_H

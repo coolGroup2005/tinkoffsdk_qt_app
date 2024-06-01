@@ -26,7 +26,7 @@
 #include <cstdlib>
 #include <QDebug> // for finding segmentation fault
 
-Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
+Portfolio::Portfolio(QWidget *parent, const QString& token) : QWidget(parent), token(token)
 {
     balanceLabel = new QLabel(this);
     accountComboBox = new QComboBox(this);
@@ -40,7 +40,6 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     layout->addWidget(portfolioTableView);
     setLayout(layout);
 
-    token = getenv("TOKEN");
     client = new InvestApiClient("sandbox-invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
 
     auto accountService = std::dynamic_pointer_cast<Users>(client->service("users"));

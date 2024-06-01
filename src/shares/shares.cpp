@@ -1,21 +1,6 @@
 #include "shares/shares.h"
 #include "ui_shares.h"
 
-QVector<double> calculateSMA(const QVector<double>& closePrices, int period) {
-    QVector<double> smaValues;
-
-    for (int i = 0; i <= closePrices.size() - period; ++i) {
-        double sum = 0.0;
-        for (int j = 0; j < period; ++j) {
-            sum += closePrices[i + j];
-        }
-        double average = sum / period;
-        smaValues.append(average);
-    }
-
-    return smaValues;
-}
-
 
 void showError(const QString &message) {
     QMessageBox msgBox;
@@ -59,11 +44,12 @@ void insertDataIntoDatabase(const std::string& open_units, const std::string& op
     sqlite3_close(db);
 }
 
-shares::shares(QWidget *parent, const std::string& figi, const std::string& stockName)
+shares::shares(QWidget *parent, const std::string& figi, const std::string& stockName, const QString& token)
     : QDialog(parent)
     , ui(new Ui::shares)
     , figi(figi)
-    , stockName(stockName) 
+    , stockName(stockName)
+    , token(token)
 {
     ui->setupUi(this);
     this->resize(1040, 840);
@@ -106,7 +92,7 @@ void shares::fetchCandlestickData() {
     clearDatabase();
     clearChart();
 
-    InvestApiClient client("sandbox-invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
+    InvestApiClient client("invest-public-api.tinkoff.ru:443", token.toStdString());
 
     QString intervalText = ui->intervalComboBox->currentText();
     CandleInterval interval = CandleInterval::CANDLE_INTERVAL_UNSPECIFIED;
@@ -163,6 +149,7 @@ void shares::fetchCandlestickData() {
 
     updateCandleChart();
     updateLineChart();
+
 }
 
 void shares::updateCandleChart() {
@@ -170,6 +157,8 @@ void shares::updateCandleChart() {
     series->setIncreasingColor(QColor(0, 207, 120, 254));
     series->setDecreasingColor(QColor(255, 104, 97, 254));
     
+    connect(series, &QCandlestickSeries::hovered, this, &shares::showTooltipCandle);
+
     QSqlDatabase dbq = QSqlDatabase::addDatabase("QSQLITE");
     dbq.setDatabaseName("candles.db");
     if (!dbq.open()) {
@@ -200,19 +189,8 @@ void shares::updateCandleChart() {
         timestamps.append(timestamp);
     }
 
-    int period = 20; // Example period for SMA
-    QVector<double> smaValues = calculateSMA(closePrices, period);
-
-    QLineSeries *smaSeries = new QLineSeries();
-    for (int i = 0; i < smaValues.size(); ++i) {
-        qint64 timestamp = timestamps[i + period - 1]; // Align SMA with the correct timestamps
-        qreal timeValue = QDateTime::fromSecsSinceEpoch(timestamp).toMSecsSinceEpoch();
-        smaSeries->append(timeValue, smaValues[i]);
-    }
-
     QChart *chart = new QChart();
     chart->addSeries(series);
-    chart->addSeries(smaSeries);
 
     QDateTimeAxis *axisX = new QDateTimeAxis();
     axisX->setTickCount(10);
@@ -220,20 +198,66 @@ void shares::updateCandleChart() {
     axisX->setTitleText("Time");
     chart->addAxis(axisX, Qt::AlignBottom);
     series->attachAxis(axisX);
-    smaSeries->attachAxis(axisX);
 
     QValueAxis *axisY = new QValueAxis();
     axisY->setTitleText("Price");
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
-    smaSeries->attachAxis(axisY);
-
-    chart->setTitle("Candlestick Chart");
 
     chart->legend()->setVisible(false);
 
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
+
+    QLineSeries *smaSeries = new QLineSeries();
+    int period = 9; // period like on TradeView
+    for (int i = 0; i < closePrices.size(); ++i) {
+        if (i >= period - 1) {
+            double sum = 0.0;
+            for (int j = 0; j < period; ++j) {
+                sum += closePrices[i - j];
+            }
+            double sma = sum / period;
+            smaSeries->append(timestamps[i] * 1000, sma);
+        }
+    }
+    QPen smaPen(Qt::green);
+    smaPen.setWidth(2);
+    smaSeries->setPen(smaPen);
+
+    QLineSeries *emaSeries = new QLineSeries();
+    double multiplier = 2.0 / (period + 1);
+    double ema = 0.0;
+    
+    for (int i = 0; i < closePrices.size(); ++i) {
+        if (i == 0)
+            ema = closePrices[i];
+        else
+            ema = ((closePrices[i] - ema) * multiplier) + ema;
+        if (i >= period - 1)
+            emaSeries->append(timestamps[i] * 1000, ema);
+    }
+
+    QPen emaPen(Qt::blue);
+    emaPen.setWidth(2);
+    emaSeries->setPen(emaPen);
+
+    if (ui->smaCheckBox->isChecked())
+        chart->addSeries(smaSeries);
+
+    if (ui->emaCheckBox->isChecked())
+        chart->addSeries(emaSeries);
+
+    if (ui->smaCheckBox->isChecked()) {
+        smaSeries->attachAxis(axisX);
+        smaSeries->attachAxis(axisY);
+    }
+
+    if (ui->emaCheckBox->isChecked()) {
+        emaSeries->attachAxis(axisX);
+        emaSeries->attachAxis(axisY);
+
+    }
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->addWidget(chartView);
@@ -317,8 +341,6 @@ void shares::updateLineChart() {
     areaSeries->attachAxis(axisY);
     scatterSeries->attachAxis(axisY);
 
-    lineChart->setTitle("Line Chart");
-
     lineChart->legend()->setVisible(false);
 
     QChartView *lineChartView = new QChartView(lineChart);
@@ -350,6 +372,35 @@ void shares::showTooltip(const QPointF &point, bool state) {
     }
 }
 
+void shares::showTooltipCandle(bool status, QCandlestickSet *set) {
+    if (status) {
+        QString tooltipText = QString("Open: %1\nHigh: %2\nLow: %3\nClose: %4\nTime: %5")
+                .arg(set->open())
+                .arg(set->high())
+                .arg(set->low())
+                .arg(set->close())
+                .arg(QDateTime::fromMSecsSinceEpoch(set->timestamp()).toString("dd.MM.yyyy hh:mm:ss"));
+        QString tooltipStyle;
+        if (set->close() < set->open()) {
+            tooltipStyle = "QToolTip {"
+                         "    color: black;"
+                         "    background-color: #da4647;"
+                         "    border: 3px solid #c34647;"
+                         "}";
+        } else {
+            tooltipStyle = "QToolTip {"
+                         "    color: black;"
+                         "    background-color: #41a684;"
+                         "    border: 3px solid #419484;"
+                         "}";
+        }
+        qApp->setStyleSheet(tooltipStyle);
+        QToolTip::showText(QCursor::pos(), tooltipText, this);
+    } else {
+        qApp->setStyleSheet("");
+        QToolTip::hideText();
+    }
+}
 
 void shares::clearDatabase() {
     sqlite3* db;

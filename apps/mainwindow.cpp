@@ -10,16 +10,17 @@
 
 #include <vector>
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent, const QString& token)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , token(token)
 {
     ui->setupUi(this);
     ui->tabWidget->setTabText(0, "Database Fiji");
     ui->tabWidget->setTabText(1, "Statistics");
     ui->tabWidget->setTabText(2, "Home");
 
-    portfolio = new Portfolio(this);
+    portfolio = new Portfolio(this, token);
     ui->tabWidget->addTab(portfolio, "Portfolio");
 
     // Iteraction with tab Home
@@ -27,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     model = new QStringListModel;
 
     std::vector<ShareInfo> sharesList;
-    sharesList = parseFigi();
+    sharesList = parseFigi(token);
     
     for (ShareInfo availableShare: sharesList)
     {
@@ -92,7 +93,7 @@ void MainWindow::on_listView_clicked(const QModelIndex &index)
 
 void MainWindow::openShares(const std::string& figi, const std::string& stockName)
 {
-    shares *window1 = new shares(this, figi, stockName);
+    shares *window1 = new shares(this, figi, stockName, token);
     window1->show();
 }
 

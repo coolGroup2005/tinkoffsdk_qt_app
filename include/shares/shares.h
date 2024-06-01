@@ -26,7 +26,7 @@ class shares : public QDialog
     Q_OBJECT
 
 public:
-    explicit shares(QWidget *parent = nullptr, const std::string& figi = "", const std::string& stockName = "");
+    explicit shares(QWidget *parent = nullptr, const std::string& figi = "", const std::string& stockName = "", const QString& token = "");
     ~shares();
 
 private slots:
@@ -37,12 +37,16 @@ private slots:
     void updateCandleChart();
     void updateLineChart();
     void showTooltip(const QPointF &point, bool state);
-
+    void showTooltipCandle(bool status, QCandlestickSet *set);
+    
 private:
     Ui::shares *ui;
     QTimer *timer;
     std::string figi;
     std::string stockName;
+    QString token;
+    QLineSeries *smaSeries;
+    QLineSeries *emaSeries;
 };
 
 #endif // SHARES_H

@@ -13,6 +13,7 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets PrintSupport Charts Sql)
 find_package(SQLite3 REQUIRED)
 
+include_directories()
 set(PROJECT_SOURCES
     main.cpp
     mainwindow.cpp
@@ -56,6 +57,7 @@ target_link_libraries(
     Qt${QT_VERSION_MAJOR}::Sql
     invest_lib 
     homepage_lib
+    welcome_lib
     shares_lib
     tink_grpc_proto 
     TinkoffInvestSDK 
