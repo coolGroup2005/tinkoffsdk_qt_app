@@ -21,6 +21,7 @@ class Portfolio : public QWidget
 public:
     explicit Portfolio(QWidget *parent = nullptr);
     void updateBalance(const QString& accountId);
+    void updateUserInfo();
 
 private slots:
     void onAccountChanged(int index);
@@ -34,6 +35,7 @@ private:
 
     QLabel *balanceLabel;
     QLabel *yieldLabel;
+    QLabel *userInfoLabel;
     InvestApiClient *client;
     QString token;
     QComboBox *accountComboBox;

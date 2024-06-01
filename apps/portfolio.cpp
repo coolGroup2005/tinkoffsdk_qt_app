@@ -8,6 +8,10 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
 {
     balanceLabel = new QLabel(this);
     yieldLabel = new QLabel(this);
+    userInfoLabel = new QLabel(this);
+    // balanceLabel->setStyleSheet("font-weight: bold; font-size: 20px; ");
+    // yieldLabel->setStyleSheet("font-weight: bold; font-size: 20px; ");
+    // userInfoLabel->setStyleSheet("font-weight: bold; font-size: 20px; ");
     accountComboBox = new QComboBox(this);
     portfolioTableView = new QTableView(this);
     portfolioModel = new QStandardItemModel(this);
@@ -36,6 +40,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     layout->addWidget(accountComboBox);
     layout->addWidget(balanceLabel);
     layout->addWidget(yieldLabel);
+    layout->addWidget(userInfoLabel);
     layout->addWidget(portfolioTableView);
     layout->addWidget(new QLabel("Virtual Positions", this));
     layout->addWidget(virtualPortfolioTableView);
@@ -94,7 +99,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     virtualPortfolioTableView->verticalHeader()->setVisible(false);
 
     token = getenv("TOKEN");
-    client = new InvestApiClient("invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
+    client = new InvestApiClient("sandbox-invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
 
     auto accountService = std::dynamic_pointer_cast<Users>(client->service("users"));
 
@@ -117,7 +122,8 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     {
         auto account = accountID1->accounts(i);
         accountIds.push_back(account.id().c_str());
-        accountComboBox->addItem(account.name().c_str(), QVariant(account.id().c_str()));
+        auto fillIn = account.name() + ", ID: " + account.id();
+        accountComboBox->addItem(fillIn.c_str(), QVariant(account.id().c_str()));
     }
 
     
@@ -129,6 +135,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     if (!accountIds.empty())
     {
         updateBalance(accountIds[0]);
+        updateUserInfo();
     }
 
     portfolioTableView->setModel(portfolioModel);
@@ -297,8 +304,10 @@ void Portfolio::onUpdateButtonClicked()
 
 void Portfolio::onTableDoubleClicked(const QModelIndex &index)
 {
-    if (!index.isValid())
+    if (!index.isValid()) {
+        qDebug() << "Invalid index!";
         return;
+    }
 
     int row = index.row();
     QString ticker = portfolioModel->item(row, 0)->text();
@@ -341,4 +350,29 @@ void Portfolio::onVirtualTableDoubleClicked(const QModelIndex &index)
 
     // тут вызвать функцию показа свечей + добавить в хедер инклюд
     // showCandlestickChart(ticker, name);
+}
+
+void Portfolio::updateUserInfo()
+{
+    auto userService = std::dynamic_pointer_cast<Users>(client->service("users"));
+
+    if (!userService) {
+        qDebug() << "Failed to get Users service";
+        return;
+    }
+
+    auto userInfoRequest = userService->GetInfo();
+    auto userInfoResponse = dynamic_cast<GetInfoResponse*>(userInfoRequest.ptr().get());
+
+    if (!userInfoResponse) {
+        qDebug() << "Failed to get user info response";
+        return;
+    }
+
+    QString userInfoText;
+    userInfoText += "Premium Status: " + QString(userInfoResponse->prem_status() ? "Yes" : "No") + "\n" + "\n";
+    userInfoText += "Qualified Investor: " + QString(userInfoResponse->qual_status() ? "Yes" : "No") + "\n"  + "\n";
+    userInfoText += "Tariff: " + QString::fromStdString(userInfoResponse->tariff()) + "\n";
+
+    userInfoLabel->setText(userInfoText);
 }
