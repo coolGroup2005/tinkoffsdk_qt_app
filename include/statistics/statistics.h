@@ -22,13 +22,13 @@ class StatisticsManager : public QObject
     Q_OBJECT
 public:
     explicit StatisticsManager(QObject *parent = nullptr);
-    void updateStatistics(int interval, QStringListModel* topGainersModel, QStringListModel* topLosersModel, QStringListModel* topActiveModel);
+    void updateStatistics(int interval, QStringListModel* topGainersModel, QStringListModel* topLosersModel, QStringListModel* topActiveModel, bool cropped);
 
 signals:
     void statisticsUpdated();
 };
 
-SharesVector getAllSharesWithChange(InvestApiClient&, int&);
+SharesVector getAllSharesWithChange(InvestApiClient&, int&, bool);
 std::vector<std::pair<std::string, float>> getTopFromDb(std::string type);
 std::string formatTradingStatus(unsigned int);
 float getShareChange(std::string&, std::time_t&, std::time_t&); 

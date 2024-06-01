@@ -167,14 +167,14 @@ float getShareChange(std::string& figi, std::time_t& dateFromToTime, std::time_t
     auto marketdata = std::dynamic_pointer_cast<MarketData>(client.service("marketdata"));
     if (!marketdata) {
         qDebug() << "error marketdata";
-        return -1;
+        return 10000;
     }
 
     auto candlesServiceReply = marketdata->GetCandles(figi, dateFromToTime, 0, currentTime, 0, CandleInterval::CANDLE_INTERVAL_DAY);
     auto response = dynamic_cast<GetCandlesResponse*>(candlesServiceReply.ptr().get());
     if (!response) {
         qDebug() << "error response";
-        return -1;
+        return 10000;
     }
 
     if (response->candles_size() == 0) {
@@ -207,7 +207,7 @@ float getShareChange(std::string& figi, std::time_t& dateFromToTime, std::time_t
     return x;
 }
 
-SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval)
+SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval, bool cropped)
 {
     SharesVector allShares;
     auto instrumentService = std::dynamic_pointer_cast<Instruments>(client.service("instruments"));
@@ -243,8 +243,9 @@ SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval)
 
     dateFromToTime = adjustToWorkingTime(dateFromToTime);
     currentTime = adjustToWorkingTime(currentTime);
+    int size = cropped ? (answerShareReply->instruments_size() - 1)/9 : answerShareReply->instruments_size() - 1;
 
-    for (int i = 0; i < answerShareReply->instruments_size() - 1; i++) {
+    for (int i = 0; i < size; i++) {
         unsigned int tradingStatus = answerShareReply->instruments(i).trading_status();
         std::string currency = answerShareReply->instruments(i).currency();
             // std::cout << i << "trading status: " << tradingStatus << std::endl;
@@ -346,7 +347,6 @@ std::vector<std::pair<std::string, float>> getTopFromDb(std::string type) {
     sqlite3_stmt* stmt;
     int rc;
 
-    std::cout << "1111111\n";
     rc = sqlite3_open("statistics.db", &db);
     if (rc != SQLITE_OK) {
         std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
@@ -392,29 +392,32 @@ StatisticsManager::StatisticsManager(QObject *parent) : QObject(parent)
 {
 }
 
-void StatisticsManager::updateStatistics(int interval, QStringListModel* topGainersModel, QStringListModel* topLosersModel, QStringListModel* topActiveModel)
+void StatisticsManager::updateStatistics(int interval, QStringListModel* topGainersModel, QStringListModel* topLosersModel, QStringListModel* topActiveModel, bool cropped)
 {
     InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
-    auto allShares = getAllSharesWithChange(client, interval);
+    auto allShares = getAllSharesWithChange(client, interval, cropped);
     insertStatisticsIntoDatabase(allShares);
-    std::vector<std::pair<std::string, float>> top = getTopFromDb("ASC");
+    std::vector<std::pair<std::string, float>> bottom = getTopFromDb("ASC");
+    std::vector<std::pair<std::string, float>> top = getTopFromDb("DESC");
 
     QStringList topGainers;
+    QStringList topLosers;
+
     for (const auto& sharePair : top) {
-        qDebug() << "Company: " << QString::fromStdString(sharePair.first) << "\n"
-                 << "Price Change: " << sharePair.second << "%\n"
-                 << "-----------------------------\n";
+        // qDebug() << "Company: " << QString::fromStdString(sharePair.first) << "\n"
+        //          << "Price Change: " << sharePair.second << "%\n"
+        //          << "-----------------------------\n";
         QString gainer = QString::fromStdString(sharePair.first) + " (" + QString::number(sharePair.second) + ")";
         topGainers.append(gainer);
     }
 
-    // Example data for the statistics lists
-    QStringList topLosers = {"Loser 1", "Loser 2", "Loser 3"};
-    QStringList topActive = {"Active 1", "Active 2", "Active 3"};
+     for (const auto& sharePair : bottom) {
+        QString loser = QString::fromStdString(sharePair.first) + " (" + QString::number(sharePair.second) + ")";
+        topLosers.append(loser);
+    }
 
     topGainersModel->setStringList(topGainers);
     topLosersModel->setStringList(topLosers);
-    topActiveModel->setStringList(topActive);
 
     emit statisticsUpdated();
 }

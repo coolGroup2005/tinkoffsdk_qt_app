@@ -39,17 +39,24 @@ MainWindow::MainWindow(QWidget *parent)
 
     model->setStringList(list);
     ui->listView->setModel(model);
+    ui->checkBoxStatistics->setChecked(true);
 
     connect(ui->listView, &QListView::activated, this, &MainWindow::on_listView_clicked);
 
     // Connect list view clicked signals to slots
     connect(ui->top_gainers_list, &QListView::clicked, this, &MainWindow::on_topGainersList_clicked);
     connect(ui->top_losers_list, &QListView::clicked, this, &MainWindow::on_topLosersList_clicked);
-    connect(ui->top_active_list, &QListView::clicked, this, &MainWindow::on_topActiveList_clicked);
+    // connect(ui->top_active_list, &QListView::clicked, this, &MainWindow::on_topActiveList_clicked);
 
     connect(ui->updateStatisticsButton, &QPushButton::clicked, this, &MainWindow::updateStatistics);
+    connect(ui->checkBoxStatistics, &QCheckBox::stateChanged, this, &MainWindow::on_checkBoxStatistics_stateChanged);
 
 
+    ui->intervalStatisticsCombobox->addItem("1 day");
+    ui->intervalStatisticsCombobox->addItem("1 week");
+    ui->intervalStatisticsCombobox->addItem("1 month");
+
+    updateStatistics();
     // Interaction with tab Statistics ===============================================================
 }
 
@@ -59,67 +66,27 @@ void MainWindow::updateStatistics()
     QStringListModel *topLosersModel = new QStringListModel(this);
     QStringListModel *topActiveModel = new QStringListModel(this);
 
-    ui->intervalStatisticsCombobox->addItem("1 day");
-    ui->intervalStatisticsCombobox->addItem("1 week");
-    ui->intervalStatisticsCombobox->addItem("1 month");
 
     QString intervalTextStatistics = ui->intervalStatisticsCombobox->currentText();
     int intervalToPass = (intervalTextStatistics == "1 day") ? 0 : (intervalTextStatistics == "1 month") ? 1 : 2;
 
-    statisticsManager->updateStatistics(intervalToPass, topGainersModel, topLosersModel, topActiveModel);
+    bool cropped = ui->checkBoxStatistics->isChecked();
+    statisticsManager->updateStatistics(intervalToPass, topGainersModel, topLosersModel, topActiveModel, cropped);
+
+    QStringList topLosers = {"Press UPD Button and wait a little"};
+    QStringList topActive = {"Press UPD Button and wait a little"};
 
     ui->top_gainers_list->setModel(topGainersModel);
     ui->top_losers_list->setModel(topLosersModel);
-    ui->top_active_list->setModel(topActiveModel);
+    // ui->top_active_list->setModel(topActiveModel);
+
+    // updateStatistics();
 }
 
-// void MainWindow::updateStatistics() {
-//     QStringListModel *topGainersModel = new QStringListModel(this);
-//     QStringListModel *topLosersModel = new QStringListModel(this);
-//     QStringListModel *topActiveModel = new QStringListModel(this);
-
-//     ui->intervalStatisticsCombobox->addItem("1 day");
-//     ui->intervalStatisticsCombobox->addItem("1 week");
-//     ui->intervalStatisticsCombobox->addItem("1 month");
-
-//     QString intervalTextStatistics = ui->intervalStatisticsCombobox->currentText();
-//     int intervalToPass;
-//     if (intervalTextStatistics == "1 day") {
-//         intervalToPass = 0;
-//     } else if (intervalTextStatistics == "1 month") {
-//         intervalToPass = 1;
-//     } else {
-//         intervalToPass = 2;
-//     }
-
-
-//     InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
-
-//     auto allShares = getAllSharesWithChange(client, intervalToPass);
-//     insertStatisticsIntoDatabase(allShares);
-//     std::vector<std::pair<std::string, float>> top = getTopFromDb("ASC");
-
-//     QStringList topGainers;
-
-//     for (const auto& sharePair : top) {
-//         std::cout << "Company: " << sharePair.first << "\n"
-//                 << "Price Change: " << sharePair.second << "%\n"
-//                 << "-----------------------------\n";
-//     }
-
-//     for (const auto& sharePair : top) {
-//         QString gainer = QString::fromStdString(sharePair.first) + " (" + QString::number(sharePair.second) + ")";
-//         topGainers.append(gainer);
-//     }
-
-//     // Example data for the statistics lists
-//     // QStringList topGainers = {"Gainer 1", "Gainer 2", "Gainer 3"};
-//     QStringList topLosers = {"Loser 1", "Loser 2", "Loser 3"};
-//     QStringList topActive = {"Active 1", "Active 2", "Active 3"};
-
+void MainWindow::on_checkBoxStatistics_stateChanged(int state)
+{
     
-// }
-
+}
 void MainWindow::on_topGainersList_clicked(const QModelIndex &index)
 {
     QString selectedItem = index.data().toString();

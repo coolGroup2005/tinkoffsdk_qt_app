@@ -160,17 +160,18 @@
             <property name="maximumSize">
              <size>
               <width>16777214</width>
-              <height>60</height>
+              <height>90</height>
              </size>
             </property>
             <property name="font">
              <font>
-              <pointsize>20</pointsize>
+              <pointsize>30</pointsize>
              </font>
             </property>
             <property name="styleSheet">
              <string notr="true">QLabel#statistics_header {
-	margin-left: 110px;
+	margin-top: 22px;
+	margin-bottom: 22px;
 }</string>
             </property>
             <property name="lineWidth">
@@ -180,79 +181,116 @@
              <string>Statistics</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
             </property>
             <property name="margin">
-             <number>22</number>
+             <number>0</number>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="intervalStatisticsCombobox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+           <layout class="QVBoxLayout" name="statistics_settings_container">
+            <property name="leftMargin">
+             <number>180</number>
             </property>
-            <property name="maximumSize">
-             <size>
-              <width>110</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="layoutDirection">
-             <enum>Qt::LeftToRight</enum>
-            </property>
-            <property name="autoFillBackground">
-             <bool>false</bool>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QComboBox#intervalStatisticsCombobox {
+            <item>
+             <layout class="QHBoxLayout" name="statistics_buttons_container">
+              <item>
+               <widget class="QComboBox" name="intervalStatisticsCombobox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>110</width>
+                  <height>40</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="autoFillBackground">
+                 <bool>false</bool>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QComboBox#intervalStatisticsCombobox {
 	border: 1px solid rgb(211, 210, 208);
 	border-radius: 5px;
 	padding: 8px;
 	margin: 3px;
 }</string>
-            </property>
-            <property name="placeholderText">
-             <string>select period</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="updateStatisticsButton">
-            <property name="maximumSize">
-             <size>
-              <width>40</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="cursor">
-             <cursorShape>OpenHandCursor</cursorShape>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton#updateStatistics {
+                </property>
+                <property name="placeholderText">
+                 <string>select period</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="updateStatisticsButton">
+                <property name="maximumSize">
+                 <size>
+                  <width>40</width>
+                  <height>40</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="cursor">
+                 <cursorShape>OpenHandCursor</cursorShape>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton#updateStatisticsButton {
 	border: 1px solid rgb(211, 210, 208);
 	border-radius: 5px;
 	padding: 3px;
 	margin: 3px;
 }</string>
-            </property>
-            <property name="text">
-             <string>UPD</string>
-            </property>
-           </widget>
+                </property>
+                <property name="text">
+                 <string>UPD</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBoxStatistics">
+              <property name="maximumSize">
+               <size>
+                <width>200</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::RightToLeft</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QCheckBox#checkBoxStatistics {
+	margin-right: 8px;
+}</string>
+              </property>
+              <property name="text">
+               <string>Compute for a part of shares</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
@@ -313,31 +351,7 @@
            </layout>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="top_active_layout">
-            <item>
-             <widget class="QLabel" name="top_active_h">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>40</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Top Active</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QListView" name="top_active_list">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>350</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <layout class="QVBoxLayout" name="top_active_layout"/>
           </item>
          </layout>
         </item>
