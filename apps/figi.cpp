@@ -67,12 +67,59 @@ void DatabaseFigi::initializeUI() {
     mainLayout->addWidget(numElementsLabel);
     tableView->setObjectName("table_figi"); 
 
-    tableView->setStyleSheet("QTableView#table_figi { border-radius: 10px; background-color: rgb(222, 222, 222); gridline-color: rgb(100, 100, 100) }"
+    tableView->setStyleSheet("QTableView#table_figi { border-radius: 10px; background-color: rgb(222, 222, 222); }"
                          "QTableView#table_figi::first-row { background-color: rgb(193, 193, 193); }"
                          "QTableView#table_figi::first-column { background-color: rgb(193, 193, 193); }");
     tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     tableView->setModel(tableModel);
     mainLayout->addWidget(tableView);
+
+    this->setStyleSheet(R"(
+        QWidget {
+            background-color: #ebeae7;
+            color: #525252;
+        }
+        QLabel {
+            color: #525252;
+        }
+        QLineEdit, QComboBox {
+            background-color: #d3d2d0;
+            border-radius: 15px;
+            color: #525252;
+            padding: 10px;
+        }
+        QHeaderView::section {
+            background-color: lightgrey;
+        }
+        QComboBox::down-arrow {
+            image: none;
+        }
+        QTableView {
+            gridline-color: #b0b0af;
+            background-color: #d3d2d0;
+            border: 1px solid #d3d2d0;
+            border-radius: 20px;
+        }
+        QTableView::item {
+            background-color: #d3d2d0;
+        }
+        QTableView::item:selected {
+            background-color: #b5cbd8;
+            color: #000000;
+        }
+        QPushButton {
+            background-color: rgb(193, 193, 193);
+            border-radius: 20px;
+            padding: 10px;
+        }
+        QPushButton:hover {
+            background-color: rgb(170, 170, 170);
+        }
+        QPushButton:pressed {
+            background-color: rgb(150, 150, 150);
+        }
+    )");
+
 
     setLayout(mainLayout);
 }
