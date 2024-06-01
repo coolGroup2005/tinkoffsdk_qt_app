@@ -37,8 +37,8 @@ private slots:
     void on_sharesTableView_doubleClicked(const QModelIndex &index);
     void on_topGainersList_clicked(const QModelIndex &index);
     void on_topLosersList_clicked(const QModelIndex &index);
+    void on_listView_clicked(const QModelIndex &index);
     void updateStatistics();
-
 
     void createCheckboxList();
     void connectCheckboxes();

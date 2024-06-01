@@ -182,7 +182,7 @@ SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval, bool
             std::string name =  answerShareReply->instruments(i).name();
             std::string figi =  answerShareReply->instruments(i).figi();
             MoneyValue nominal =  answerShareReply->instruments(i).nominal();
-            ShareInfo share {name, figi, tradingStatus, currency, nominal};
+            ShareInfo share {name, figi, tradingStatus};
 
             try {
                 float shareChange = getShareChange(share.figi, dateFromToTime, currentTime);
