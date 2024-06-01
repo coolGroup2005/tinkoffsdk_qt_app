@@ -218,10 +218,6 @@ void insertStatisticsIntoDatabase(SharesVector& sharesVector) {
                 return a.second < b.second;
             });
 
-    // for (const auto& sharePair : sharesVector) {
-    //     std::cout << sharePair.first.figi << " " << sharePair.second << std::endl;
-    // }
-
     sqlite3* db;
     char* errMsg = 0;
     int rc = sqlite3_open("statistics.db", &db);
@@ -293,8 +289,6 @@ std::vector<std::pair<std::string, float>> getTopFromDb(std::string type) {
 
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        // ShareInfo share;
-        // share.figi = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
 
         std::string name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
         float priceChange = static_cast<float>(sqlite3_column_double(stmt, 2));
@@ -303,10 +297,6 @@ std::vector<std::pair<std::string, float>> getTopFromDb(std::string type) {
         auto pair = std::make_pair(name, priceChange);
         topShares.push_back(pair);
     }
-
-    // for (int i = 0; i < topShares.size() - 1; i++) {
-    //     std::cout << "Company: " << topShares[i].first << "\n";
-    // }
 
     sqlite3_finalize(stmt);
     sqlite3_close(db);

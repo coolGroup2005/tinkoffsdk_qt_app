@@ -17,7 +17,7 @@ struct ShareInfo
     std::string name;
     std::string figi;
 
-    unsigned int trading_status;
+    std::string trading_status;
 
     std::string currency;
     MoneyValue nominal;
@@ -27,19 +27,10 @@ struct ShareInfo
 
 };
 
-// typedef std::vector<std::pair<ShareInfo, float>> SharesVector;
 
 ShareInfo getShareInfo(InvestApiClient&, std::string&);
 
-// SharesVector getAllSharesWithChange(InvestApiClient&, int&);
-// std::vector<std::pair<std::string, float>> getTopGainers();
-
 std::vector<ShareInfo> parseFigi();
 std::string formatTradingStatus(unsigned int);
-
-// float getShareChange(int& intervalType, std::string& figi);
-// void clearDatabaseStatistics();
-
-// void insertStatisticsIntoDatabase(SharesVector&);
 
 #endif // __EXAMPLE_H__

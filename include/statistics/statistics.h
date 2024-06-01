@@ -39,12 +39,8 @@ signals:
 };
 
 
-
-
-
 SharesVector getAllSharesWithChange(InvestApiClient&, int&, bool);
 std::vector<std::pair<std::string, float>> getTopFromDb(std::string type);
-std::string formatTradingStatus(unsigned int);
 float getShareChange(std::string&, std::time_t&, std::time_t&); 
 void clearDatabaseStatistics();
 void insertStatisticsIntoDatabase(SharesVector&);
