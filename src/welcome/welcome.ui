@@ -13,6 +13,43 @@
   <property name="windowTitle">
    <string>Token Input</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">
+            QWidget {
+                background-color: #ebeae7;
+                color: #525252;
+            }
+
+            QTabWidget::pane {
+                border: 1px solid #ebeae7;
+            }
+
+            QLabel {
+                color: #525252;
+            }
+
+            QLineEdit#tokenLineEdit {
+                background-color: #d3d2d0;
+                border-radius: 10px;
+                color: #525252;
+                padding: 10px;
+            }
+
+            QPushButton#browseButton, QPushButton#saveButton {
+                background-color: rgb(193, 193, 193);
+                border-radius: 8px;
+                padding: 5px;
+            }
+
+            QPushButton#browseButton:hover, QPushButton#saveButton:hover {
+                background-color: rgb(170, 170, 170);
+            }
+
+            QPushButton#browseButton:pressed, QPushButton#saveButton:pressed {
+                background-color: rgb(150, 150, 150);
+            }
+        </string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QFormLayout" name="formLayout">
