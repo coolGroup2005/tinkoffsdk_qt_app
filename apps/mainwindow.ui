@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="layoutDirection">
+   <enum>Qt::LeftToRight</enum>
+  </property>
   <property name="styleSheet">
    <string notr="true">
             QWidget {
@@ -56,7 +59,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="figi">
        <attribute name="title">
@@ -143,36 +146,115 @@
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
        </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <attribute name="title">
         <string>Tab 2</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QLabel" name="statistics_header">
-          <property name="maximumSize">
-           <size>
-            <width>16777214</width>
-            <height>60</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>20</pointsize>
-           </font>
-          </property>
-          <property name="lineWidth">
-           <number>5</number>
-          </property>
-          <property name="text">
-           <string>Statistics</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-          <property name="margin">
-           <number>22</number>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="statistics_header_container">
+          <item>
+           <widget class="QLabel" name="statistics_header">
+            <property name="maximumSize">
+             <size>
+              <width>16777214</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>20</pointsize>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QLabel#statistics_header {
+	margin-left: 110px;
+}</string>
+            </property>
+            <property name="lineWidth">
+             <number>5</number>
+            </property>
+            <property name="text">
+             <string>Statistics</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="margin">
+             <number>22</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="intervalStatisticsCombobox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>110</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QComboBox#intervalStatisticsCombobox {
+	border: 1px solid rgb(211, 210, 208);
+	border-radius: 5px;
+	padding: 8px;
+	margin: 3px;
+}</string>
+            </property>
+            <property name="placeholderText">
+             <string>select period</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="updateStatisticsButton">
+            <property name="maximumSize">
+             <size>
+              <width>40</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="cursor">
+             <cursorShape>OpenHandCursor</cursorShape>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton#updateStatistics {
+	border: 1px solid rgb(211, 210, 208);
+	border-radius: 5px;
+	padding: 3px;
+	margin: 3px;
+}</string>
+            </property>
+            <property name="text">
+             <string>UPD</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <layout class="QHBoxLayout" name="statistics_content">

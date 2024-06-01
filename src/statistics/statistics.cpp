@@ -283,7 +283,6 @@ SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval)
 
 
 
-
 void insertStatisticsIntoDatabase(SharesVector& sharesVector) {    
     std::sort(sharesVector.begin(), sharesVector.end(), 
             [](const std::pair<ShareInfo, float>& a, const std::pair<ShareInfo, float>& b) {
@@ -341,7 +340,7 @@ void insertStatisticsIntoDatabase(SharesVector& sharesVector) {
     std::cout << "Inserted all" << std::endl;
 }
 
-std::vector<std::pair<std::string, float>> getTopGainers() {
+std::vector<std::pair<std::string, float>> getTopFromDb(std::string type) {
     std::vector<std::pair<std::string, float>> topShares;
     sqlite3* db;
     sqlite3_stmt* stmt;
@@ -356,8 +355,8 @@ std::vector<std::pair<std::string, float>> getTopGainers() {
 
     std::string sql = "SELECT company_name, company_figi, total_price_change "
                     "FROM statistics "
-                    "ORDER BY total_price_change DESC "
-                    "LIMIT 5";
+                    "ORDER BY total_price_change " + type + " " +
+                    "LIMIT 7";
 
     rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
     if (rc != SQLITE_OK) {
@@ -386,4 +385,36 @@ std::vector<std::pair<std::string, float>> getTopGainers() {
     sqlite3_finalize(stmt);
     sqlite3_close(db);
     return topShares;
+}
+
+
+StatisticsManager::StatisticsManager(QObject *parent) : QObject(parent)
+{
+}
+
+void StatisticsManager::updateStatistics(int interval, QStringListModel* topGainersModel, QStringListModel* topLosersModel, QStringListModel* topActiveModel)
+{
+    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
+    auto allShares = getAllSharesWithChange(client, interval);
+    insertStatisticsIntoDatabase(allShares);
+    std::vector<std::pair<std::string, float>> top = getTopFromDb("ASC");
+
+    QStringList topGainers;
+    for (const auto& sharePair : top) {
+        qDebug() << "Company: " << QString::fromStdString(sharePair.first) << "\n"
+                 << "Price Change: " << sharePair.second << "%\n"
+                 << "-----------------------------\n";
+        QString gainer = QString::fromStdString(sharePair.first) + " (" + QString::number(sharePair.second) + ")";
+        topGainers.append(gainer);
+    }
+
+    // Example data for the statistics lists
+    QStringList topLosers = {"Loser 1", "Loser 2", "Loser 3"};
+    QStringList topActive = {"Active 1", "Active 2", "Active 3"};
+
+    topGainersModel->setStringList(topGainers);
+    topLosersModel->setStringList(topLosers);
+    topActiveModel->setStringList(topActive);
+
+    emit statisticsUpdated();
 }

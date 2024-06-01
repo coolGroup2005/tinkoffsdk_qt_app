@@ -2,6 +2,8 @@
 #define __STATISTICS_H__
 #include <iostream>
 #include <vector>
+#include <QObject>
+#include <QStringListModel>
 
 #include "investapiclient.h"
 #include "marketdataservice.h"
@@ -15,9 +17,19 @@
 
 typedef std::vector<std::pair<ShareInfo, float>> SharesVector;
 
+class StatisticsManager : public QObject
+{
+    Q_OBJECT
+public:
+    explicit StatisticsManager(QObject *parent = nullptr);
+    void updateStatistics(int interval, QStringListModel* topGainersModel, QStringListModel* topLosersModel, QStringListModel* topActiveModel);
+
+signals:
+    void statisticsUpdated();
+};
 
 SharesVector getAllSharesWithChange(InvestApiClient&, int&);
-std::vector<std::pair<std::string, float>> getTopGainers();
+std::vector<std::pair<std::string, float>> getTopFromDb(std::string type);
 std::string formatTradingStatus(unsigned int);
 float getShareChange(std::string&, std::time_t&, std::time_t&); 
 void clearDatabaseStatistics();
