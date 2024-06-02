@@ -43,8 +43,17 @@ InvestManager is a comprehensive desktop application which is designed to help i
  Statistics page
 </summary> <br />
 
-> **Note**
-> Some important informatin about Statistics 
+> **Description**
+>
+>
+> This page displays top most profitable and non-profitable shares over selected period. Options: 
+> * 1 day
+> * 1 week
+> * 1 month
+> 
+> In order to compute the result, application makes a lot of requests to the server to get all neccessary data, so computation may take some time, especially if the network connection is unstable. In order to see demonstration of this functionality quickly, one may set combo box to active mode.  
+>
+> ![Statistics demo](./assets/statistics.gif)
 </details>
 
 <details open>
@@ -52,19 +61,27 @@ InvestManager is a comprehensive desktop application which is designed to help i
  Portfolio
 </summary> <br />
 
-> **Note**
-> Some important informatin about Statistics 
-> 
+
+> **Description**
+>
+>
+> This page displays information about portfolio of the user. It is possible to switch between accounts and update information in real time.
+>   
+> ![Figi demo](./assets/portfolio.gif)
 </details>
 
 
 <details open>
 <summary style="font-size: 20px; font-weight: 600; text-decoration: underline">
- Database
+ Database Figi
 </summary> <br />
 
-> **Note**
-> Some important informatin about Database 
+> **Description**
+>
+>
+> This page ensures quick access to the unique figi of a particular share and helps to instantly check its trading status.
+>   
+> ![Figi demo](./assets/figi.gif)
 </details>
 
 <br /><br />
