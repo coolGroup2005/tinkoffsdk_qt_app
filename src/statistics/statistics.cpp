@@ -201,7 +201,7 @@ SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval, bool
 
 
     for (int i = 0; i < allShares.size(); ++i) {
-        std::cout << allShares[i].first.name << '\t' << allShares[i].second << '\n';
+        // std::cout << allShares[i].first.name << '\t' << allShares[i].second << '\n';
     }
     clearDatabaseStatistics();
     return allShares;
