@@ -15,11 +15,11 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     accountComboBox = new QComboBox(this);
     portfolioTableView = new QTableView(this);
     portfolioModel = new QStandardItemModel(this);
-    portfolioModel->setHorizontalHeaderLabels({"Ticker", "Name", "Quantity", "Current Price", "Value"});
+    portfolioModel->setHorizontalHeaderLabels({"FIGI", "Ticker", "Name", "Quantity", "Current Price", "Value"});
 
     virtualPortfolioTableView = new QTableView(this);
     virtualPortfolioModel = new QStandardItemModel(this);
-    virtualPortfolioModel->setHorizontalHeaderLabels({"Ticker", "Name", "Quantity", "Current Price", "Value"});
+    virtualPortfolioModel->setHorizontalHeaderLabels({"FIGI", "Ticker", "Name", "Quantity", "Current Price", "Value"});
 
     updateButton = new QPushButton("Update", this);
 
@@ -99,7 +99,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     virtualPortfolioTableView->verticalHeader()->setVisible(false);
 
     token = getenv("TOKEN");
-    client = new InvestApiClient("sandbox-invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
+    client = new InvestApiClient("invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
 
     auto accountService = std::dynamic_pointer_cast<Users>(client->service("users"));
 
@@ -206,18 +206,21 @@ void Portfolio::updateBalance(const QString &accountId)
             auto instrumentTicker = instrumentInfo.ticker();
 
             QList<QStandardItem *> rowItems;
+            QStandardItem *figiItem = new QStandardItem(QString::fromStdString(instrumentInfo.uid()));
             QStandardItem *tickerItem = new QStandardItem(QString::fromStdString(instrumentTicker));
             QStandardItem *nameItem = new QStandardItem(QString::fromStdString(instrumentName));
             QStandardItem *quantityItem = new QStandardItem(QString::number(position.quantity().units()));
             QStandardItem *priceItem = new QStandardItem(QString::number(position.current_price().units()) + " " + QString::fromStdString(position.current_price().currency()));
             QStandardItem *valueItem = new QStandardItem(QString::number(position.current_price().units() * position.quantity().units()) + " " + QString::fromStdString(position.current_price().currency()));
 
+            figiItem->setFlags(figiItem->flags() & ~Qt::ItemIsEditable);
             tickerItem->setFlags(tickerItem->flags() & ~Qt::ItemIsEditable);
             nameItem->setFlags(nameItem->flags() & ~Qt::ItemIsEditable);
             quantityItem->setFlags(quantityItem->flags() & ~Qt::ItemIsEditable);
             priceItem->setFlags(priceItem->flags() & ~Qt::ItemIsEditable);
             valueItem->setFlags(valueItem->flags() & ~Qt::ItemIsEditable);
 
+            rowItems.append(figiItem);
             rowItems.append(tickerItem);
             rowItems.append(nameItem);
             rowItems.append(quantityItem);
@@ -256,18 +259,21 @@ void Portfolio::updateBalance(const QString &accountId)
             auto instrumentTicker = instrumentInfo.ticker();
 
             QList<QStandardItem *> rowItems;
+            QStandardItem *figiItem = new QStandardItem(QString::fromStdString(instrumentInfo.uid()));
             QStandardItem *ticker = new QStandardItem(QString::fromStdString(instrumentTicker));
             QStandardItem *nameItem = new QStandardItem(QString::fromStdString(instrumentName));
             QStandardItem *quantityItem = new QStandardItem(QString::number(position.quantity().units()));
             QStandardItem *priceItem = new QStandardItem(QString::number(position.current_price().units()) + " " + QString::fromStdString(position.current_price().currency()));
             QStandardItem *valueItem = new QStandardItem(QString::number(position.current_price().units() * position.quantity().units()) + " " + QString::fromStdString(position.current_price().currency()));
             
+            figiItem->setFlags(figiItem->flags() & ~Qt::ItemIsEditable);
             ticker->setFlags(ticker->flags() & ~Qt::ItemIsEditable);
             nameItem->setFlags(nameItem->flags() & ~Qt::ItemIsEditable);
             quantityItem->setFlags(quantityItem->flags() & ~Qt::ItemIsEditable);
             priceItem->setFlags(priceItem->flags() & ~Qt::ItemIsEditable);
             valueItem->setFlags(valueItem->flags() & ~Qt::ItemIsEditable);
 
+            rowItems.append(figiItem);
             rowItems.append(ticker);
             rowItems.append(nameItem);
             rowItems.append(quantityItem);
@@ -350,6 +356,8 @@ void Portfolio::onVirtualTableDoubleClicked(const QModelIndex &index)
 
     // тут вызвать функцию показа свечей + добавить в хедер инклюд
     // showCandlestickChart(ticker, name);
+
+    // MainWindow::openShares(ticker, name);
 }
 
 void Portfolio::updateUserInfo()

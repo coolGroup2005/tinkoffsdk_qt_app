@@ -14,6 +14,9 @@
 #include <ordersservice.h> // for adding shares into positions
 #include <instrumentsservice.h> // for getting Tiker
 
+#include "mainwindow.h"
+#include "mainwindow.cpp"
+
 class Portfolio : public QWidget
 {
     Q_OBJECT
