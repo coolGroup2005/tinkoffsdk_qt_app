@@ -32,7 +32,7 @@ class StatisticsManager : public QObject
     Q_OBJECT
 public:
     explicit StatisticsManager(QObject *parent = nullptr);
-    void updateStatistics(int interval, QStringListModel* topGainersModel, QStringListModel* topLosersModel, bool cropped);
+    void updateStatistics(QString token, int interval, QStringListModel* topGainersModel, QStringListModel* topLosersModel, bool cropped);
 
 signals:
     void statisticsUpdated();
@@ -41,7 +41,7 @@ signals:
 
 SharesVector getAllSharesWithChange(InvestApiClient&, int&, bool);
 std::vector<std::pair<std::string, float>> getTopFromDb(std::string type);
-float getShareChange(std::string&, std::time_t&, std::time_t&); 
+float getShareChange(InvestApiClient&, std::string&, std::time_t&, std::time_t&); 
 void clearDatabaseStatistics();
 void insertStatisticsIntoDatabase(SharesVector&);
 bool isWeekend(std::time_t time);

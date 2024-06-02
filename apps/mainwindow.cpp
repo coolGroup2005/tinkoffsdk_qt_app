@@ -59,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent, const QString& token)
 
 
 
-    databaseFigi->insertSharesIntoDatabase();
+    databaseFigi->insertSharesIntoDatabase(token);
     // updateStatistics();
     // END Statistics ================================================================
 }
@@ -76,7 +76,7 @@ void MainWindow::updateStatistics()
     int intervalToPass = (intervalTextStatistics == "1 day") ? 0 : (intervalTextStatistics == "1 month") ? 1 : 2;
 
     bool cropped = ui->checkBoxStatistics->isChecked();
-    statisticsManager->updateStatistics(intervalToPass, topGainersModel, topLosersModel, cropped);
+    statisticsManager->updateStatistics(token, intervalToPass, topGainersModel, topLosersModel, cropped);
 
     ui->top_gainers_list->setModel(topGainersModel);
     ui->top_losers_list->setModel(topLosersModel);
