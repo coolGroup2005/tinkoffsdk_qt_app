@@ -11,3 +11,4 @@ docs/CMakeLists.txt.autosave
 candles.db
 statistics.db
 figi.db
+statistics.session.sql
