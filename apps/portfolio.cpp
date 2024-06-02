@@ -28,7 +28,7 @@ Portfolio::Portfolio(QWidget *parent, const QString& token) : QWidget(parent), t
     updateButton->setStyleSheet(
         "QPushButton {"
         "    background-color: rgb(193, 193, 193);"
-        "    border-radius: 15px;"
+        "    border-radius: 10px;"
         "    padding: 10px 20px;"
         "}"
         "QPushButton:hover {"
@@ -58,40 +58,28 @@ Portfolio::Portfolio(QWidget *parent, const QString& token) : QWidget(parent), t
             color: #525252;
         }
         QLineEdit, QComboBox {
-            background-color: #d3d2d0;
-            border-radius: 15px;
+            background-color: rgb(222, 222, 222);
+            border-radius: 10px;
             color: #525252;
             padding: 10px;
         }
         QHeaderView::section {
-            background-color: lightgrey;
+            background-color: #ebeae7;
+            border-top: 0px solid #b0b0af;
+            border-bottom: 0px solid #b0b0af;
+            border-right: 1px solid #b0b0af;
+        }
+        QHeaderView::section:horizontal:first {
+            border-left: 1px solid #d9d9d9;
         }
         QComboBox::down-arrow {
             image: none;
         }
         QTableView {
             gridline-color: #b0b0af;
-            background-color: #d3d2d0;
-            border: 1px solid #d3d2d0;
-            border-radius: 20px;
-        }
-        QTableView::item {
-            background-color: #d3d2d0;
-        }
-        QTableView::item:selected {
-            background-color: #b5cbd8;
-            color: #000000;
-        }
-        QPushButton {
-            background-color: rgb(193, 193, 193);
-            border-radius: 20px;
-            padding: 10px;
-        }
-        QPushButton:hover {
-            background-color: rgb(170, 170, 170);
-        }
-        QPushButton:pressed {
-            background-color: rgb(150, 150, 150);
+            background-color: rgb(222, 222, 222);
+            border: none;
+            border-radius: 10px;
         }
     )");
 

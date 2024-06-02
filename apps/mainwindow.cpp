@@ -14,41 +14,47 @@
 MainWindow::MainWindow(QWidget *parent, const QString& token)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , favouritesModel(new FavouritesModel)
+    , proxyModel(new ProxyModel)
     , statisticsManager(new StatisticsManager(this))
     , databaseFigi(new DatabaseFigi(this))
     , token(token)
 {
     ui->setupUi(this);
-    ui->tabWidget->setTabText(0, "Statistics");
-    ui->tabWidget->setTabText(1, "Home");
+    ui->tabWidget->setTabText(0, "Home");
+    ui->tabWidget->setTabText(1, "Statistics");
 
     portfolio = new Portfolio(this, token);
     ui->tabWidget->addTab(portfolio, "Portfolio");
     ui->tabWidget->addTab(databaseFigi, "Database Figi");
 
-
-    // Iteraction with tab Home ====================================================
-    QStringList list;
-    model = new QStringListModel;
-
-    std::vector<ShareInfo> sharesList;
-    sharesList = parseFigi(token);
-    
-    for (ShareInfo availableShare: sharesList)
-    {
-        QString listItem = QString::fromStdString(availableShare.name + "\t" + availableShare.figi + "\t" + availableShare.trading_status);
-        list << listItem;
-    }
-
-    model->setStringList(list);
-    ui->listView->setModel(model);
+    // Iteraction with tab Home ===================================================
+    proxyModel->setSourceModel(favouritesModel);
+    createCheckboxList();
+    ui->sharesTableView->setModel(proxyModel);
+    ui->sharesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->sharesTableView->verticalHeader()->setVisible(false);
+    ui->sharesTableView->setStyleSheet(R"(
+        QHeaderView::section {
+            background-color: #ebeae7;
+            border-top: 0px solid #b0b0af;
+            border-bottom: 0px solid #b0b0af;
+            border-right: 1px solid #b0b0af;
+        }
+        QHeaderView::section:horizontal:first {
+            border-left: 1px solid #b0b0af;
+        }
+        QTableView {
+            gridline-color: #b0b0af;
+            background-color: rgb(222, 222, 222);
+            border-radius: 20px;
+        }
+    )");
     // END Home ===================================================================
-
-
     // Interaction with tab Statistics ============================================
     ui->checkBoxStatistics->setChecked(true);
 
-    connect(ui->listView, &QListView::activated, this, &MainWindow::on_listView_clicked);
+    // connect(ui->listView, &QListView::activated, this, &MainWindow::on_listView_clicked);
     connect(ui->top_gainers_list, &QListView::clicked, this, &MainWindow::on_topGainersList_clicked);
     connect(ui->top_losers_list, &QListView::clicked, this, &MainWindow::on_topLosersList_clicked);
     connect(ui->updateStatisticsButton, &QPushButton::clicked, this, &MainWindow::updateStatistics);
@@ -60,10 +66,17 @@ MainWindow::MainWindow(QWidget *parent, const QString& token)
 
 
     databaseFigi->insertSharesIntoDatabase();
-    // updateStatistics();
-    // END Statistics ================================================================
+    updateStatistics();
+
+    ui->top_gainers_list->setStyleSheet("QListView { background-color: rgb(222, 222, 222); }");
+    ui->top_losers_list->setStyleSheet("QListView { background-color: rgb(222, 222, 222); }");
+    // END Statistics ==============================================================
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
 
 void MainWindow::updateStatistics()
 {
@@ -83,6 +96,85 @@ void MainWindow::updateStatistics()
 }
 
 
+
+void MainWindow::createCheckboxList()
+{
+    QStringList  itemLabels = {"STATUS UNSPECIFIED", "NOT AVAILABLE FOR TRADING", 
+                            "OPENING PERIOD", "CLOSING PERIOD", "BREAK IN TRADING", 
+                            "NORMAL TRADING", "CLOSING AUCTION", "DARK POOL AUCTION", 
+                            "DISCRETE AUCTION", "OPENING AUCTION PERIOD", "TRADING AT CLOSING AUCTION PRICE", 
+                            "SESSION ASSIGNED", "SESSION CLOSE", "SESSION OPEN", 
+                            "DEALER NORMAL TRADING", "DEALER BREAK IN TRADING", "DEALER NOT AVAILABLE FOR TRADING"};
+
+    QStringListIterator it(itemLabels);
+    while (it.hasNext())
+    {
+        QListWidgetItem *listItem = new QListWidgetItem(it.next(), ui->listWidget);
+        listItem->setCheckState(Qt::Unchecked);
+        listItem->setFlags(listItem->flags() & ~Qt::ItemIsSelectable);
+        ui->listWidget->addItem(listItem);
+    }
+    ui->listWidget->setStyleSheet("QListWidget { border-radius: 10px; background-color: rgb(222, 222, 222); }");
+    connectCheckboxes();
+}
+
+
+void MainWindow::connectCheckboxes() 
+{
+    for (int i = 0; i < ui->listWidget->count(); ++i) {
+        QListWidgetItem *item = ui->listWidget->item(i);
+        connect(ui->listWidget, &QListWidget::itemChanged, this, &MainWindow::checkItemsChecked);
+    }
+}
+
+
+void MainWindow::checkItemsChecked(QListWidgetItem* changedItem)
+{
+    if (changedItem->checkState() == Qt::Checked) 
+    {
+        for (int i = 0; i < ui->listWidget->count(); ++i) 
+        {
+            QListWidgetItem *item = ui->listWidget->item(i);
+            if (item != changedItem) 
+                item->setCheckState(Qt::Unchecked);
+        }
+        updateFilter();
+    }
+    else
+        proxyModel->setTradingStatus("ALL");
+}
+
+void MainWindow::updateFilter() 
+{
+    QString filterString;
+    for (int i = 0; i < ui->listWidget->count(); ++i) {
+        QListWidgetItem *item = ui->listWidget->item(i);
+        if (item->checkState() == Qt::Checked) {
+            filterString = item->text();
+        }
+    }
+    proxyModel->setTradingStatus(filterString);
+}
+
+
+void MainWindow::on_sharesTableView_doubleClicked(const QModelIndex &index)
+{
+    QString stockName = ui->sharesTableView->model()->index(index.row(),0).data().toString();
+    QString figi = ui->sharesTableView->model()->index(index.row(),1).data().toString();
+
+    ui->lineEdit->setText(stockName);
+
+    MainWindow::openShares(figi.toStdString(), stockName.toStdString());
+}
+
+
+void MainWindow::openShares(const std::string& figi, const std::string& stockName)
+{
+    shares *window1 = new shares(this, figi, stockName);
+    window1->show();
+}
+
+
 void MainWindow::on_topGainersList_clicked(const QModelIndex &index)
 {
     QString selectedItem = index.data().toString();
@@ -92,20 +184,11 @@ void MainWindow::on_topGainersList_clicked(const QModelIndex &index)
         QMessageBox::information(this, "Error", "Either today is Sunday or there is an error on the server");
 }
 
+
 void MainWindow::on_topLosersList_clicked(const QModelIndex &index)
 {
     QString selectedItem = index.data().toString();
-    if (selectedItem != "No data for selected period")
-        QMessageBox::information(this, "Top Loser Selected", "You selected: " + selectedItem);
-    else 
-        QMessageBox::information(this, "Error", "Either today is Sunday or there is an error on the server");
-}
-
-
-
-MainWindow::~MainWindow()
-{
-    delete ui;
+    QMessageBox::information(this, "Top Loser Selected", "You selected: " + selectedItem);
 }
 
 

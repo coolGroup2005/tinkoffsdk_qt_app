@@ -20,6 +20,11 @@ set(PROJECT_SOURCES
     portfolio.h
     figi.h 
     figi.cpp
+
+    favouritesModel.cpp
+    favouritesModel.h
+    favouritesProxyModel.cpp
+    favouritesProxyModel.h
 )
 
 add_executable(tinkoff-app ${PROJECT_SOURCES} mainwindow.ui portfolio.ui figi.h figi.cpp figi.ui)

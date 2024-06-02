@@ -7,6 +7,11 @@
 #include <QTableView>
 #include <QStandardItemModel>
 #include <QPushButton>
+#include <QVBoxLayout>
+#include <cstdlib>
+#include <QDebug> // for finding segmentation fault
+#include <QHeaderView>
+
 #include "investapiclient.h"
 #include "usersservice.h"
 #include "operationsservice.h"
