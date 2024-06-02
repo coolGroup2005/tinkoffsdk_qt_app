@@ -21,8 +21,8 @@ MainWindow::MainWindow(QWidget *parent)
     , databaseFigi(new DatabaseFigi(this))
 {
     ui->setupUi(this);
-    ui->tabWidget->setTabText(0, "Statistics");
-    ui->tabWidget->setTabText(1, "Home");
+    ui->tabWidget->setTabText(0, "Home");
+    ui->tabWidget->setTabText(1, "Statistics");
 
     portfolio = new Portfolio(this);
     ui->tabWidget->addTab(portfolio, "Portfolio");
@@ -34,7 +34,22 @@ MainWindow::MainWindow(QWidget *parent)
     ui->sharesTableView->setModel(proxyModel);
     ui->sharesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->sharesTableView->verticalHeader()->setVisible(false);
-    ui->sharesTableView->setStyleSheet("QHeaderView::section {background-color: lightgrey}");
+    ui->sharesTableView->setStyleSheet(R"(
+        QHeaderView::section {
+            background-color: #ebeae7;
+            border-top: 0px solid #b0b0af;
+            border-bottom: 0px solid #b0b0af;
+            border-right: 1px solid #b0b0af;
+        }
+        QHeaderView::section:horizontal:first {
+            border-left: 1px solid #b0b0af;
+        }
+        QTableView {
+            gridline-color: #b0b0af;
+            background-color: rgb(222, 222, 222);
+            border-radius: 20px;
+        }
+    )");
 
     // Interaction with tab Statistics ============================================
     ui->checkBoxStatistics->setChecked(true);

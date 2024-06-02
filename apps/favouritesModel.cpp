@@ -10,7 +10,7 @@ FavouritesModel::FavouritesModel(QObject* parent)
         _sharesData.append(shareDescription);
     }
 
-    _header.append({"Name", "Figi", "Trading Status"});
+    _header.append({"Name", "FIGI", "Trading Status"});
 }
 
 int FavouritesModel::rowCount(const QModelIndex& parent) const
