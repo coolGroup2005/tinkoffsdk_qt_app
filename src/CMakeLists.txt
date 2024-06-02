@@ -13,33 +13,7 @@ find_package(SQLite3 REQUIRED)
 
 set(PROJECT_SOURCES ${CMAKE_SOURCE_DIR})
 
-file(GLOB 
-        HEADER_LIST 
-        CONFIGURE_DEPENDS 
-        "${DSBAProj_SOURCE_DIR}/include/invest/*.hpp" 
-        "${DSBAProj_SOURCE_DIR}/include/invest/*.h"
-        )
-
-
-add_library(invest_lib 
-        invest/example.cpp 
-        ${HEADER_LIST}
-        )
-
-target_include_directories(invest_lib 
-        PUBLIC 
-        ../include
-        ${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
-        )
-
-# link invest_lib along with other required libraries
-target_link_libraries(invest_lib 
-        PRIVATE # The PRIVATE keyword means that the library will be used by this project, but it will not be available to other projects via this project’s interface
-        tink_grpc_proto 
-        TinkoffInvestSDK
-        Qt${QT_VERSION_MAJOR}::Widgets
-        )
-
+# Define shares_lib ===================================================
 # the file() command is used to find all header files for homepage_lib
 file(GLOB 
         HEADER_LIST2 # the variable where the list of files will be stored
@@ -48,21 +22,11 @@ file(GLOB
         "${DSBAProj_SOURCE_DIR}/include/homepage/*.h" 
 )
 
-# define homepage_lib
 add_library(homepage_lib #name of your library
-        homepage/homepage.cpp #if >1, try adding them to a list first?
+        homepage/homepage.cpp
         ${HEADER_LIST2} #name of variable from respective file()
         )
 
-# define shares_lib
-add_library(shares_lib #name of your library
-        shares/shares.cpp
-        ../include/shares/shares.h #if >1, try adding them to a list first?
-        ${HEADER_LIST3} #name of variable from respective file()
-        )
-        
-
-# set include directories for homepage_lib
 target_include_directories(homepage_lib 
         PUBLIC # Paths in PUBLIC section are used by projects that link to this library
         ../include
@@ -84,16 +48,22 @@ file(GLOB HEADER_LIST3
         "${DSBAProj_SOURCE_DIR}/include/shares/*.h"
     )
 
-# set include directories for shares_lib
+# Define shares_lib ===================================================
+add_library(shares_lib
+        shares/shares.cpp
+        ../include/shares/shares.h
+        ${HEADER_LIST3} 
+        )
+
 target_include_directories(shares_lib 
-        PUBLIC # Paths in PUBLIC section are used by projects that link to this library
+        PUBLIC
         ../include
         ${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
         )
 
 
 target_link_libraries(shares_lib 
-        PRIVATE # The PRIVATE keyword means that the library will be used by this project, but it will not be available to other projects via this project’s interface
+        PRIVATE
         tink_grpc_proto 
         TinkoffInvestSDK
         Qt6::Charts
@@ -108,12 +78,9 @@ target_sources(shares_lib
     PRIVATE
     ${UI_HEADERS}
 )
-# target_link_libraries(ort ortools::ortools)
 
 
-
-
-# set include directories for statistics_lib ===============================================
+# Define statistics_lib ===============================================
 file(GLOB 
         HEADER_LIST4 
         CONFIGURE_DEPENDS

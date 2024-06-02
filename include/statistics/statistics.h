@@ -14,12 +14,24 @@
 #include <QPushButton>
 #include <QTableView>
 #include <QStandardItemModel>
+#include <string>
+#include <chrono>
+#include <ctime>
+#include <cmath>
+#include <utility>
+#include <string>
+#include <sqlite3.h>
+#include <filesystem>
+#include <algorithm>
+#include <QSqlError>
+#include <QSqlRecord>
+#include <QMessageBox>
+#include <QDebug>
 
 #include "investapiclient.h"
 #include "marketdataservice.h"
 #include "usersservice.h"
 #include "ordersservice.h"
-
 #include "instrumentsservice.h"
 #include "operationsservice.h"
 #include "../homepage/homepage.h"

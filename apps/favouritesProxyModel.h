@@ -17,8 +17,6 @@ public slots:
     void setTradingStatus(const QString& tradeStatus);
 
 private:
-    // QString _name;
-    // QString _figi;
     QString _trading_status;
 };
 

@@ -1,19 +1,4 @@
 #include "statistics/statistics.h"
-#include <QDebug> 
-#include <string>
-#include <vector>
-#include <chrono>
-#include <ctime>
-#include <cmath>
-#include <utility>
-#include <string>
-#include <sqlite3.h>
-#include <filesystem>
-#include <algorithm>
-#include <QSqlError>
-#include <QSqlRecord>
-#include <QMessageBox>
-#include <QDebug>
 
 
 const int MOEX_START_HOUR = 9;

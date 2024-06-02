@@ -13,9 +13,6 @@ endif()
 
 include(cmake/common.cmake)
 
-# include(CTest)
-# enable_testing()
-
 add_subdirectory(src)
 add_subdirectory(apps)
 

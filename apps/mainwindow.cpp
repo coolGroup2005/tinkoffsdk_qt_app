@@ -1,16 +1,5 @@
 #include "mainwindow.h"
-#include "shares/shares.h"
-#include "ui_mainwindow.h"
-#include "homepage/homepage.h"
 
-#include "portfolio.h"
-#include <QStringList>
-#include <QStringListModel>
-#include <QMessageBox>
-
-#include <vector>
-
-#include <QListWidget>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -28,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tabWidget->addTab(portfolio, "Portfolio");
     ui->tabWidget->addTab(databaseFigi, "Database Figi");
 
-    // Iteraction with tab Home
+    // Iteraction with tab Home ===================================================
     proxyModel->setSourceModel(favouritesModel);
     createCheckboxList();
     ui->sharesTableView->setModel(proxyModel);
@@ -50,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
             border-radius: 20px;
         }
     )");
-
+    // END Home ===================================================================
     // Interaction with tab Statistics ============================================
     ui->checkBoxStatistics->setChecked(true);
 
@@ -65,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     databaseFigi->insertSharesIntoDatabase();
     updateStatistics();
-    // END Statistics ================================================================
+    // END Statistics ==============================================================
 }
 
 MainWindow::~MainWindow()
@@ -112,7 +101,7 @@ void MainWindow::createCheckboxList()
         listItem->setFlags(listItem->flags() & ~Qt::ItemIsSelectable);
         ui->listWidget->addItem(listItem);
     }
-
+    ui->listWidget->setStyleSheet("QListWidget { border-radius: 10px; background-color: rgb(222, 222, 222); }");
     connectCheckboxes();
 }
 

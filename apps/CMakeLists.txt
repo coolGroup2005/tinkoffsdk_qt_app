@@ -34,8 +34,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         mainwindow.h mainwindow.cpp mainwindow.ui
         portfolio.h portfolio.cpp portfolio.ui
-        figi.h figi.cpp
-        figi.ui
+        figi.h figi.cpp figi.ui
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET tinkoff-app APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -63,7 +62,6 @@ target_link_libraries(
     Qt${QT_VERSION_MAJOR}::PrintSupport
     Qt${QT_VERSION_MAJOR}::Charts
     Qt${QT_VERSION_MAJOR}::Sql
-    invest_lib 
     homepage_lib
     shares_lib
     statistics_lib

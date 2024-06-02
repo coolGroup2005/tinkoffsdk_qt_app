@@ -14,9 +14,14 @@
 #include "favouritesModel.h"
 #include "favouritesProxyModel.h"
 #include "portfolio.h"
-#include "statistics/statistics.h"
 #include "figi.h"
 
+#include "mainwindow.h"
+#include "shares/shares.h"
+#include "statistics/statistics.h"
+#include "ui_mainwindow.h"
+#include "homepage/homepage.h"
+#include "portfolio.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

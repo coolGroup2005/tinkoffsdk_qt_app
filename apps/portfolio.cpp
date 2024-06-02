@@ -1,8 +1,4 @@
 #include "portfolio.h"
-#include <QVBoxLayout>
-#include <cstdlib>
-#include <QDebug> // for finding segmentation fault
-#include <QHeaderView>
 
 Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
 {
@@ -22,7 +18,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     updateButton->setStyleSheet(
         "QPushButton {"
         "    background-color: rgb(193, 193, 193);"
-        "    border-radius: 15px;"
+        "    border-radius: 10px;"
         "    padding: 10px 20px;"
         "}"
         "QPushButton:hover {"
@@ -52,7 +48,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
         }
         QLineEdit, QComboBox {
             background-color: rgb(222, 222, 222);
-            border-radius: 15px;
+            border-radius: 10px;
             color: #525252;
             padding: 10px;
         }
@@ -72,7 +68,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
             gridline-color: #b0b0af;
             background-color: rgb(222, 222, 222);
             border: none;
-            border-radius: 20px;
+            border-radius: 10px;
         }
     )");
 
