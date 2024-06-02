@@ -1,11 +1,17 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+
 #include <QMainWindow>
 #include <QDialog>
 #include <QString>
 #include <QStringListModel>
-
+#include <QStringList>
+#include <QMessageBox>
+#include <QStandardItemModel>
+#include <QSortFilterProxyModel>
+#include <QListWidget>
+#include <vector>
 #include "portfolio.h"
 #include "statistics/statistics.h"
 #include "figi.h"
@@ -24,9 +30,10 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void openShares(const std::string& figi, const std::string& stockName);
+
 
 private slots:
-    void openShares(const std::string& figi, const std::string& stockName);
     void on_listView_clicked(const QModelIndex &index);
     void on_topGainersList_clicked(const QModelIndex &index);
     void on_topLosersList_clicked(const QModelIndex &index);

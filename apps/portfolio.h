@@ -14,8 +14,7 @@
 #include <ordersservice.h> // for adding shares into positions
 #include <instrumentsservice.h> // for getting Tiker
 
-#include "mainwindow.h"
-#include "mainwindow.cpp"
+class MainWindow; 
 
 class Portfolio : public QWidget
 {
@@ -48,6 +47,7 @@ private:
     QTableView *virtualPortfolioTableView;
     QStandardItemModel *virtualPortfolioModel;
     QPushButton *updateButton;
+    MainWindow *mainWindow;
 };
 
 #endif // PORTFOLIOBALANCE_H

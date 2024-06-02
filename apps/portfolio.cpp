@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <QDebug> // for finding segmentation fault
 #include <QHeaderView>
+#include "mainwindow.h" 
 
 Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
 {
@@ -206,7 +207,7 @@ void Portfolio::updateBalance(const QString &accountId)
             auto instrumentTicker = instrumentInfo.ticker();
 
             QList<QStandardItem *> rowItems;
-            QStandardItem *figiItem = new QStandardItem(QString::fromStdString(instrumentInfo.uid()));
+            QStandardItem *figiItem = new QStandardItem(QString::fromStdString(instrumentInfo.figi()));
             QStandardItem *tickerItem = new QStandardItem(QString::fromStdString(instrumentTicker));
             QStandardItem *nameItem = new QStandardItem(QString::fromStdString(instrumentName));
             QStandardItem *quantityItem = new QStandardItem(QString::number(position.quantity().units()));
@@ -259,7 +260,7 @@ void Portfolio::updateBalance(const QString &accountId)
             auto instrumentTicker = instrumentInfo.ticker();
 
             QList<QStandardItem *> rowItems;
-            QStandardItem *figiItem = new QStandardItem(QString::fromStdString(instrumentInfo.uid()));
+            QStandardItem *figiItem = new QStandardItem(QString::fromStdString(instrumentInfo.figi()));
             QStandardItem *ticker = new QStandardItem(QString::fromStdString(instrumentTicker));
             QStandardItem *nameItem = new QStandardItem(QString::fromStdString(instrumentName));
             QStandardItem *quantityItem = new QStandardItem(QString::number(position.quantity().units()));
@@ -356,8 +357,9 @@ void Portfolio::onVirtualTableDoubleClicked(const QModelIndex &index)
 
     // тут вызвать функцию показа свечей + добавить в хедер инклюд
     // showCandlestickChart(ticker, name);
-
-    // MainWindow::openShares(ticker, name);
+    std::string tickerStd = ticker.toStdString();
+    std::string nameStd = name.toStdString();
+    mainWindow->openShares(tickerStd, nameStd);
 }
 
 void Portfolio::updateUserInfo()

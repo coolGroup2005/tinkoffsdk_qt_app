@@ -9,3 +9,5 @@ include/.DS_Store
 apps/mainwindow.ui.autosave
 docs/CMakeLists.txt.autosave
 candles.db
+statistics.db
+figi.db
