@@ -54,6 +54,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     databaseFigi->insertSharesIntoDatabase();
     updateStatistics();
+
+    ui->top_gainers_list->setStyleSheet("QListView { background-color: rgb(222, 222, 222); }");
+    ui->top_losers_list->setStyleSheet("QListView { background-color: rgb(222, 222, 222); }");
     // END Statistics ==============================================================
 }
 
