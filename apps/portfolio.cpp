@@ -5,6 +5,7 @@
 #include <QHeaderView>
 #include "mainwindow.h" 
 
+
 Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
 {
     balanceLabel = new QLabel(this);
