@@ -6,7 +6,7 @@
 #include "mainwindow.h" 
 
 
-Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
+Portfolio::Portfolio(QWidget *parent, const QString& token) : QWidget(parent), token(token)
 {
     balanceLabel = new QLabel(this);
     yieldLabel = new QLabel(this);
@@ -100,7 +100,6 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     portfolioTableView->verticalHeader()->setVisible(false);
     virtualPortfolioTableView->verticalHeader()->setVisible(false);
 
-    token = getenv("TOKEN");
     client = new InvestApiClient("invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
 
     auto accountService = std::dynamic_pointer_cast<Users>(client->service("users"));
@@ -327,7 +326,8 @@ void Portfolio::onTableDoubleClicked(const QModelIndex &index)
     std::string nameStd = name.toStdString();
 
     // тут вызвать функцию показа свечей + добавить в хедер инклюд
-    mainWindow->openShares(tickerStd, nameStd);
+    std::string _token = token.toStdString();
+    mainWindow->openShares(tickerStd, nameStd, QString::fromStdString(_token));
 }
 
 void Portfolio::onVirtualTableDoubleClicked(const QModelIndex &index)
@@ -363,7 +363,7 @@ void Portfolio::onVirtualTableDoubleClicked(const QModelIndex &index)
     // showCandlestickChart(ticker, name);
     std::string tickerStd = ticker.toStdString();
     std::string nameStd = name.toStdString();
-    mainWindow->openShares(tickerStd, nameStd);
+    mainWindow->openShares(tickerStd, nameStd, token);
 }
 
 void Portfolio::updateUserInfo()

@@ -12,6 +12,8 @@
 #include <algorithm>
 
 
+#include <QDebug>
+
 ShareInfo::ShareInfo(std::string name, std::string figi, unsigned int trading_status): 
                     name(name), 
                     figi(figi), 
@@ -46,9 +48,9 @@ ShareInfo getShareInfo(InvestApiClient& client, std::string& figi)
 }
 
 
-std::vector<ShareInfo> parseFigi()
+std::vector<ShareInfo> parseFigi(const QString& token)
 {
-    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
+    InvestApiClient client("invest-public-api.tinkoff.ru:443", token.toStdString());
 
     auto accountService = std::dynamic_pointer_cast<Users>(client.service("users"));
     auto accountList = accountService->GetAccounts();

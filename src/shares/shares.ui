@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>764</width>
-    <height>491</height>
+    <width>857</width>
+    <height>658</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -33,68 +33,54 @@
     <number>6</number>
    </property>
    <property name="sizeConstraint">
-    <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+    <enum>QLayout::SetDefaultConstraint</enum>
    </property>
    <item>
-    <widget class="QLabel" name="dateLabel">
-     <property name="text">
-      <string>Monday, June 8</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="timeLabel">
-     <property name="text">
-      <string>9:41:00</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="stocknameLabel">
-     <property name="font">
-      <font>
-       <pointsize>15</pointsize>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Apple</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout">
+    <layout class="QHBoxLayout" name="_2">
      <item>
-      <widget class="QLabel" name="fromLabel">
+      <widget class="QLabel" name="stocknameLabel">
        <property name="font">
         <font>
-         <pointsize>13</pointsize>
+         <pointsize>15</pointsize>
+         <bold>true</bold>
         </font>
        </property>
        <property name="text">
-        <string>from:</string>
+        <string>Apple</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="toLabel">
-       <property name="font">
-        <font>
-         <pointsize>13</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>to:</string>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="_3">
+       <item>
+        <widget class="QLabel" name="timeLabel">
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>9:41:00</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="dateLabel">
+         <property name="text">
+          <string>Monday, June 8</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout"/>
    </item>
    <item>
     <layout class="QHBoxLayout">
@@ -118,7 +104,7 @@
         </date>
        </property>
        <property name="displayFormat">
-        <string>dd.MM.yyyy hh:mm:ss AP</string>
+        <string>dd.MM.yyyy hh:mm:ss</string>
        </property>
        <property name="calendarPopup">
         <bool>true</bool>
@@ -145,7 +131,7 @@
         </date>
        </property>
        <property name="displayFormat">
-        <string>dd.MM.yyyy hh:mm:ss AP</string>
+        <string>dd.MM.yyyy hh:mm:ss</string>
        </property>
        <property name="calendarPopup">
         <bool>true</bool>
@@ -155,42 +141,87 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QLabel" name="intervalLabel">
-       <property name="font">
-        <font>
-         <pointsize>13</pointsize>
-        </font>
+      <layout class="QHBoxLayout">
+       <item>
+        <widget class="QLabel" name="intervalLabel">
+         <property name="font">
+          <font>
+           <pointsize>13</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Options:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>30</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="smaCheckBox">
+         <property name="text">
+          <string>SMA</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="emaCheckBox">
+         <property name="text">
+          <string>EMA</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="intervalComboBox">
+         <property name="currentText">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="updateButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>&gt;&gt;&gt;</string>
+         </property>
+         <property name="shortcut">
+          <string>Return</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QChartView" name="graphicsCandleView">
+       <property name="autoFillBackground">
+        <bool>false</bool>
        </property>
-       <property name="text">
-        <string>Interval:</string>
+       <property name="sizeAdjustPolicy">
+        <enum>QAbstractScrollArea::AdjustIgnored</enum>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="intervalComboBox"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="updateButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>build/update the chart</string>
-       </property>
-       <property name="shortcut">
-        <string>Return</string>
-       </property>
-      </widget>
+      <widget class="QChartView" name="graphicsLineView"/>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QChartView" name="graphicsView"/>
    </item>
   </layout>
  </widget>

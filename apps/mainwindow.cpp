@@ -11,17 +11,18 @@
 
 #include <vector>
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent, const QString& token)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow),
-    statisticsManager(new StatisticsManager(this)),
-    databaseFigi(new DatabaseFigi(this))
+    , ui(new Ui::MainWindow)
+    , statisticsManager(new StatisticsManager(this))
+    , databaseFigi(new DatabaseFigi(this))
+    , token(token)
 {
     ui->setupUi(this);
     ui->tabWidget->setTabText(0, "Statistics");
     ui->tabWidget->setTabText(1, "Home");
 
-    portfolio = new Portfolio(this);
+    portfolio = new Portfolio(this, token);
     ui->tabWidget->addTab(portfolio, "Portfolio");
     ui->tabWidget->addTab(databaseFigi, "Database Figi");
 
@@ -31,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     model = new QStringListModel;
 
     std::vector<ShareInfo> sharesList;
-    sharesList = parseFigi();
+    sharesList = parseFigi(token);
     
     for (ShareInfo availableShare: sharesList)
     {
@@ -109,13 +110,13 @@ void MainWindow::on_listView_clicked(const QModelIndex &index)
     ui->lineEdit->setText(";;;  " + selectedItem);
     std::string figi = selectedItem.split("\t")[1].toStdString(); 
     std::string stockName = selectedItem.section('\t', 0, 0).toStdString();   
-    std::cout << figi;
-    MainWindow::openShares(figi, stockName);
+    QString token;
+    MainWindow::openShares(figi, stockName, token);
 }
 
 
-void MainWindow::openShares(const std::string& figi, const std::string& stockName)
+void MainWindow::openShares(const std::string& figi, const std::string& stockName, QString token)
 {
-    shares *window1 = new shares(this, figi, stockName);
+    shares *window1 = new shares(this, figi, stockName, token);
     window1->show();
 }

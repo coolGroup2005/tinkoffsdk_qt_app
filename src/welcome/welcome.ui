@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Welcome</class>
+ <widget class="QDialog" name="Welcome">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>150</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Token Input</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+            QWidget {
+                background-color: #ebeae7;
+                color: #525252;
+            }
+
+            QTabWidget::pane {
+                border: 1px solid #ebeae7;
+            }
+
+            QLabel {
+                color: #525252;
+            }
+
+            QLineEdit#tokenLineEdit {
+                background-color: #d3d2d0;
+                border-radius: 10px;
+                color: #525252;
+                padding: 10px;
+            }
+
+            QPushButton#browseButton, QPushButton#saveButton {
+                background-color: rgb(193, 193, 193);
+                border-radius: 8px;
+                padding: 5px;
+            }
+
+            QPushButton#browseButton:hover, QPushButton#saveButton:hover {
+                background-color: rgb(170, 170, 170);
+            }
+
+            QPushButton#browseButton:pressed, QPushButton#saveButton:pressed {
+                background-color: rgb(150, 150, 150);
+            }
+        </string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+     </property>
+     <property name="labelAlignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="formAlignment">
+      <set>Qt::AlignHCenter|Qt::AlignTop</set>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Enter Token:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="tokenLineEdit"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="browseButton">
+       <property name="text">
+        <string>Browse...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Expanding</enum>
+       </property>
+       <property name="width">
+        <number>40</number>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveButton">
+       <property name="text">
+        <string>Save</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

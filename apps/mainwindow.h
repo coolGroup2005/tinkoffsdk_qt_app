@@ -28,9 +28,9 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(QWidget *parent = nullptr, const QString& token = "");
     ~MainWindow();
-    void openShares(const std::string& figi, const std::string& stockName);
+    void openShares(const std::string& figi, const std::string& stockName, QString token);
 
 
 private slots:
@@ -46,6 +46,7 @@ private:
     Portfolio *portfolio;
     StatisticsManager *statisticsManager;
     DatabaseFigi *databaseFigi;
+    QString token;
 };
 
 #endif // MAINWINDOW_H

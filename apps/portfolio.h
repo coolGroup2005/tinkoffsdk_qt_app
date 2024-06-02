@@ -21,7 +21,7 @@ class Portfolio : public QWidget
     Q_OBJECT
 
 public:
-    explicit Portfolio(QWidget *parent = nullptr);
+    explicit Portfolio(QWidget *parent = nullptr, const QString& token = "");
     void updateBalance(const QString& accountId);
     void updateUserInfo();
 

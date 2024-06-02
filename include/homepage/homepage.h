@@ -1,6 +1,8 @@
-#ifndef __EXAMPLE_H__
-#define __EXAMPLE_H__
+#ifndef __HOMEPAGE__
+#define __HOMEPAGE__
 #include <iostream>
+#include <QString>
+#include <QStringListModel>
 #include <vector>
 
 #include "investapiclient.h"
@@ -29,8 +31,7 @@ struct ShareInfo
 
 
 ShareInfo getShareInfo(InvestApiClient&, std::string&);
-
-std::vector<ShareInfo> parseFigi();
+std::vector<ShareInfo> parseFigi(const QString& token);
 std::string formatTradingStatus(unsigned int);
 
-#endif // __EXAMPLE_H__
+#endif // __HOMEPAGE__
