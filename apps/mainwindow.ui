@@ -308,20 +308,17 @@
                  <cursorShape>OpenHandCursor</cursorShape>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QPushButton#updateStatisticsButton {
-	border: 1px solid rgb(211, 210, 208);
-	border-radius: 5px;
-	padding: 3px;
-	margin: 3px;
-}
-
-QPushButton#updateStatisticsButton:pressed {
-	background-color: 1px solid rgb(211, 210, 208);
-}
-
-QPushButton#updateStatisticsButton:hover {
-	background-color: 1px solid rgb(188, 188, 188);
-}</string>
+                 <string notr="true">  QPushButton {
+            background-color: rgb(193, 193, 193);
+            border-radius: 10px;
+            padding: 5px;
+        }
+        QPushButton:hover {
+            background-color: rgb(170, 170, 170);
+        }
+        QPushButton:pressed {
+            background-color: rgb(150, 150, 150);
+        }</string>
                 </property>
                 <property name="text">
                  <string>UPD</string>

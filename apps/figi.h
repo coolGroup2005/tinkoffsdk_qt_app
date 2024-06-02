@@ -28,7 +28,7 @@ class DatabaseFigi : public QWidget {
 
 public:
     explicit DatabaseFigi(QWidget *parent = nullptr);
-    void insertSharesIntoDatabase();
+    void insertSharesIntoDatabase(QString token);
 
 private slots:
     void onSearchButtonClicked();

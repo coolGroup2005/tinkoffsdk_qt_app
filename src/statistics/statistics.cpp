@@ -86,9 +86,8 @@ void clearDatabaseStatistics() {
 
 
 
-float getShareChange(std::string& figi, std::time_t& dateFromToTime, std::time_t& currentTime)  {
+float getShareChange(std::string& figi, std::time_t& dateFromToTime, std::time_t& currentTime, InvestApiClient& client)  {
     
-    InvestApiClient client("sandbox-invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
     auto marketdata = std::dynamic_pointer_cast<MarketData>(client.service("marketdata"));
     if (!marketdata) {
         qDebug() << "error connection to marketdata getShareChange()";
@@ -186,7 +185,7 @@ SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval, bool
             ShareInfo share {name, figi, tradingStatus};
 
             try {
-                float shareChange = getShareChange(share.figi, dateFromToTime, currentTime);
+                float shareChange = getShareChange(share.figi, dateFromToTime, currentTime, client);
                 // std::cout << share.figi << '\t' << share.name << '\t' << shareChange << '\n';
                 if (shareChange != 10000) {
                     auto pair = std::make_pair(share, shareChange);
@@ -307,9 +306,9 @@ StatisticsManager::StatisticsManager(QObject *parent) : QObject(parent)
 {
 }
 
-void StatisticsManager::updateStatistics(int interval, QStringListModel* topGainersModel, QStringListModel* topLosersModel, bool cropped)
+void StatisticsManager::updateStatistics(QString token, int interval, QStringListModel* topGainersModel, QStringListModel* topLosersModel, bool cropped)
 {
-    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
+    InvestApiClient client("invest-public-api.tinkoff.ru:443", token.toStdString());
     auto allShares = getAllSharesWithChange(client, interval, cropped);
     insertStatisticsIntoDatabase(allShares);
     std::vector<std::pair<std::string, float>> bottom = getTopFromDb("ASC");
