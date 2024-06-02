@@ -1,12 +1,31 @@
 #include "homepage/homepage.h"
-
+#include <QDebug> 
 #include <string>
 #include <vector>
+#include <chrono>
+#include <ctime>
+#include <cmath>
+#include <utility>
+#include <string>
+#include <sqlite3.h>
+#include <filesystem>
+#include <algorithm>
+
 
 #include <QDebug>
 
-ShareInfo::ShareInfo(std::string name, std::string figi, unsigned int trading_status): name(name), figi(figi), trading_status(trading_status){};
+ShareInfo::ShareInfo(std::string name, std::string figi, unsigned int trading_status): 
+                    name(name), 
+                    figi(figi), 
+                    trading_status(formatTradingStatus(trading_status)){};
 
+ShareInfo::ShareInfo(std::string name, std::string figi, unsigned int trading_status, 
+                    std::string currency, MoneyValue nominal): 
+                    name(name), 
+                    figi(figi), 
+                    trading_status(formatTradingStatus(trading_status)), 
+                    currency(currency), 
+                    nominal(nominal){};
 
 std::ostream& operator<< (std::ostream& ss, const ShareInfo& shareParam)
 {

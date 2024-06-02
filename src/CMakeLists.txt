@@ -27,17 +27,26 @@ set(WELCOME_SOURCES
     ${PROJECT_INCLUDE_DIR}/welcome/welcome.h
 )
 
+set(STATISTICS_SOURCES
+    statistics/statistics.cpp
+    ${PROJECT_INCLUDE_DIR}/statistics/statistics.h
+)
+
 # Define library targets
 add_library(homepage_lib ${HOMEPAGE_SOURCES})
 add_library(shares_lib ${SHARES_SOURCES})
 add_library(welcome_lib ${WELCOME_SOURCES})
+add_library(statistics_lib ${WELCOME_SOURCES})
+
 
 # Include directories for all library targets
 target_include_directories(homepage_lib PUBLIC ${PROJECT_INCLUDE_DIR})
 target_include_directories(shares_lib PUBLIC ${PROJECT_INCLUDE_DIR})
 target_include_directories(welcome_lib PUBLIC ${PROJECT_INCLUDE_DIR})
+target_include_directories(statistics_lib PUBLIC ${PROJECT_INCLUDE_DIR})
 
 # Link libraries
 target_link_libraries(homepage_lib PRIVATE tink_grpc_proto TinkoffInvestSDK Qt6::Widgets)
 target_link_libraries(shares_lib PRIVATE tink_grpc_proto TinkoffInvestSDK Qt6::Widgets Qt6::Charts Qt6::PrintSupport Qt6::Sql sqlite3)
 target_link_libraries(welcome_lib PRIVATE Qt6::Widgets Qt6::PrintSupport)
+target_link_libraries(statistics_lib PRIVATE  tink_grpc_proto TinkoffInvestSDK Qt6::Widgets Qt6::Sql sqlite3)

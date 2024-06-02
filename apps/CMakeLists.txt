@@ -18,9 +18,11 @@ set(PROJECT_SOURCES
     mainwindow.h
     portfolio.cpp
     portfolio.h
+    figi.h 
+    figi.cpp
 )
 
-add_executable(tinkoff-app ${PROJECT_SOURCES} mainwindow.ui portfolio.ui)
+add_executable(tinkoff-app ${PROJECT_SOURCES} mainwindow.ui portfolio.ui figi.h figi.cpp figi.ui)
 
 target_link_libraries(tinkoff-app PRIVATE
     Qt6::Widgets
@@ -30,6 +32,7 @@ target_link_libraries(tinkoff-app PRIVATE
     homepage_lib
     welcome_lib
     shares_lib
+    statistics_lib
     tink_grpc_proto 
     TinkoffInvestSDK 
     sqlite3
