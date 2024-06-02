@@ -305,7 +305,7 @@ StatisticsManager::StatisticsManager(QObject *parent) : QObject(parent)
 {
 }
 
-void StatisticsManager::updateStatistics(int interval, QStringListModel* topGainersModel, QStringListModel* topLosersModel, QStringListModel* topActiveModel, bool cropped)
+void StatisticsManager::updateStatistics(int interval, QStringListModel* topGainersModel, QStringListModel* topLosersModel, bool cropped)
 {
     InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
     auto allShares = getAllSharesWithChange(client, interval, cropped);
@@ -315,6 +315,14 @@ void StatisticsManager::updateStatistics(int interval, QStringListModel* topGain
 
     QStringList topGainers;
     QStringList topLosers;
+
+    if (allShares.size() <= 0) {
+        topGainers.append(QString::fromStdString("No data for selected period"));
+        topLosers.append(QString::fromStdString("No data for selected period"));
+        topGainersModel->setStringList(topGainers);
+        topLosersModel->setStringList(topLosers);
+        return;
+    }
 
     for (const auto& sharePair : top) {
         // qDebug() << "Company: " << QString::fromStdString(sharePair.first) << "\n"

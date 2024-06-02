@@ -32,7 +32,7 @@ class StatisticsManager : public QObject
     Q_OBJECT
 public:
     explicit StatisticsManager(QObject *parent = nullptr);
-    void updateStatistics(int interval, QStringListModel* topGainersModel, QStringListModel* topLosersModel, QStringListModel* topActiveModel, bool cropped);
+    void updateStatistics(int interval, QStringListModel* topGainersModel, QStringListModel* topLosersModel, bool cropped);
 
 signals:
     void statisticsUpdated();

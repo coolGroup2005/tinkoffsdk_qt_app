@@ -57,8 +57,10 @@ MainWindow::MainWindow(QWidget *parent, const QString& token)
     ui->intervalStatisticsCombobox->addItem("1 week");
     ui->intervalStatisticsCombobox->addItem("1 month");
 
+
+
     databaseFigi->insertSharesIntoDatabase();
-    updateStatistics();
+    // updateStatistics();
     // END Statistics ================================================================
 }
 
@@ -74,10 +76,7 @@ void MainWindow::updateStatistics()
     int intervalToPass = (intervalTextStatistics == "1 day") ? 0 : (intervalTextStatistics == "1 month") ? 1 : 2;
 
     bool cropped = ui->checkBoxStatistics->isChecked();
-    statisticsManager->updateStatistics(intervalToPass, topGainersModel, topLosersModel, topActiveModel, cropped);
-
-    QStringList topLosers = {"Press UPD Button and wait a little"};
-    QStringList topActive = {"Press UPD Button and wait a little"};
+    statisticsManager->updateStatistics(intervalToPass, topGainersModel, topLosersModel, cropped);
 
     ui->top_gainers_list->setModel(topGainersModel);
     ui->top_losers_list->setModel(topLosersModel);
@@ -87,13 +86,19 @@ void MainWindow::updateStatistics()
 void MainWindow::on_topGainersList_clicked(const QModelIndex &index)
 {
     QString selectedItem = index.data().toString();
-    QMessageBox::information(this, "Top Gainer Selected", "You selected: " + selectedItem);
+    if (selectedItem != "No data for selected period")
+        QMessageBox::information(this, "Top Gainer Selected", "You selected: " + selectedItem);
+    else 
+        QMessageBox::information(this, "Error", "Either today is Sunday or there is an error on the server");
 }
 
 void MainWindow::on_topLosersList_clicked(const QModelIndex &index)
 {
     QString selectedItem = index.data().toString();
-    QMessageBox::information(this, "Top Loser Selected", "You selected: " + selectedItem);
+    if (selectedItem != "No data for selected period")
+        QMessageBox::information(this, "Top Loser Selected", "You selected: " + selectedItem);
+    else 
+        QMessageBox::information(this, "Error", "Either today is Sunday or there is an error on the server");
 }
 
 
