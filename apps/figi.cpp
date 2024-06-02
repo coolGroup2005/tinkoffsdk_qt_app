@@ -15,7 +15,8 @@
 #include <QSqlRecord>
 #include <QHeaderView> 
 #include <QStandardItemModel>
-#include <QSet> 
+#include <QSet>
+#include <QDebug> 
 
 #include "investapiclient.h"
 #include "marketdataservice.h"
