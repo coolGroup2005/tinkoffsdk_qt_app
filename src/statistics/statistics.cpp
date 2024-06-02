@@ -1,5 +1,4 @@
 #include "statistics/statistics.h"
-#include <QDebug> 
 #include <string>
 #include <vector>
 #include <chrono>
@@ -76,7 +75,7 @@ void clearDatabaseStatistics() {
             std::cerr << "SQL error: " << errMsg << std::endl;
             sqlite3_free(errMsg);
         } else {
-            std::cout << "Database cleared" << std::endl;
+            std::cout << "Statistics database cleared" << std::endl;
         }
         sqlite3_close(db);
     } else {
@@ -92,19 +91,19 @@ float getShareChange(std::string& figi, std::time_t& dateFromToTime, std::time_t
     InvestApiClient client("sandbox-invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
     auto marketdata = std::dynamic_pointer_cast<MarketData>(client.service("marketdata"));
     if (!marketdata) {
-        qDebug() << "error marketdata";
+        qDebug() << "error connection to marketdata getShareChange()";
         return 10000;
     }
 
     auto candlesServiceReply = marketdata->GetCandles(figi, dateFromToTime, 0, currentTime, 0, CandleInterval::CANDLE_INTERVAL_DAY);
     auto response = dynamic_cast<GetCandlesResponse*>(candlesServiceReply.ptr().get());
     if (!response) {
-        qDebug() << "error response";
+        qDebug() << "error response getShareChange()";
         return 10000;
     }
 
     if (response->candles_size() == 0) {
-        qDebug() << "No candles found in the response";
+        qDebug() << "No candles found in the response getShareChange()";
         return 10000; 
     }
 
@@ -117,12 +116,12 @@ float getShareChange(std::string& figi, std::time_t& dateFromToTime, std::time_t
     auto close_nano = lastCandle.close().nano();
 
     if (!open_units && !open_nano) {
-        qDebug() << "Invalid open units or nano";
+        qDebug() << "Invalid open units or nano in getShareChange()";
         return 10000;
     }
 
     if (!close_units && !close_nano) {
-        qDebug() << "Invalid close units or nano";
+        qDebug() << "Invalid close units or nano getShareChange()";
         return 10000;
     }
 
@@ -200,9 +199,9 @@ SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval, bool
     }
 
 
-    for (int i = 0; i < allShares.size(); ++i) {
-        // std::cout << allShares[i].first.name << '\t' << allShares[i].second << '\n';
-    }
+    // for (int i = 0; i < allShares.size(); ++i) {
+    //     std::cout << allShares[i].first.name << '\t' << allShares[i].second << '\n';
+    // }
     clearDatabaseStatistics();
     return allShares;
     
@@ -221,6 +220,7 @@ void insertStatisticsIntoDatabase(SharesVector& sharesVector) {
     sqlite3* db;
     char* errMsg = 0;
     int rc = sqlite3_open("statistics.db", &db);
+    std::cout << "Database creating statistics" << std::endl;
 
     std::string sqlStatement = "CREATE TABLE IF NOT EXISTS statistics ("
                                "ID INTEGER PRIMARY KEY  AUTOINCREMENT, "
@@ -233,7 +233,6 @@ void insertStatisticsIntoDatabase(SharesVector& sharesVector) {
         sqlite3_free(errMsg);
     }
 
-    std::cout << "Database created statistics" << std::endl;
 
     sqlite3_stmt* stmt;
     sqlStatement = "INSERT INTO statistics (company_name, company_figi, total_price_change) VALUES (?, ?, ?);";
@@ -259,8 +258,6 @@ void insertStatisticsIntoDatabase(SharesVector& sharesVector) {
     }
     sqlite3_finalize(stmt);
     sqlite3_close(db);
-
-    std::cout << "Inserted all statistics window" << std::endl;
 }
 
 std::vector<std::pair<std::string, float>> getTopFromDb(std::string type) {
@@ -271,7 +268,7 @@ std::vector<std::pair<std::string, float>> getTopFromDb(std::string type) {
 
     rc = sqlite3_open("statistics.db", &db);
     if (rc != SQLITE_OK) {
-        std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "Can't open database statistics: " << sqlite3_errmsg(db) << std::endl;
         return topShares;
     }
 
