@@ -100,7 +100,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     virtualPortfolioTableView->verticalHeader()->setVisible(false);
 
     token = getenv("TOKEN");
-    client = new InvestApiClient("invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
+    client = new InvestApiClient("sandbox-invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
 
     auto accountService = std::dynamic_pointer_cast<Users>(client->service("users"));
 
@@ -320,10 +320,13 @@ void Portfolio::onTableDoubleClicked(const QModelIndex &index)
     QString ticker = portfolioModel->item(row, 0)->text();
     QString name = portfolioModel->item(row, 1)->text();
 
-    std::cout << "13213213123" << '\n';
+    // std::cout << "13213213123" << '\n';
+
+    std::string tickerStd = ticker.toStdString();
+    std::string nameStd = name.toStdString();
 
     // тут вызвать функцию показа свечей + добавить в хедер инклюд
-    // showCandlestickChart(ticker, name);
+    mainWindow->openShares(tickerStd, nameStd);
 }
 
 void Portfolio::onVirtualTableDoubleClicked(const QModelIndex &index)
