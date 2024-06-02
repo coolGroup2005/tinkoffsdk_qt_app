@@ -3,7 +3,7 @@
 FavouritesModel::FavouritesModel(QObject* parent)
     : QAbstractTableModel(parent)
 {
-    std::vector<ShareInfo> figies = parseFigi(); // parseTest()
+    std::vector<ShareInfo> figies = parseFavFigi(); // parseTest()
     for (ShareInfo share: figies)
     {
         QList<QVariant> shareDescription({QString::fromStdString(share.name), QString::fromStdString(share.figi), QString::fromStdString(share.trading_status)});

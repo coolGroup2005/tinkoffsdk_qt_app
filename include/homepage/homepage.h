@@ -25,7 +25,7 @@ struct ShareInfo
 
 
 ShareInfo getShareInfo(InvestApiClient&, std::string&);
-std::vector<ShareInfo> parseFigi();
+std::vector<ShareInfo> parseFavFigi();
 std::string formatTradingStatus(unsigned int);
 QString accountsInfoText();
 
