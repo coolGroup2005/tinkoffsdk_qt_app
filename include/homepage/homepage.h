@@ -2,7 +2,8 @@
 #define __HOMEPAGE__
 #include <iostream>
 #include <QString>
-#include <QStringListModel>#include <vector>
+#include <QStringListModel>
+#include <vector>
 
 #include "investapiclient.h"
 #include "marketdataservice.h"

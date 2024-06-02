@@ -36,7 +36,7 @@ set(STATISTICS_SOURCES
 add_library(homepage_lib ${HOMEPAGE_SOURCES})
 add_library(shares_lib ${SHARES_SOURCES})
 add_library(welcome_lib ${WELCOME_SOURCES})
-add_library(statistics_lib ${WELCOME_SOURCES})
+add_library(statistics_lib ${STATISTICS_SOURCES})
 
 
 # Include directories for all library targets

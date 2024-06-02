@@ -110,12 +110,12 @@ void MainWindow::on_listView_clicked(const QModelIndex &index)
     ui->lineEdit->setText(";;;  " + selectedItem);
     std::string figi = selectedItem.split("\t")[1].toStdString(); 
     std::string stockName = selectedItem.section('\t', 0, 0).toStdString();   
-    std::cout << figi;
-    MainWindow::openShares(figi, stockName);
+    QString token;
+    MainWindow::openShares(figi, stockName, token);
 }
 
 
-void MainWindow::openShares(const std::string& figi, const std::string& stockName)
+void MainWindow::openShares(const std::string& figi, const std::string& stockName, QString token)
 {
     shares *window1 = new shares(this, figi, stockName, token);
     window1->show();
