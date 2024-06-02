@@ -35,9 +35,6 @@ DatabaseFigi::DatabaseFigi(QWidget *parent)
     tableModel(new QStandardItemModel(this))
 {
     initializeUI();
-    initializeDatabase();
-    setupConnections();
-    loadAllShares(); 
 }
 
 void DatabaseFigi::initializeUI() {
@@ -58,7 +55,7 @@ void DatabaseFigi::initializeUI() {
     searchButton->setObjectName("search_figi_btn"); 
     searchButton->setMinimumSize(QSize(0, 40));
     searchButton->setMaximumSize(QSize(16777215, 40));
-    searchButton->setStyleSheet("QPushButton#search_figi_btn { margin: 0; background-color: rgb(193, 193, 193); padding: 5px; border-radius: 8px; }"); 
+    // searchButton->setStyleSheet("QPushButton#search_figi_btn { margin: 0; background-color: rgb(193, 193, 193); padding: 5px; border-radius: 8px; }"); 
     searchLayout->addWidget(textEdit);
     searchLayout->addWidget(searchButton);
     mainLayout->addLayout(searchLayout);
@@ -147,8 +144,11 @@ void DatabaseFigi::setupConnections() {
     connect(searchButton, &QPushButton::clicked, this, &DatabaseFigi::onSearchButtonClicked);
 }
 
-void DatabaseFigi::insertSharesIntoDatabase() {
-    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
+void DatabaseFigi::insertSharesIntoDatabase(QString token) {
+    initializeDatabase();
+    setupConnections();
+    loadAllShares(); 
+    InvestApiClient client("invest-public-api.tinkoff.ru:443", token.toStdString());
     auto instrumentService = std::dynamic_pointer_cast<Instruments>(client.service("instruments"));
     auto answerShares = instrumentService->Shares(INSTRUMENT_STATUS_BASE);
     auto answerShareReply = dynamic_cast<SharesResponse*>(answerShares.ptr().get());
