@@ -1,9 +1,8 @@
-#ifndef __HOMEPAGE__
-#define __HOMEPAGE__
+#ifndef __HOMEPAGE_H__
+#define __HOMEPAGE_H__
 #include <iostream>
 #include <QString>
 #include <QStringListModel>
-#include <vector>
 
 #include "investapiclient.h"
 #include "marketdataservice.h"
@@ -13,6 +12,9 @@
 #include "instrumentsservice.h"
 #include "operationsservice.h"
 
+#include <string>
+#include <vector>
+#include <QString>
 
 struct ShareInfo
 {
@@ -31,7 +33,23 @@ struct ShareInfo
 
 
 ShareInfo getShareInfo(InvestApiClient&, std::string&);
-std::vector<ShareInfo> parseFigi(const QString& token);
-std::string formatTradingStatus(unsigned int);
 
-#endif // __HOMEPAGE__
+std::vector<ShareInfo> parseFavFigi();
+std::string formatTradingStatus(unsigned int);
+QString accountsInfoText();
+
+std::vector<ShareInfo> parseTest();
+
+
+struct AccountInfo
+{
+    std::string name;
+    std::string id;
+    std::string totalValue;
+    std::string relYield;
+
+    AccountInfo(std::string, std::string, std::string, std::string);
+};
+    std::vector<AccountInfo> getAccountInfo();
+
+#endif // __HOMEPAGE_H__
