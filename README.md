@@ -37,8 +37,11 @@ InvestManager is a comprehensive desktop application which is designed to help i
  Homepage
 </summary> <br />
 
-> **Note**
-> Some important informatin about homepage 
+> **Description**
+>
+> This page displays all favourite shares and gives a possibility to filter them by trading status. By clicking on one particular share, it is possible to see a detailed graph with historical candles over selected period
+>   
+> ![Figi demo](./assets/home.gif) 
 </details>
 
 
@@ -94,31 +97,9 @@ InvestManager is a comprehensive desktop application which is designed to help i
 ## ❗️  Prerequisites 
 <details open>
 <summary>
- Install this shit to use app
+ Install this to use the app
 </summary> <br />
 
-bla bla bla
-```shell
-# do this
-npm run shit1
-```
-
-bla bla bla
-```shell
-# do this
-npm run shit2
-```
-
-bla bla bla
-```shell
-# do this
-npm run shit3
-```
-bla bla bla
-
-```shell
-sudo rm -rf 
-```
 
 
 </details>
