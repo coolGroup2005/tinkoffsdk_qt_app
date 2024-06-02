@@ -173,11 +173,13 @@ SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval, bool
     for (int i = 0; i < size; i++) {
         unsigned int tradingStatus = answerShareReply->instruments(i).trading_status();
         std::string currency = answerShareReply->instruments(i).currency();
+        bool for_qual_investor_flag = answerShareReply->instruments(i).for_qual_investor_flag();
+
             // std::cout << i << "trading status: " << tradingStatus << std::endl;
         std::time_t now_time = std::chrono::system_clock::to_time_t(now);
         bool now_time_not_ok = isWeekend(now_time) || isOutsideWorkingHours(now_time);
 
-        if (tradingStatus == 5 || (now_time_not_ok && currency == "rub")) {
+        if (!for_qual_investor_flag && currency == "rub") {
             std::string name =  answerShareReply->instruments(i).name();
             std::string figi =  answerShareReply->instruments(i).figi();
             MoneyValue nominal =  answerShareReply->instruments(i).nominal();
