@@ -14,6 +14,8 @@
 #include <ordersservice.h> // for adding shares into positions
 #include <instrumentsservice.h> // for getting Tiker
 
+class MainWindow; 
+
 class Portfolio : public QWidget
 {
     Q_OBJECT
@@ -21,6 +23,7 @@ class Portfolio : public QWidget
 public:
     explicit Portfolio(QWidget *parent = nullptr);
     void updateBalance(const QString& accountId);
+    void updateUserInfo();
 
 private slots:
     void onAccountChanged(int index);
@@ -34,6 +37,7 @@ private:
 
     QLabel *balanceLabel;
     QLabel *yieldLabel;
+    QLabel *userInfoLabel;
     InvestApiClient *client;
     QString token;
     QComboBox *accountComboBox;
@@ -43,6 +47,7 @@ private:
     QTableView *virtualPortfolioTableView;
     QStandardItemModel *virtualPortfolioModel;
     QPushButton *updateButton;
+    MainWindow *mainWindow;
 };
 
 #endif // PORTFOLIOBALANCE_H

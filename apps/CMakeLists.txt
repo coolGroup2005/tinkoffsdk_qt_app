@@ -9,7 +9,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Charts PrintSupport Sql)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets PrintSupport Charts Sql)
 find_package(SQLite3 REQUIRED)
 
@@ -32,17 +32,11 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         figi.h figi.cpp
         figi.ui
     )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET tinkoff-app APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
     if(ANDROID)
         add_library(tinkoff-app SHARED
             ${PROJECT_SOURCES}
         )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
         add_executable(tinkoff-app
             ${PROJECT_SOURCES}
@@ -50,7 +44,6 @@ else()
     endif()
 endif()
 
-# сюда дописывать названия библиотек из src
 target_link_libraries(
     tinkoff-app 
     PRIVATE 
@@ -65,11 +58,8 @@ target_link_libraries(
     tink_grpc_proto 
     TinkoffInvestSDK 
     sqlite3
-) # tink_grpc_proto TinkoffInvestSDK
+)
 
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
 if(${QT_VERSION} VERSION_LESS 6.1.0)
   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.tinkoff-app)
 endif()

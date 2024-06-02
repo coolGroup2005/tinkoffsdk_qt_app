@@ -15,7 +15,8 @@
 #include <QSqlRecord>
 #include <QHeaderView> 
 #include <QStandardItemModel>
-#include <QSet> 
+#include <QSet>
+#include <QDebug> 
 
 #include "investapiclient.h"
 #include "marketdataservice.h"
@@ -151,7 +152,7 @@ void DatabaseFigi::insertSharesIntoDatabase() {
     query.prepare("INSERT INTO figi (name, figi, trading_status) VALUES (:name, :figi, :trading_status)");
 
     for (int i = 0; i < answerShareReply->instruments_size(); i++) {
-        std::cout << answerShareReply->instruments(i).name() << std::endl;
+        // std::cout << answerShareReply->instruments(i).name() << std::endl;
         query.bindValue(":name", QString::fromStdString(answerShareReply->instruments(i).name()));
         query.bindValue(":figi", QString::fromStdString(answerShareReply->instruments(i).figi()));
         query.bindValue(":trading_status", QString::fromStdString(formatTradingStatus(answerShareReply->instruments(i).trading_status())));
