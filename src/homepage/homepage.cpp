@@ -108,7 +108,7 @@ ShareInfo getShareInfo(InvestApiClient& client, std::string& figi)
 }
 
 
-std::vector<ShareInfo> parseFigi()
+std::vector<ShareInfo> parseFavFigi()
 {
     InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
 
@@ -119,7 +119,7 @@ std::vector<ShareInfo> parseFigi()
     std::vector<ShareInfo> sharesList;
     for (size_t i = 0; i < favouritesList->favorite_instruments_size(); ++i)
     {
-        std::string figi = favouritesList->favorite_instruments(0).figi();
+        std::string figi = favouritesList->favorite_instruments(i).figi();
         sharesList.push_back(getShareInfo(client, figi));
     }
     return sharesList;
@@ -147,13 +147,5 @@ std::vector<ShareInfo> parseTest()
     sharesList.push_back({"Эн+", "OCP239030RKD", 2});
     sharesList.push_back({"Татнефть", "FKL573924PGF", 8});
     sharesList.push_back({"АО Красногорский завод им. С.А. Зверева", "DJL759274DSJ", 4});
-
-    // sharesList.push_back({"Лаборатория Лос-Аламоса", "USK482024XJF", 0});
-    // sharesList.push_back({"Лаборатория Лос-Аламоса", "PSN340482EGC", 8});
-    // sharesList.push_back({"Лаборатория Лос-Аламоса", "TIR594208PAK", 11});
-    // sharesList.push_back({"Лаборатория Лос-Аламоса", "APD438205LQE", 13});
-    // sharesList.push_back({"Лаборатория Лос-Аламоса", "SFE665435", 3});
-    // sharesList.push_back({"Лаборатория Лос-Аламоса", "OFH753893YUR", 9});
-
     return sharesList;
 }

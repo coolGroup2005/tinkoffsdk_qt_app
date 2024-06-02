@@ -59,7 +59,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="statistics">
        <property name="layoutDirection">
@@ -293,7 +293,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,1">
+         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="5,1">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <item>
