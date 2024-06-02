@@ -1,9 +1,10 @@
 #include "favouritesModel.h"
 
-FavouritesModel::FavouritesModel(QObject* parent)
+FavouritesModel::FavouritesModel(QObject* parent, const QString& token)
     : QAbstractTableModel(parent)
+    , token(token)
 {
-    std::vector<ShareInfo> figies = parseFavFigi(); // parseTest()
+    std::vector<ShareInfo> figies = parseFavFigi(token);
     for (ShareInfo share: figies)
     {
         QList<QVariant> shareDescription({QString::fromStdString(share.name), QString::fromStdString(share.figi), QString::fromStdString(share.trading_status)});

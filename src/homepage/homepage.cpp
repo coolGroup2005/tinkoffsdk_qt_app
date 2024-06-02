@@ -13,8 +13,8 @@
 AccountInfo::AccountInfo(std::string name, std::string id, std::string totalValue, std::string relYield) : 
     name(name), id(id), totalValue(totalValue), relYield(relYield) {};
 
-std::vector<AccountInfo> getAccountInfo() {
-    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
+std::vector<AccountInfo> getAccountInfo(const QString& token) {
+    InvestApiClient client("invest-public-api.tinkoff.ru:443", token.toStdString());
 
     auto accountService = std::dynamic_pointer_cast<Users>(client.service("users"));
     auto operationService = std::dynamic_pointer_cast<Operations>(client.service("operations"));
@@ -56,8 +56,8 @@ std::string formatTradingStatus(unsigned int statusId) {
     }
 }
 
-QString accountsInfoText() {
-    std::vector<AccountInfo> accountsInfos = getAccountInfo();
+QString accountsInfoText(const QString& token) {
+    std::vector<AccountInfo> accountsInfos = getAccountInfo(token);
     QString outputText = "";
     for (AccountInfo acc : accountsInfos) {
         outputText += acc.name + acc.id + acc.totalValue + acc.relYield;
@@ -88,8 +88,8 @@ ShareInfo getShareInfo(InvestApiClient& client, std::string& figi) {
     return share;
 }
 
-std::vector<ShareInfo> parseFavFigi() {
-    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
+std::vector<ShareInfo> parseFavFigi(const QString& token) {
+    InvestApiClient client("invest-public-api.tinkoff.ru:443", token.toStdString());
 
     auto instrumentService = std::dynamic_pointer_cast<Instruments>(client.service("instruments"));
     auto instrumentAnswer = instrumentService->GetFavorites();

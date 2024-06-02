@@ -14,7 +14,7 @@
 MainWindow::MainWindow(QWidget *parent, const QString& token)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , favouritesModel(new FavouritesModel)
+    , favouritesModel(new FavouritesModel(this, token))
     , proxyModel(new ProxyModel)
     , statisticsManager(new StatisticsManager(this))
     , databaseFigi(new DatabaseFigi(this))
@@ -163,17 +163,8 @@ void MainWindow::on_sharesTableView_doubleClicked(const QModelIndex &index)
     QString figi = ui->sharesTableView->model()->index(index.row(),1).data().toString();
 
     ui->lineEdit->setText(stockName);
-
-    MainWindow::openShares(figi.toStdString(), stockName.toStdString());
+    MainWindow::openShares(figi.toStdString(), stockName.toStdString(), token);
 }
-
-
-void MainWindow::openShares(const std::string& figi, const std::string& stockName)
-{
-    shares *window1 = new shares(this, figi, stockName);
-    window1->show();
-}
-
 
 void MainWindow::on_topGainersList_clicked(const QModelIndex &index)
 {

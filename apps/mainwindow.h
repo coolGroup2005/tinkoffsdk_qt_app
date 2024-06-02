@@ -47,7 +47,6 @@ public:
 
 
 private slots:
-    void openShares(const std::string& figi, const std::string& stockName);
     void on_listView_clicked(const QModelIndex &index);
     void on_sharesTableView_doubleClicked(const QModelIndex &index);
     void on_topGainersList_clicked(const QModelIndex &index);

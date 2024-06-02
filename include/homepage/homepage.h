@@ -34,9 +34,9 @@ struct ShareInfo
 
 ShareInfo getShareInfo(InvestApiClient&, std::string&);
 
-std::vector<ShareInfo> parseFavFigi();
+std::vector<ShareInfo> parseFavFigi(const QString& token);
 std::string formatTradingStatus(unsigned int);
-QString accountsInfoText();
+QString accountsInfoText(const QString& token);
 
 std::vector<ShareInfo> parseTest();
 
@@ -50,6 +50,6 @@ struct AccountInfo
 
     AccountInfo(std::string, std::string, std::string, std::string);
 };
-    std::vector<AccountInfo> getAccountInfo();
+    std::vector<AccountInfo> getAccountInfo(const QString& token);
 
 #endif // __HOMEPAGE_H__

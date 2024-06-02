@@ -13,7 +13,7 @@ class FavouritesModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    explicit FavouritesModel(QObject* parent = nullptr);
+    explicit FavouritesModel(QObject* parent = nullptr, const QString& token = "");
 
 protected:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -24,6 +24,7 @@ protected:
 private:
     QList<QList<QVariant>> _sharesData;
     QList<QString> _header;
+    QString token;
 };
 
 #endif// __FAVOURITES_H__
