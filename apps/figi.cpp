@@ -16,6 +16,8 @@
 #include <QHeaderView> 
 #include <QStandardItemModel>
 #include <QSet> 
+#include <QMouseEvent>
+#include <QDebug> 
 
 #include "investapiclient.h"
 #include "marketdataservice.h"
@@ -51,6 +53,8 @@ void DatabaseFigi::initializeUI() {
     textEdit->setMaximumSize(QSize(16777215, 40));
     textEdit->setStyleSheet("QTextEdit#input_figi { border-radius: 10px; background-color: rgb(222, 222,  222); }"); 
     searchButton = new QPushButton("Search");
+    ClickCounter::installOn(searchButton);
+
     searchButton->setObjectName("search_figi_btn"); 
     searchButton->setMinimumSize(QSize(0, 40));
     searchButton->setMaximumSize(QSize(16777215, 40));
@@ -67,12 +71,61 @@ void DatabaseFigi::initializeUI() {
     mainLayout->addWidget(numElementsLabel);
     tableView->setObjectName("table_figi"); 
 
-    tableView->setStyleSheet("QTableView#table_figi { border-radius: 10px; background-color: rgb(222, 222, 222); gridline-color: rgb(100, 100, 100) }"
+    tableView->setStyleSheet("QTableView#table_figi { border-radius: 10px; background-color: rgb(222, 222, 222); }"
                          "QTableView#table_figi::first-row { background-color: rgb(193, 193, 193); }"
                          "QTableView#table_figi::first-column { background-color: rgb(193, 193, 193); }");
     tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ClickCounter::installOn(tableView);
+
     tableView->setModel(tableModel);
     mainLayout->addWidget(tableView);
+
+    this->setStyleSheet(R"(
+        QWidget {
+            background-color: #ebeae7;
+            color: #525252;
+        }
+        QLabel {
+            color: #525252;
+        }
+        QLineEdit, QComboBox {
+            background-color: #d3d2d0;
+            border-radius: 15px;
+            color: #525252;
+            padding: 10px;
+        }
+        QHeaderView::section {
+            background-color: lightgrey;
+        }
+        QComboBox::down-arrow {
+            image: none;
+        }
+        QTableView {
+            gridline-color: #b0b0af;
+            background-color: #d3d2d0;
+            border: 1px solid #d3d2d0;
+            border-radius: 20px;
+        }
+        QTableView::item {
+            background-color: #d3d2d0;
+        }
+        QTableView::item:selected {
+            background-color: #b5cbd8;
+            color: #000000;
+        }
+        QPushButton {
+            background-color: rgb(193, 193, 193);
+            border-radius: 20px;
+            padding: 10px;
+        }
+        QPushButton:hover {
+            background-color: rgb(170, 170, 170);
+        }
+        QPushButton:pressed {
+            background-color: rgb(150, 150, 150);
+        }
+    )");
+
 
     setLayout(mainLayout);
 }
@@ -81,9 +134,9 @@ void DatabaseFigi::initializeDatabase() {
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("figi.db");
     if (!db.open()) {
-        qDebug() << "Error: connection with database failed";
+        qDebug() << "Error: connection with database figi failed";
     } else {
-        qDebug() << "Database: connection ok";
+        qDebug() << "Database figi: connection ok";
     }
 
     QSqlQuery query;
@@ -104,12 +157,12 @@ void DatabaseFigi::insertSharesIntoDatabase() {
     query.prepare("INSERT INTO figi (name, figi, trading_status) VALUES (:name, :figi, :trading_status)");
 
     for (int i = 0; i < answerShareReply->instruments_size(); i++) {
-        std::cout << answerShareReply->instruments(i).name() << std::endl;
+        // std::cout << answerShareReply->instruments(i).name() << std::endl;
         query.bindValue(":name", QString::fromStdString(answerShareReply->instruments(i).name()));
         query.bindValue(":figi", QString::fromStdString(answerShareReply->instruments(i).figi()));
         query.bindValue(":trading_status", QString::fromStdString(formatTradingStatus(answerShareReply->instruments(i).trading_status())));
         if (!query.exec()) {
-            qDebug() << "Error inserting into table: " << query.lastError();
+            qDebug() << "Error inserting into database figi: " << query.lastError();
         }
     }
 }
@@ -121,7 +174,7 @@ void DatabaseFigi::onSearchButtonClicked() {
     query.bindValue(":name", "%" + searchText + "%");
 
     if (!query.exec()) {
-        qDebug() << "Error searching table: " << query.lastError();
+        qDebug() << "Error searching in database figi: " << query.lastError();
         return;
     }
 
@@ -182,4 +235,27 @@ void DatabaseFigi::loadAllShares() {
     }
     int numElements = tableModel->rowCount();
     numElementsLabel->setText(QString::number(numElements) + " elements found");
+}
+
+
+
+int ClickCounter::clickCount = 0;
+
+ClickCounter::ClickCounter(QObject *parent)
+    : QObject(parent) {}
+
+void ClickCounter::installOn(QWidget *widget) {
+    widget->installEventFilter(new ClickCounter(widget));
+}
+
+bool ClickCounter::eventFilter(QObject *obj, QEvent *event) {
+    if (event->type() == QEvent::MouseButtonPress) {
+        incrementClickCount();
+    }
+    return QObject::eventFilter(obj, event);
+}
+
+void ClickCounter::incrementClickCount() {
+    ++clickCount;
+    qDebug() << "Click count:" << clickCount;
 }

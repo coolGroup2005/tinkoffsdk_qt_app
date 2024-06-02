@@ -51,4 +51,19 @@ private:
     void loadAllShares();
 };
 
+class ClickCounter : public QObject {
+    Q_OBJECT
+
+public:
+    explicit ClickCounter(QObject *parent = nullptr);
+    static void installOn(QWidget *widget);
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
+
+private:
+    static int clickCount;
+    void incrementClickCount();
+};
+
 #endif // __FIGI_H__

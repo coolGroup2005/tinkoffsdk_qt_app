@@ -5,10 +5,11 @@
 #include "sandboxservice.h"
 #include <ordersservice.h> 
 #include <QApplication>
+#include <QMessageBox>
 #include "mainwindow.h"
 #include "marketdataservice.h"
 #include "instrumentsservice.h"
-
+#include "welcome/welcome.h"
 #include <signal.h>
 #include <QMessageBox>
 
@@ -47,11 +48,23 @@ int main(int argc, char *argv[])
     app.setStyleSheet(scrollBarStyle);
 
     signal(SIGSEGV, manageSegFailure);
+    
+    Welcome tokenDialog;
+    if (tokenDialog.exec() == QDialog::Accepted) {
+        QString token = tokenDialog.getToken();
 
-    MainWindow mainWindow;
-    mainWindow.show();
+        if (token.isEmpty() || token.length() <= 80) {
+            QMessageBox::critical(nullptr, "Error", "Invalid or empty token provided. Please provide a valid token.");
+            return 1;
+        }
+        MainWindow mainWindow(nullptr, token);
+        mainWindow.show();
 
-    return app.exec();
+        return app.exec();
+    }
+    
+    return 0;
+
 }
 
 

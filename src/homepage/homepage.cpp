@@ -1,12 +1,59 @@
 #include "homepage/homepage.h"
+#include <QDebug> 
+#include <string>
+#include <vector>
+#include <chrono>
+#include <ctime>
+#include <cmath>
+#include <utility>
+#include <string>
+#include <sqlite3.h>
+#include <filesystem>
+#include <algorithm>
+#include <QDebug>
+
+ShareInfo::ShareInfo(std::string name, std::string figi, unsigned int trading_status): 
+                    name(name), 
+                    figi(figi), 
+                    trading_status(formatTradingStatus(trading_status)){};
+
+ShareInfo::ShareInfo(std::string name, std::string figi, unsigned int trading_status, 
+                    std::string currency, MoneyValue nominal): 
+                    name(name), 
+                    figi(figi), 
+                    trading_status(formatTradingStatus(trading_status)), 
+                    currency(currency), 
+                    nominal(nominal){};
+
+std::ostream& operator<< (std::ostream& ss, const ShareInfo& shareParam)
+{
+    ss << "Company: " << shareParam.name << '\n' << "Figi: " << shareParam.figi << '\n' << "Trading status: " << shareParam.trading_status << '\n';
+    return ss;
+}
+
+ShareInfo getShareInfo(InvestApiClient& client, std::string& figi)
+{
+    auto instrumentService = std::dynamic_pointer_cast<Instruments>(client.service("instruments"));
+    auto answerInstruments = instrumentService->GetInstrumentBy(InstrumentIdType::INSTRUMENT_ID_TYPE_FIGI, "", figi);
+    auto answerReply = dynamic_cast<InstrumentResponse*>(answerInstruments.ptr().get());
+    // std::cout << answerReply->instrument().figi();
+
+    std::string name = answerReply->instrument().name();
+    unsigned int tradingStatus = answerReply->instrument().trading_status();
+
+    ShareInfo share {name, figi, tradingStatus};
+    return share;
+}
+
+
 
 
 AccountInfo::AccountInfo(std::string name, std::string id, std::string totalValue, std::string relYield): name(name), id(id), totalValue(totalValue), relYield(relYield){};
 
 
-std::vector<AccountInfo> getAccountInfo()
+std::vector<AccountInfo> getAccountInfo(const QString& token)
 {
-    InvestApiClient client("invest-public-api.tinkoff.ru:443", getenv("TOKEN"));
+    InvestApiClient client("invest-public-api.tinkoff.ru:443", token.toStdString());
 
     auto accountService = std::dynamic_pointer_cast<Users>(client.service("users"));
     auto operationService = std::dynamic_pointer_cast<Operations>(client.service("operations"));

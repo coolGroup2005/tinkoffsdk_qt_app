@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+
 #include <QMainWindow>
 #include <QDialog>
 #include <QString>
@@ -12,7 +13,12 @@
 #include <QListWidget>
 #include <vector>
 #include "favouritesModel.h"
-#include "favouritesProxyModel.h"
+#include "favouritesProxyModel.h"#include <QStringList>
+#include <QMessageBox>
+#include <QStandardItemModel>
+#include <QSortFilterProxyModel>
+#include <QListWidget>
+#include <vector>
 #include "portfolio.h"
 #include "figi.h"
 
@@ -34,11 +40,14 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(QWidget *parent = nullptr, const QString& token = "");
     ~MainWindow();
+    void openShares(const std::string& figi, const std::string& stockName, QString token);
+
 
 private slots:
     void openShares(const std::string& figi, const std::string& stockName);
+    void on_listView_clicked(const QModelIndex &index);
     void on_sharesTableView_doubleClicked(const QModelIndex &index);
     void on_topGainersList_clicked(const QModelIndex &index);
     void on_topLosersList_clicked(const QModelIndex &index);
@@ -57,6 +66,7 @@ private:
     Portfolio *portfolio;
     StatisticsManager *statisticsManager;
     DatabaseFigi *databaseFigi;
+    QString token;
 };
 
 #endif // MAINWINDOW_H

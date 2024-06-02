@@ -1,17 +1,27 @@
 #include "portfolio.h"
+#include <QVBoxLayout>
+#include <cstdlib>
+#include <QDebug> // for finding segmentation fault
+#include <QHeaderView>
+#include "mainwindow.h" 
 
-Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
+
+Portfolio::Portfolio(QWidget *parent, const QString& token) : QWidget(parent), token(token)
 {
     balanceLabel = new QLabel(this);
     yieldLabel = new QLabel(this);
+    userInfoLabel = new QLabel(this);
+    // balanceLabel->setStyleSheet("font-weight: bold; font-size: 20px; ");
+    // yieldLabel->setStyleSheet("font-weight: bold; font-size: 20px; ");
+    // userInfoLabel->setStyleSheet("font-weight: bold; font-size: 20px; ");
     accountComboBox = new QComboBox(this);
     portfolioTableView = new QTableView(this);
     portfolioModel = new QStandardItemModel(this);
-    portfolioModel->setHorizontalHeaderLabels({"Ticker", "Name", "Quantity", "Current Price", "Value"});
+    portfolioModel->setHorizontalHeaderLabels({"FIGI", "Ticker", "Name", "Quantity", "Current Price", "Value"});
 
     virtualPortfolioTableView = new QTableView(this);
     virtualPortfolioModel = new QStandardItemModel(this);
-    virtualPortfolioModel->setHorizontalHeaderLabels({"Ticker", "Name", "Quantity", "Current Price", "Value"});
+    virtualPortfolioModel->setHorizontalHeaderLabels({"FIGI", "Ticker", "Name", "Quantity", "Current Price", "Value"});
 
     updateButton = new QPushButton("Update", this);
 
@@ -32,6 +42,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     layout->addWidget(accountComboBox);
     layout->addWidget(balanceLabel);
     layout->addWidget(yieldLabel);
+    layout->addWidget(userInfoLabel);
     layout->addWidget(portfolioTableView);
     layout->addWidget(new QLabel("Virtual Positions", this));
     layout->addWidget(virtualPortfolioTableView);
@@ -77,7 +88,6 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     portfolioTableView->verticalHeader()->setVisible(false);
     virtualPortfolioTableView->verticalHeader()->setVisible(false);
 
-    token = getenv("TOKEN");
     client = new InvestApiClient("invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
 
     auto accountService = std::dynamic_pointer_cast<Users>(client->service("users"));
@@ -101,7 +111,8 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     {
         auto account = accountID1->accounts(i);
         accountIds.push_back(account.id().c_str());
-        accountComboBox->addItem(account.name().c_str(), QVariant(account.id().c_str()));
+        auto fillIn = account.name() + ", ID: " + account.id();
+        accountComboBox->addItem(fillIn.c_str(), QVariant(account.id().c_str()));
     }
 
     
@@ -113,6 +124,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     if (!accountIds.empty())
     {
         updateBalance(accountIds[0]);
+        updateUserInfo();
     }
 
     portfolioTableView->setModel(portfolioModel);
@@ -183,18 +195,21 @@ void Portfolio::updateBalance(const QString &accountId)
             auto instrumentTicker = instrumentInfo.ticker();
 
             QList<QStandardItem *> rowItems;
+            QStandardItem *figiItem = new QStandardItem(QString::fromStdString(instrumentInfo.figi()));
             QStandardItem *tickerItem = new QStandardItem(QString::fromStdString(instrumentTicker));
             QStandardItem *nameItem = new QStandardItem(QString::fromStdString(instrumentName));
             QStandardItem *quantityItem = new QStandardItem(QString::number(position.quantity().units()));
             QStandardItem *priceItem = new QStandardItem(QString::number(position.current_price().units()) + " " + QString::fromStdString(position.current_price().currency()));
             QStandardItem *valueItem = new QStandardItem(QString::number(position.current_price().units() * position.quantity().units()) + " " + QString::fromStdString(position.current_price().currency()));
 
+            figiItem->setFlags(figiItem->flags() & ~Qt::ItemIsEditable);
             tickerItem->setFlags(tickerItem->flags() & ~Qt::ItemIsEditable);
             nameItem->setFlags(nameItem->flags() & ~Qt::ItemIsEditable);
             quantityItem->setFlags(quantityItem->flags() & ~Qt::ItemIsEditable);
             priceItem->setFlags(priceItem->flags() & ~Qt::ItemIsEditable);
             valueItem->setFlags(valueItem->flags() & ~Qt::ItemIsEditable);
 
+            rowItems.append(figiItem);
             rowItems.append(tickerItem);
             rowItems.append(nameItem);
             rowItems.append(quantityItem);
@@ -233,18 +248,21 @@ void Portfolio::updateBalance(const QString &accountId)
             auto instrumentTicker = instrumentInfo.ticker();
 
             QList<QStandardItem *> rowItems;
+            QStandardItem *figiItem = new QStandardItem(QString::fromStdString(instrumentInfo.figi()));
             QStandardItem *ticker = new QStandardItem(QString::fromStdString(instrumentTicker));
             QStandardItem *nameItem = new QStandardItem(QString::fromStdString(instrumentName));
             QStandardItem *quantityItem = new QStandardItem(QString::number(position.quantity().units()));
             QStandardItem *priceItem = new QStandardItem(QString::number(position.current_price().units()) + " " + QString::fromStdString(position.current_price().currency()));
             QStandardItem *valueItem = new QStandardItem(QString::number(position.current_price().units() * position.quantity().units()) + " " + QString::fromStdString(position.current_price().currency()));
             
+            figiItem->setFlags(figiItem->flags() & ~Qt::ItemIsEditable);
             ticker->setFlags(ticker->flags() & ~Qt::ItemIsEditable);
             nameItem->setFlags(nameItem->flags() & ~Qt::ItemIsEditable);
             quantityItem->setFlags(quantityItem->flags() & ~Qt::ItemIsEditable);
             priceItem->setFlags(priceItem->flags() & ~Qt::ItemIsEditable);
             valueItem->setFlags(valueItem->flags() & ~Qt::ItemIsEditable);
 
+            rowItems.append(figiItem);
             rowItems.append(ticker);
             rowItems.append(nameItem);
             rowItems.append(quantityItem);
@@ -281,17 +299,23 @@ void Portfolio::onUpdateButtonClicked()
 
 void Portfolio::onTableDoubleClicked(const QModelIndex &index)
 {
-    if (!index.isValid())
+    if (!index.isValid()) {
+        qDebug() << "Invalid index!";
         return;
+    }
 
     int row = index.row();
     QString ticker = portfolioModel->item(row, 0)->text();
     QString name = portfolioModel->item(row, 1)->text();
 
-    std::cout << "13213213123" << '\n';
+    // std::cout << "13213213123" << '\n';
+
+    std::string tickerStd = ticker.toStdString();
+    std::string nameStd = name.toStdString();
 
     // тут вызвать функцию показа свечей + добавить в хедер инклюд
-    // showCandlestickChart(ticker, name);
+    std::string _token = token.toStdString();
+    mainWindow->openShares(tickerStd, nameStd, QString::fromStdString(_token));
 }
 
 void Portfolio::onVirtualTableDoubleClicked(const QModelIndex &index)
@@ -325,4 +349,32 @@ void Portfolio::onVirtualTableDoubleClicked(const QModelIndex &index)
 
     // тут вызвать функцию показа свечей + добавить в хедер инклюд
     // showCandlestickChart(ticker, name);
+    std::string tickerStd = ticker.toStdString();
+    std::string nameStd = name.toStdString();
+    mainWindow->openShares(tickerStd, nameStd, token);
+}
+
+void Portfolio::updateUserInfo()
+{
+    auto userService = std::dynamic_pointer_cast<Users>(client->service("users"));
+
+    if (!userService) {
+        qDebug() << "Failed to get Users service";
+        return;
+    }
+
+    auto userInfoRequest = userService->GetInfo();
+    auto userInfoResponse = dynamic_cast<GetInfoResponse*>(userInfoRequest.ptr().get());
+
+    if (!userInfoResponse) {
+        qDebug() << "Failed to get user info response";
+        return;
+    }
+
+    QString userInfoText;
+    userInfoText += "Premium Status: " + QString(userInfoResponse->prem_status() ? "Yes" : "No") + "\n" + "\n";
+    userInfoText += "Qualified Investor: " + QString(userInfoResponse->qual_status() ? "Yes" : "No") + "\n"  + "\n";
+    userInfoText += "Tariff: " + QString::fromStdString(userInfoResponse->tariff()) + "\n";
+
+    userInfoLabel->setText(userInfoText);
 }

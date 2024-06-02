@@ -1,19 +1,30 @@
 #include "mainwindow.h"
+#include "shares/shares.h"
+#include "ui_mainwindow.h"
+#include "homepage/homepage.h"
+#include "statistics/statistics.h"
+#include "portfolio.h"
 
+#include <QStringList>
+#include <QStringListModel>
+#include <QMessageBox>
 
-MainWindow::MainWindow(QWidget *parent)
+#include <vector>
+
+MainWindow::MainWindow(QWidget *parent, const QString& token)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , favouritesModel(new FavouritesModel)
     , proxyModel(new ProxyModel)
     , statisticsManager(new StatisticsManager(this))
     , databaseFigi(new DatabaseFigi(this))
+    , token(token)
 {
     ui->setupUi(this);
     ui->tabWidget->setTabText(0, "Home");
     ui->tabWidget->setTabText(1, "Statistics");
 
-    portfolio = new Portfolio(this);
+    portfolio = new Portfolio(this, token);
     ui->tabWidget->addTab(portfolio, "Portfolio");
     ui->tabWidget->addTab(databaseFigi, "Database Figi");
 
@@ -52,6 +63,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->intervalStatisticsCombobox->addItem("1 week");
     ui->intervalStatisticsCombobox->addItem("1 month");
 
+
+
     databaseFigi->insertSharesIntoDatabase();
     updateStatistics();
 
@@ -76,10 +89,7 @@ void MainWindow::updateStatistics()
     int intervalToPass = (intervalTextStatistics == "1 day") ? 0 : (intervalTextStatistics == "1 month") ? 1 : 2;
 
     bool cropped = ui->checkBoxStatistics->isChecked();
-    statisticsManager->updateStatistics(intervalToPass, topGainersModel, topLosersModel, topActiveModel, cropped);
-
-    QStringList topLosers = {"Press UPD Button and wait a little"};
-    QStringList topActive = {"Press UPD Button and wait a little"};
+    statisticsManager->updateStatistics(intervalToPass, topGainersModel, topLosersModel, cropped);
 
     ui->top_gainers_list->setModel(topGainersModel);
     ui->top_losers_list->setModel(topLosersModel);
@@ -168,7 +178,10 @@ void MainWindow::openShares(const std::string& figi, const std::string& stockNam
 void MainWindow::on_topGainersList_clicked(const QModelIndex &index)
 {
     QString selectedItem = index.data().toString();
-    QMessageBox::information(this, "Top Gainer Selected", "You selected: " + selectedItem);
+    if (selectedItem != "No data for selected period")
+        QMessageBox::information(this, "Top Gainer Selected", "You selected: " + selectedItem);
+    else 
+        QMessageBox::information(this, "Error", "Either today is Sunday or there is an error on the server");
 }
 
 
@@ -185,6 +198,13 @@ void MainWindow::on_listView_clicked(const QModelIndex &index)
     ui->lineEdit->setText(";;;  " + selectedItem);
     std::string figi = selectedItem.split("\t")[1].toStdString(); 
     std::string stockName = selectedItem.section('\t', 0, 0).toStdString();   
-    std::cout << figi;
-    MainWindow::openShares(figi, stockName);
+    QString token;
+    MainWindow::openShares(figi, stockName, token);
+}
+
+
+void MainWindow::openShares(const std::string& figi, const std::string& stockName, QString token)
+{
+    shares *window1 = new shares(this, figi, stockName, token);
+    window1->show();
 }

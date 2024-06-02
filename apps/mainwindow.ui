@@ -313,10 +313,21 @@
 	border-radius: 5px;
 	padding: 3px;
 	margin: 3px;
+}
+
+QPushButton#updateStatisticsButton:pressed {
+	background-color: 1px solid rgb(211, 210, 208);
+}
+
+QPushButton#updateStatisticsButton:hover {
+	background-color: 1px solid rgb(188, 188, 188);
 }</string>
                 </property>
                 <property name="text">
                  <string>UPD</string>
+                </property>
+                <property name="autoDefault">
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
