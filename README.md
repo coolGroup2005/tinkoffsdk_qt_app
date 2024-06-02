@@ -1,8 +1,12 @@
 # Invest Manager Desktop Application
 
+![d](https://img.shields.io/badge/language-C++_-blue)
+![d](https://img.shields.io/badge/contributors-4_-green)
+![d](https://img.shields.io/badge/group-232–1_-pink)
+
 InvestManager is a comprehensive desktop application which is designed to help investors of all levels with the tools and insights they may need to navigate the world of financial markets. Built upon the robust foundation of C++, leveraging the Tinkoff Invest API for seamless market access, and adorned with an intuitive Qt-based user interface, InvestManager offers a streamlined and efficient approach to managing your investment portfolio.
 
-## Features:
+## 📝 Features
 
 1) Portfolio management:
    * Effortlessly track and manage your shares and bonds in a centralized location.
@@ -16,7 +20,7 @@ InvestManager is a comprehensive desktop application which is designed to help i
 3) User-Friendly Interface:
     * Navigate effortlessly through the application with a clean and intuitive Qt-based interface.
 
-## Technologies:
+## 💻 Technologies
 
 | Component     |Role              |
 |----------------------|-----------------------------------------------------------------------------------|
@@ -26,7 +30,7 @@ InvestManager is a comprehensive desktop application which is designed to help i
 
 <br/>
 
-## Detailed Overview ==============
+## 🔎 Detailed Overview 
 
 <details open>
 <summary style="font-size: 20px; font-weight: 600; text-decoration: underline">
@@ -87,7 +91,7 @@ InvestManager is a comprehensive desktop application which is designed to help i
 <br /><br />
 
 
-## Prerequisites ==============
+## ❗️  Prerequisites 
 <details open>
 <summary>
  Install this shit to use app
@@ -119,26 +123,10 @@ sudo rm -rf
 
 </details>
 
-## Documentation ==============
+<br />
+
+## 📖 Documentation 
+link to documentation: ``https://pelancha.github.io/index.html``
 
 
-### Possible statuses of shares in the list
-| Name | Description|
-| -------- | ------- |
-| STATUS UNSPECIFIED | Trading status not defined |
-| NOT AVAILABLE FOR TRADING | Not available for trading |
-| OPENING PERIOD | Trading opening period |
-| CLOSING PERIOD | Trading Closing Period |
-| BREAK IN TRADING | Break in trading |
-| NORMAL TRADING | Normal trading |
-| CLOSING AUCTION | Closing Auction |
-| DARK POOL AUCTION | Large Package Auction |
-| DISCRETE AUCTION | Discrete Auction |
-| OPENING AUCTION PERIOD | Opening Auction |
-| TRADING AT CLOSING AUCTION PRICE | Bidding period at closing auction price |
-| SESSION ASSIGNED | Session assigned |
-| SESSION CLOSE | Session closed |
-| SESSION OPEN | Session open |
-| DEALER NORMAL TRADING | Trading in the broker's internal liquidity mode is available |
-| DEALER BREAK IN TRADING | Trading interruption in the broker's internal liquidity mode |
-| DEALER NOT AVAILABLE FOR TRADING | Trading in the broker's internal liquidity mode is not available |
+
