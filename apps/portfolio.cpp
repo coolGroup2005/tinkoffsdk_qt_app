@@ -101,7 +101,7 @@ Portfolio::Portfolio(QWidget *parent) : QWidget(parent)
     virtualPortfolioTableView->verticalHeader()->setVisible(false);
 
     token = getenv("TOKEN");
-    client = new InvestApiClient("sandbox-invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
+    client = new InvestApiClient("invest-public-api.tinkoff.ru:443", token.toStdString()); // sandbox-
 
     auto accountService = std::dynamic_pointer_cast<Users>(client->service("users"));
 
