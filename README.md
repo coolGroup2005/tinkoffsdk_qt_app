@@ -100,6 +100,8 @@ InvestManager is a comprehensive desktop application which is designed to help i
  Install this to use the app
 </summary> <br />
 
+## Building
+- To compile this project via CMake in Linux you need to manually replace two files in `build/_deps/grpc-src/third_party/abseil-cpp/absl/strings/internal/str_format`: [extension.cc](https://pastebin.com/uqrCrtyA) and [extension.h](https://pastebin.com/4LvmszCY)
 
 
 </details>
