@@ -128,7 +128,7 @@ InvestManager is a comprehensive desktop application which is designed to help i
     FetchContent_MakeAvailable(grpc)
     ```
 - Windows
-  - Install [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) and got to
+  - Install [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) and go to Linux tutorial
 
 
 </details>
