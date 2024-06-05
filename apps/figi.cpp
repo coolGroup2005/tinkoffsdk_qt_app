@@ -262,5 +262,5 @@ bool ClickCounter::eventFilter(QObject *obj, QEvent *event) {
 
 void ClickCounter::incrementClickCount() {
     ++clickCount;
-    qDebug() << "Click count:" << clickCount;
+    std::cout << "Click count: " << clickCount << std::endl;
 }
