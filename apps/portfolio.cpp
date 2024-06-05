@@ -110,10 +110,15 @@ Portfolio::Portfolio(QWidget *parent, const QString& token) : QWidget(parent), t
     for (int i = 0; i < accountID1->accounts_size(); ++i)
     {
         auto account = accountID1->accounts(i);
-        accountIds.push_back(account.id().c_str());
-        auto fillIn = account.name() + ", ID: " + account.id();
-        accountComboBox->addItem(fillIn.c_str(), QVariant(account.id().c_str()));
+        if (account.status() != AccountStatus::ACCOUNT_STATUS_CLOSED)
+        {
+            accountIds.push_back(account.id().c_str());
+            auto fillIn = account.name() + ", ID: " + account.id();
+            accountComboBox->addItem(fillIn.c_str(), QVariant(account.id().c_str()));
+        }
     }
+
+
 
     
     connect(portfolioTableView, &QTableView::doubleClicked, this, &Portfolio::onTableDoubleClicked);
@@ -193,6 +198,7 @@ void Portfolio::updateBalance(const QString &accountId)
             auto instrumentInfo = instrumentResponse->instrument();
             auto instrumentName = instrumentInfo.name();
             auto instrumentTicker = instrumentInfo.ticker();
+
 
             QList<QStandardItem *> rowItems;
             QStandardItem *figiItem = new QStandardItem(QString::fromStdString(instrumentInfo.figi()));
@@ -279,9 +285,12 @@ void Portfolio::updateBalance(const QString &accountId)
     yieldLabel->setText("Expected Yield: " + QString::number(yieldValue) + "%");
 }
 
+
 void Portfolio::onAccountChanged(int index)
 {
     QString accountId = accountComboBox->itemData(index).toString();
+    portfolioModel->setRowCount(0);
+    virtualPortfolioModel->setRowCount(0);  
     updateBalance(accountId);
 }
 
@@ -315,7 +324,15 @@ void Portfolio::onTableDoubleClicked(const QModelIndex &index)
 
     // тут вызвать функцию показа свечей + добавить в хедер инклюд
     std::string _token = token.toStdString();
-    mainWindow->openShares(tickerStd, nameStd, QString::fromStdString(_token));
+    if (tickerStd == "RUB000UTSTOM") {
+        QMessageBox messageBox;
+        messageBox.setWindowTitle("Attention");
+        messageBox.setText("Plots are not available for fiat currency");
+        messageBox.setIcon(QMessageBox::Warning);
+        messageBox.exec();
+    }
+    else
+        mainWindow->openShares(tickerStd, nameStd, QString::fromStdString(_token));
 }
 
 void Portfolio::onVirtualTableDoubleClicked(const QModelIndex &index)
@@ -351,7 +368,15 @@ void Portfolio::onVirtualTableDoubleClicked(const QModelIndex &index)
     // showCandlestickChart(ticker, name);
     std::string tickerStd = ticker.toStdString();
     std::string nameStd = name.toStdString();
-    mainWindow->openShares(tickerStd, nameStd, token);
+    if (tickerStd == "RUB000UTSTOM") {
+        QMessageBox messageBox;
+        messageBox.setWindowTitle("Attention");
+        messageBox.setText("Plots are not available for fiat currency");
+        messageBox.setIcon(QMessageBox::Warning);
+        messageBox.exec();
+    }
+    else 
+        mainWindow->openShares(tickerStd, nameStd, token);
 }
 
 void Portfolio::updateUserInfo()
