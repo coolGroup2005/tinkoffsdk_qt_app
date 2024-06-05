@@ -20,7 +20,6 @@ set(PROJECT_SOURCES
     portfolio.h
     figi.h 
     figi.cpp
-
     favouritesModel.cpp
     favouritesModel.h
     favouritesProxyModel.cpp
@@ -51,4 +50,7 @@ set_target_properties(tinkoff-app PROPERTIES
 )
 
 include(GNUInstallDirs)
-install(TARGETS tinkoff-app RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+if (LINUX)
+    install(TARGETS tinkoff-app RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
