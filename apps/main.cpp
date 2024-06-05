@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
     )";
 
     QApplication app(argc, argv);
+    
     app.setStyleSheet(scrollBarStyle);
 
     signal(SIGSEGV, manageSegFailure);

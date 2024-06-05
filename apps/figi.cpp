@@ -169,46 +169,44 @@ void DatabaseFigi::insertSharesIntoDatabase(QString token) {
 
 void DatabaseFigi::onSearchButtonClicked() {
     QString searchText = textEdit->toPlainText();
-    QtConcurrent::run([=]() {
-        QSqlQuery query;
-        query.prepare("SELECT name, figi, trading_status FROM figi WHERE name LIKE :name COLLATE NOCASE");
-        query.bindValue(":name", "%" + searchText + "%");
 
-        if (!query.exec()) {
-            qDebug() << "Error searching in database figi: " << query.lastError();
-            return;
+    QSqlQuery query;
+    query.prepare("SELECT name, figi, trading_status FROM figi WHERE name LIKE :name COLLATE NOCASE");
+    query.bindValue(":name", "%" + searchText + "%");
+
+    if (!query.exec()) {
+        qDebug() << "Error searching in database figi: " << query.lastError();
+        return;
+    }
+
+    QList<QList<QStandardItem*>> items;
+    QSet<QString> uniqueEntries; 
+
+    while (query.next()) {
+        QString name = query.value("name").toString();
+        QString figi = query.value("figi").toString();
+        QString trading_status = query.value("trading_status").toString();
+
+        QString entryKey = name + figi + trading_status; 
+        if (!uniqueEntries.contains(entryKey)) {
+            uniqueEntries.insert(entryKey);
+
+            QList<QStandardItem *> rowItems;
+            rowItems.append(new QStandardItem(name));
+            rowItems.append(new QStandardItem(figi));
+            rowItems.append(new QStandardItem(trading_status));
+            items.append(rowItems);
         }
+    }
 
-        QList<QList<QStandardItem*>> items;
-        QSet<QString> uniqueEntries; 
+    tableModel->clear();
+    tableModel->setHorizontalHeaderLabels({"Name", "FIGI", "Trading Status"});
+    for (auto &itemRow : items) {
+        tableModel->appendRow(itemRow);
+    }
 
-        while (query.next()) {
-            QString name = query.value("name").toString();
-            QString figi = query.value("figi").toString();
-            QString trading_status = query.value("trading_status").toString();
-
-            QString entryKey = name + figi + trading_status; 
-            if (!uniqueEntries.contains(entryKey)) {
-                uniqueEntries.insert(entryKey);
-
-                QList<QStandardItem *> rowItems;
-                rowItems.append(new QStandardItem(name));
-                rowItems.append(new QStandardItem(figi));
-                rowItems.append(new QStandardItem(trading_status));
-                items.append(rowItems);
-            }
-        }
-
-        QMetaObject::invokeMethod(this, [=]() {
-            tableModel->clear();
-            tableModel->setHorizontalHeaderLabels({"Name", "FIGI", "Trading Status"});
-            for (auto &itemRow : items) {
-                tableModel->appendRow(itemRow);
-            }
-            int numElements = tableModel->rowCount();
-            numElementsLabel->setText(QString::number(numElements) + " elements found");
-        });
-    });
+    int numElements = tableModel->rowCount();
+    numElementsLabel->setText(QString::number(numElements) + " elements found");
 }
 
 void DatabaseFigi::loadAllShares() {
@@ -262,5 +260,5 @@ bool ClickCounter::eventFilter(QObject *obj, QEvent *event) {
 
 void ClickCounter::incrementClickCount() {
     ++clickCount;
-    std::cout << "Click count: " << clickCount << std::endl;
+    qDebug() << "Click count:" << clickCount;
 }
