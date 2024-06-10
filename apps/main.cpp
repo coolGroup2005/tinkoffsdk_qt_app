@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
 void manageSegFailure(int signalCode)
 {
-    QMessageBox::critical(nullptr, "Error", "Access denied\nCheck access level of token in settings", QMessageBox::Ok);
+    QMessageBox::critical(nullptr, "Error", "Access denied\nCheck access level of token in settings\nHint: check your connection", QMessageBox::Ok);
     signal(signalCode, SIG_DFL);
     QApplication::exit(3);
 }

@@ -19,6 +19,7 @@
 #include <QMouseEvent>
 #include <QDebug> 
 #include <QtConcurrent>
+#include <QFile>
 
 #include "investapiclient.h"
 #include "marketdataservice.h"
@@ -32,9 +33,16 @@
 DatabaseFigi::DatabaseFigi(QWidget *parent)
     : QWidget(parent),
     tableView(new QTableView(this)),
-    tableModel(new QStandardItemModel(this))
-{
+    tableModel(new QStandardItemModel(this)),
+    textEdit(new SearchTextEdit(this))
+{   
     initializeUI();
+}
+
+QStandardItem* DatabaseFigi::createNonEditableItem(const QString& text) {
+    QStandardItem* item = new QStandardItem(text);
+    item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+    return item;
 }
 
 void DatabaseFigi::initializeUI() {
@@ -45,7 +53,6 @@ void DatabaseFigi::initializeUI() {
     mainLayout->addWidget(enterLabel);
 
     searchLayout = new QHBoxLayout();
-    textEdit = new QTextEdit();
     textEdit->setObjectName("input_figi"); 
     textEdit->setMaximumSize(QSize(16777215, 40));
     textEdit->setStyleSheet("QTextEdit#input_figi { border-radius: 10px; background-color: rgb(222, 222,  222); }"); 
@@ -126,8 +133,13 @@ void DatabaseFigi::initializeUI() {
 }
 
 void DatabaseFigi::initializeDatabase() {
+    QString dbPath = "figi.db";
+    // if (QFile::exists(dbPath)) {
+    //     QFile::remove(dbPath);
+    // }
+
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("figi.db");
+    db.setDatabaseName(dbPath);
     if (!db.open()) {
         qDebug() << "Error: connection with database figi failed";
     } else {
@@ -141,6 +153,17 @@ void DatabaseFigi::initializeDatabase() {
 
 void DatabaseFigi::setupConnections() {
     connect(searchButton, &QPushButton::clicked, this, &DatabaseFigi::onSearchButtonClicked);
+    connect(textEdit, &SearchTextEdit::enterPressed, this, &DatabaseFigi::onSearchButtonClicked);
+    //connect(tableView, &QTableView::clicked, this, &DatabaseFigi::onTableDoubleClicked);
+}
+
+void DatabaseFigi::onTableDoubleClicked(const QModelIndex &index) {
+    QString name = tableModel->item(index.row(), 0)->text();
+    QString figi = tableModel->item(index.row(), 1)->text();
+    std::string _token = "t.oKorE_EYwJfNIVocBju-zSeLPhq4SbM4LgSVF0gJUShLQBk7z16xHYxZd489LUPnD3djym7T1SKSavBLwhs3hA";
+    std::cout << _token << name.toStdString();
+    mainWindow->openShares(figi.toStdString(), name.toStdString(), QString::fromStdString(_token));
+
 }
 
 void DatabaseFigi::insertSharesIntoDatabase(QString token) {
@@ -192,9 +215,9 @@ void DatabaseFigi::onSearchButtonClicked() {
             uniqueEntries.insert(entryKey);
 
             QList<QStandardItem *> rowItems;
-            rowItems.append(new QStandardItem(name));
-            rowItems.append(new QStandardItem(figi));
-            rowItems.append(new QStandardItem(trading_status));
+            rowItems.append(createNonEditableItem(name));
+            rowItems.append(createNonEditableItem(figi));
+            rowItems.append(createNonEditableItem(trading_status));
             items.append(rowItems);
         }
     }
@@ -232,9 +255,9 @@ void DatabaseFigi::loadAllShares() {
             uniqueEntries.insert(entryKey);
 
             QList<QStandardItem *> items;
-            items.append(new QStandardItem(name));
-            items.append(new QStandardItem(figi));
-            items.append(new QStandardItem(trading_status));
+            items.append(createNonEditableItem(name));
+            items.append(createNonEditableItem(figi));
+            items.append(createNonEditableItem(trading_status));
             tableModel->appendRow(items);
         }
     }
@@ -242,7 +265,7 @@ void DatabaseFigi::loadAllShares() {
     numElementsLabel->setText(QString::number(numElements) + " elements found");
 }
 
-int ClickCounter::clickCount = 0;
+size_t ClickCounter::clickCount = 0;
 
 ClickCounter::ClickCounter(QObject *parent)
     : QObject(parent) {}
@@ -260,5 +283,5 @@ bool ClickCounter::eventFilter(QObject *obj, QEvent *event) {
 
 void ClickCounter::incrementClickCount() {
     ++clickCount;
-    qDebug() << "Click count:" << clickCount;
+    std::cout << "Click count:" << clickCount << std::endl;
 }

@@ -198,6 +198,7 @@ SharesVector getAllSharesWithChange(InvestApiClient& client, int& interval, bool
             }
         }
     }
+    
 
 
     // for (int i = 0; i < allShares.size(); ++i) {

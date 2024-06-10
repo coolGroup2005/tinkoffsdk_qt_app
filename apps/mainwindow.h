@@ -29,12 +29,15 @@
 #include "ui_mainwindow.h"
 #include "homepage/homepage.h"
 #include "portfolio.h"
+#include "figi.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
 }
 QT_END_NAMESPACE
+
+class DatabaseFigi;
 
 class MainWindow : public QMainWindow
 {

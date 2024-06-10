@@ -21,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent, const QString& token)
     , token(token)
 {
     ui->setupUi(this);
+    this->resize(850, 600);
+    this->setMinimumSize(this->size());
     ui->tabWidget->setTabText(0, "Home");
     ui->tabWidget->setTabText(1, "Statistics");
 
