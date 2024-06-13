@@ -100,6 +100,35 @@ InvestManager is a comprehensive desktop application which is designed to help i
  Install this to use the app
 </summary> <br />
 
+## Building
+- Linux (tested on rpm and deb-based distros)
+  - To compile this project via CMake you need to manually replace two files in `build/_deps/grpc-src/third_party/abseil-cpp/absl/strings/internal/str_format`: [extension.cc](https://pastebin.com/uqrCrtyA) and [extension.h](https://pastebin.com/4LvmszCY)
+  - Also, in `build/_deps/tinkoffinvestsdk-src/cmake/common.cmake` you might also need to change `set (CMAKE_CXX_STANDARD 11)` to `set (CMAKE_CXX_STANDARD 17)`
+- MacOS (tested on Ventura (Apple Silicon) and Catalina (Intel))
+  - See `build/deps/tinkoffinvest-src/CMakeLists.txt`, check that `cmake_minimum_required version` is `3.8`
+  - See `build/deps/tinkoffinvest-src/cmake/common.cmake` and check that gRPC version is [the latest one](https://github.com/grpc/grpc.git). You might also need to change `set (CMAKE_CXX_STANDARD 11)` to `set (CMAKE_CXX_STANDARD 17)`
+  - Modify a piece of code related to absl in `build/deps/tinkoffinvest-src/cmake/common.cmake`:
+
+    ```
+    set(ABSL_ENABLE_INSTALL ON)
+    FetchContent_Declare(
+      absl
+      GIT_REPOSITORY https://github.com/abseil/abseil-cpp.git
+      GIT_TAG        origin/master
+      OVERRIDE_FIND_PACKAGE
+    )
+    
+    FetchContent_MakeAvailable(absl)
+    message(STATUS "Using gRPC via add_subdirectory (FetchContent).")
+    include(FetchContent)
+    FetchContent_Declare(
+      grpc
+      GIT_REPOSITORY https://github.com/grpc/grpc.git
+      GIT_TAG        v1.64.0)
+    FetchContent_MakeAvailable(grpc)
+    ```
+- Windows
+  - Install [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) and go to Linux tutorial
 
 
 </details>

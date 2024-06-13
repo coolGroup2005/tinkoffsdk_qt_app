@@ -10,6 +10,8 @@ Welcome::Welcome(QWidget *parent) :
     ui(new Ui::Welcome)
 {
     ui->setupUi(this);
+    this->resize(400, 150);
+    this->setMinimumSize(this->size());
     loadToken();
 }
 
@@ -48,13 +50,13 @@ void Welcome::on_saveButton_clicked()
 
 void Welcome::loadToken()
 {
-    QSettings settings("YourCompany", "YourApp");
+    QSettings settings("coolGroup", "TB76M");
     token = settings.value("token", "").toString();
     ui->tokenLineEdit->setText(token);
 }
 
 void Welcome::saveToken()
 {
-    QSettings settings("YourCompany", "YourApp");
+    QSettings settings("coolGroup", "TB76M");
     settings.setValue("token", token);
 }

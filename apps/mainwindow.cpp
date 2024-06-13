@@ -21,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent, const QString& token)
     , token(token)
 {
     ui->setupUi(this);
+    this->resize(850, 600);
+    this->setMinimumSize(this->size());
     ui->tabWidget->setTabText(0, "Home");
     ui->tabWidget->setTabText(1, "Statistics");
 
@@ -185,7 +187,7 @@ void MainWindow::on_topLosersList_clicked(const QModelIndex &index)
 void MainWindow::on_listView_clicked(const QModelIndex &index)
 {
     QString selectedItem = index.data().toString();
-    ui->lineEdit->setText(";;;  " + selectedItem);
+    ui->lineEdit->setText(selectedItem);
     std::string figi = selectedItem.split("\t")[1].toStdString(); 
     std::string stockName = selectedItem.section('\t', 0, 0).toStdString();   
     QString token;

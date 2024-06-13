@@ -55,7 +55,6 @@ shares::shares(QWidget *parent, const std::string& figi, const std::string& stoc
     this->resize(1040, 840);
     this->setMinimumSize(this->size());
     ui->stocknameLabel->setText(QString::fromStdString(stockName));
-
     ui->graphicsLineView->chart()->setBackgroundBrush(QBrush(QColor("#ebeae7")));
     ui->graphicsCandleView->chart()->setBackgroundBrush(QBrush(QColor("#ebeae7")));
 
@@ -245,6 +244,8 @@ void shares::updateCandleChart() {
     chart->legend()->setVisible(false);
 
     QChartView *chartView = new QChartView(chart);
+    chartView->setRubberBand(QChartView::HorizontalRubberBand);
+    chartView->setRubberBand(QChartView::VerticalRubberBand);
     chartView->setRenderHint(QPainter::Antialiasing);
 
     QLineSeries *smaSeries = new QLineSeries();
@@ -300,6 +301,7 @@ void shares::updateCandleChart() {
     QVBoxLayout *layout = new QVBoxLayout();
     layout->addWidget(chartView);
     ui->graphicsCandleView->setLayout(layout);
+    
 }
 
 void shares::updateLineChart() {
@@ -389,6 +391,7 @@ void shares::updateLineChart() {
 
     QChartView *lineChartView = new QChartView(lineChart);
     lineChartView->setRubberBand(QChartView::HorizontalRubberBand);
+    lineChartView->setRubberBand(QChartView::VerticalRubberBand);
     lineChartView->setRenderHint(QPainter::Antialiasing);
     lineChart->setBackgroundBrush(QBrush(QColor("#ebeae7")));
 
